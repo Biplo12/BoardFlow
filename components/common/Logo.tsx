@@ -11,9 +11,9 @@ const font = Poppins({
 
 const Logo: React.FC = (): JSX.Element => {
   return (
-    <div className='flex items-center gap-2 text-white'>
+    <div className='flex items-center gap-2'>
       <Image
-        src='/images/logo/logo-black-no-bg.png'
+        src='/images/logo/logo-white-no-bg.png'
         alt='Logo'
         width={30}
         height={30}
