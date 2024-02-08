@@ -12,6 +12,7 @@ const OrgSwitcher: React.FC = (): JSX.Element => {
             justifyContent: 'center',
             alignItems: 'center',
             width: '100%',
+            maxWidth: '400px',
           },
           organizationSwitcherTrigger: {
             padding: '6px',

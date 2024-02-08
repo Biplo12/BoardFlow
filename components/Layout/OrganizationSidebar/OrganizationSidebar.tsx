@@ -1,13 +1,17 @@
 'use client';
 import { LayoutDashboard, Star } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import React from 'react';
 
 import Logo from '@/components/common/Logo';
-import OrgSwitcher from '@/components/Layout/Partials/OrgSwitcher';
+import OrgSwitcher from '@/components/Layout/OrganizationSidebar/Partials/OrgSwitcher';
 import { Button } from '@/components/ui/button';
 
 const OrganizationSidebar: React.FC = (): JSX.Element => {
+  const searchParams = useSearchParams();
+  const favorites = searchParams.get('favorites');
+
   return (
     <div className='hidden w-[200px] flex-col items-center gap-4 pl-5 pt-5 lg:flex'>
       <Link href='/dashboard/organization'>
@@ -26,7 +30,7 @@ const OrganizationSidebar: React.FC = (): JSX.Element => {
           </Link>
         </Button>
         <Button
-          variant={'ghost'}
+          variant={favorites ? 'secondary' : 'ghost'}
           asChild
           size='lg'
           className='w-full justify-start px-2 font-normal'

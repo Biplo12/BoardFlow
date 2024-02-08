@@ -1,5 +1,5 @@
-import Navbar from '@/components/Layout/Navbar';
-import OrganizationSidebar from '@/components/Layout/OrganizationSidebar';
+import Navbar from '@/components/Layout/Navbar/Navbar';
+import OrganizationSidebar from '@/components/Layout/OrganizationSidebar/OrganizationSidebar';
 import Sidebar from '@/components/Layout/Sidebar/Sidebar';
 
 interface DashboardLayoutProps {
