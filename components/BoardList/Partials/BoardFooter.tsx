@@ -15,12 +15,12 @@ const BoardFooter: React.FC<BoardFooterProps> = ({ board }): JSX.Element => {
   return (
     <div className='relative bg-white p-3'>
       <p className='max-w-[calc(100%-20px)] truncate text-sm'>{board.title}</p>
-      <p className='truncate text-sm text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100'>
+      <p className='truncate text-sm text-muted-foreground opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100'>
         {board.authorName}
       </p>
       <button
         className={cn(
-          'absolute right-3 top-3 text-muted-foreground opacity-0 transition hover:text-blue-950 group-hover:opacity-100',
+          'absolute right-3 top-3 text-muted-foreground opacity-100 transition hover:text-blue-950 lg:opacity-0 lg:group-hover:opacity-100',
           disabled && 'cursor-not-allowed opacity-75'
         )}
       >

@@ -3,10 +3,12 @@ import { Inter } from 'next/font/google';
 
 import './globals.css';
 
+import DialogController from '@/components/Dialogs/DialogController';
 import { Toaster } from '@/components/ui/sonner';
 
 import { siteConfig } from '@/constant/config';
 import { ConvexClientProvider } from '@/providers/convex-client-provider';
+import { ReduxProvider } from '@/providers/redux-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -45,10 +47,13 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <ConvexClientProvider>
-          <Toaster />
-          {children}
-        </ConvexClientProvider>
+        <ReduxProvider>
+          <ConvexClientProvider>
+            <Toaster />
+            <DialogController />
+            {children}
+          </ConvexClientProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

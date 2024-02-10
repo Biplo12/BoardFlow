@@ -2,6 +2,8 @@ import { v } from 'convex/values';
 
 import { mutation } from './_generated/server';
 
+const MAX_TITLE_LENGTH = 60;
+
 const images = [
   '/images/board/placeholders/1.svg',
   '/images/board/placeholders/2.svg',
@@ -37,5 +39,62 @@ export const create = mutation({
     });
 
     return board;
+  },
+});
+
+export const remove = mutation({
+  args: {
+    id: v.id('boards'),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error('Not authenticated');
+    }
+
+    const board = await ctx.db.get(args.id);
+    if (!board) {
+      throw new Error('Board not found');
+    }
+
+    if (board.authorId !== identity.subject) {
+      throw new Error('Not authorized');
+    }
+
+    await ctx.db.delete(args.id);
+  },
+});
+
+export const rename = mutation({
+  args: {
+    id: v.id('boards'),
+    title: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error('Not authenticated');
+    }
+
+    const board = await ctx.db.get(args.id);
+    if (!board) {
+      throw new Error('Board not found');
+    }
+
+    if (board.authorId !== identity.subject) {
+      throw new Error('Not authorized');
+    }
+
+    const title = args.title.trim();
+
+    if (!title) {
+      throw new Error('Title is required');
+    }
+
+    if (title.length > MAX_TITLE_LENGTH) {
+      throw new Error('Title cannot be longer than 60 characters');
+    }
+
+    await ctx.db.patch(args.id, { title: args.title });
   },
 });
