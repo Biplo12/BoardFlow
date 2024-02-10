@@ -1,11 +1,21 @@
 'use client';
 
 import Canvas from '@/components/Canvas/Canvas';
+import CanvasLoading from '@/components/Canvas/Partials/CanvasLoading';
+import Room from '@/components/Room';
 
-export default function BoardPage(): JSX.Element {
+interface BoardPageProps {
+  params: {
+    boardId: string;
+  };
+}
+
+export default function BoardPage({ params }: BoardPageProps): JSX.Element {
   return (
     <div className='flex h-full w-full'>
-      <Canvas />
+      <Room roomId={params.boardId} fallback={<CanvasLoading />}>
+        <Canvas boardId={params.boardId} />
+      </Room>
     </div>
   );
 }
