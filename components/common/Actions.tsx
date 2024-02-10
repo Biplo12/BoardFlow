@@ -2,7 +2,6 @@
 
 import { DropdownMenuContentProps } from '@radix-ui/react-dropdown-menu';
 import { Link2, Pencil, Trash2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { useApiMutation } from '@/hooks/useApiMutation';
@@ -37,7 +36,6 @@ export const Actions = ({
   title,
 }: ActionsProps) => {
   const dispatch = useAppDispatch();
-  const router = useRouter();
   const { mutate, pending } = useApiMutation(api.board.remove);
 
   const onCopyLink = () => {
@@ -57,8 +55,8 @@ export const Actions = ({
   const handleDeleteBoard = async () => {
     try {
       await mutate({ id });
-      if (router.pathname !== '/') {
-        router.push('/');
+      if (window.location.pathname.includes(id)) {
+        window.location.href = '/';
       }
       toast.success('Board deleted successfully');
     } catch (error) {
