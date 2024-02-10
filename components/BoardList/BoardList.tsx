@@ -21,7 +21,7 @@ interface BoardListProps {
 }
 
 const BoardList: React.FC<BoardListProps> = ({ orgId, query }): JSX.Element => {
-  const boards = useQuery(api.boards.get, { orgId });
+  const boards = useQuery(api.boards.get, { orgId, ...query });
 
   if (boards === undefined) {
     return <BoardsLoading query={query} orgId={orgId} />;
@@ -44,7 +44,7 @@ const BoardList: React.FC<BoardListProps> = ({ orgId, query }): JSX.Element => {
       <h2 className='text-2xl font-semibold'>
         {query.favorites ? 'Favorites Boards' : 'Team Boards'}
       </h2>
-      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'>
+      <div className='grid grid-cols-1 gap-4 pb-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'>
         <NewBoardButton orgId={orgId} />
         {boards.map((board) => (
           <BoardCard key={board._id} board={board} />

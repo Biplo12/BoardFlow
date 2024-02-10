@@ -22,7 +22,7 @@ const BoardsLoading: React.FC<BoardsLoadingProps> = ({
       <h2 className='text-3xl'>
         {query.favorites ? 'Favorite boards' : 'Team boards'}
       </h2>
-      <div className='mt-8 grid grid-cols-1 gap-5 pb-10 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'>
+      <div className='mt-8 grid grid-cols-1 gap-5 pb-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'>
         <NewBoardButton orgId={orgId} disabled />
         {[...Array(SKELETON_COUNT)].map((_, index) => (
           <div
