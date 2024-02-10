@@ -14,9 +14,7 @@ const OrganizationSidebar: React.FC = (): JSX.Element => {
 
   return (
     <div className='hidden w-[200px] flex-col items-center gap-4 pl-5 pt-5 lg:flex'>
-      <Link href='/dashboard/organization'>
-        <Logo />
-      </Link>
+      <Logo />
       <OrgSwitcher />
       <div className='flex w-full flex-col gap-2'>
         <Button

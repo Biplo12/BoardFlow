@@ -1,5 +1,6 @@
 import { Poppins } from 'next/font/google';
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
 
 import { cn } from '@/lib/utils';
@@ -11,7 +12,7 @@ const font = Poppins({
 
 const Logo: React.FC = (): JSX.Element => {
   return (
-    <div className='flex items-center gap-2'>
+    <Link href='/' className='flex items-center gap-2'>
       <Image
         src='/images/logo/logo-white-no-bg.png'
         alt='Logo'
@@ -21,7 +22,7 @@ const Logo: React.FC = (): JSX.Element => {
       <span className={cn('text-2xl font-semibold', font.className)}>
         BoardFlow
       </span>
-    </div>
+    </Link>
   );
 };
 export default Logo;
