@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { useApiMutation } from '@/hooks/useApiMutation';
 
 import { api } from '@/convex/_generated/api';
-import Board from '@/interfaces/Board';
+import Board from '@/constant/interfaces/Board';
 
 interface BoardFooterProps {
   board: Board;

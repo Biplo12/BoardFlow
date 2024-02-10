@@ -331,6 +331,16 @@
   resolved "https://registry.yarnpkg.com/@liveblocks/core/-/core-1.9.7.tgz#3209a8ac20cf41cf6d7b015fe51e863178ddcbb2"
   integrity sha512-zvYZch5eU3raLWgNTQyCxLVM+c4V5ped2YGPIiir2Uw09ITKJTqhLqp6ZHqRkWE7mpogV4fJKnF/M1jNDqPh3Q==
 
+"@liveblocks/node@^1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@liveblocks/node/-/node-1.9.7.tgz#55fc4fde77ea1013f3c40c7b1dc79decfb0ff520"
+  integrity sha512-wXDTH+eoe6KPZnQNrHLs8wheXKe0roKtaABs1yaY7syISpYOgvikAN4RMsjVWmRwBllr+ssxYGIpqt6hMPNw4g==
+  dependencies:
+    "@liveblocks/core" "1.9.7"
+    "@stablelib/base64" "^1.0.1"
+    fast-sha256 "^1.3.0"
+    node-fetch "^2.6.1"
+
 "@liveblocks/react@^1.9.7":
   version "1.9.7"
   resolved "https://registry.yarnpkg.com/@liveblocks/react/-/react-1.9.7.tgz#de03ae6233d84628d8105665a5cadae98c2a5c19"
@@ -792,6 +802,11 @@
   version "1.7.2"
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.7.2.tgz#2d4260033e199b3032a08b41348ac10de21c47e9"
   integrity sha512-RbhOOTCNoCrbfkRyoXODZp75MlpiHMgbE5MEBZAnnnLyQNgrigEj4p0lzsMDyc1zVsJDLrivB58tgg3emX0eEA==
+
+"@stablelib/base64@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stablelib/base64/-/base64-1.0.1.tgz#bdfc1c6d3a62d7a3b7bbc65b6cce1bb4561641be"
+  integrity sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==
 
 "@swc/helpers@0.5.2":
   version "0.5.2"
@@ -1973,6 +1988,11 @@ fast-levenshtein@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
   integrity sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==
+
+fast-sha256@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/fast-sha256/-/fast-sha256-1.3.0.tgz#7916ba2054eeb255982608cccd0f6660c79b7ae6"
+  integrity sha512-n11RGP/lrWEFI/bWdygLxhI+pVeo1ZYIVwvvPkW7azl/rOy+F3HYRZ2K5zeE9mmkhQppyv9sQFx0JM9UabnpPQ==
 
 fastq@^1.6.0:
   version "1.17.1"

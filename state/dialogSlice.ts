@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { RootState } from '@/store/store';
 
-import IDialogReducerInterface from '@/interfaces/IDialogReducerInterface';
+import IDialogReducerInterface from '@/constant/interfaces/IDialogReducerInterface';
 
 import TDialog from '@/types/TDialog';
 

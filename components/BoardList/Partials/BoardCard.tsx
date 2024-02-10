@@ -6,7 +6,7 @@ import BoardFooter from '@/components/BoardList/Partials/BoardFooter';
 import MoreButton from '@/components/BoardList/Partials/MoreButton';
 import Overlay from '@/components/common/Overlay';
 
-import Board from '@/interfaces/Board';
+import Board from '@/constant/interfaces/Board';
 
 interface BoardCardProps {
   board: Board;
