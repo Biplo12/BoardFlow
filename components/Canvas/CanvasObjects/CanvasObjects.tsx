@@ -4,6 +4,7 @@ import React from 'react';
 import useCanvas from '@/hooks/useCanvas';
 
 import LayerPreview from '@/components/Canvas/CanvasObjects/LayerPreview';
+import SelectionBox from '@/components/Canvas/CanvasObjects/SelectionBox';
 import CursorsPresence from '@/components/Canvas/CursorsPresence/CursorsPresence';
 
 import { TCanvasState } from '@/types/TCanvasState';
@@ -24,6 +25,7 @@ const CanvasObjects: React.FC<CanvasObjectsProps> = ({
     onPointerLeave,
     onPointerUp,
     layerIdsToColorSelection,
+    onResizeHandlePointerDown,
     camera,
     layerIds,
   } = useCanvas({
@@ -52,6 +54,7 @@ const CanvasObjects: React.FC<CanvasObjectsProps> = ({
             selectionColor={layerIdsToColorSelection[layerId]}
           />
         ))}
+        <SelectionBox onResizeHandlePointerDown={onResizeHandlePointerDown} />
         <CursorsPresence />
       </g>
     </svg>

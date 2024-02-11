@@ -6,6 +6,7 @@ import { nanoid } from 'nanoid';
 import { useCallback, useMemo, useState } from 'react';
 
 import { pointerEventToCanvasPoint, randomBorderColor } from '@/lib/utils';
+import useBounds from '@/hooks/useBounds';
 
 import {
   useHistory,
@@ -20,7 +21,9 @@ import {
   Color,
   LayerType,
   Point,
+  Side,
   TCanvasState,
+  XYWH,
 } from '@/types/TCanvasState';
 
 const MAX_LAYERS = 100;
@@ -46,6 +49,8 @@ const useCanvas = ({
   const layerIds = useStorage((s) => s.layerIds);
 
   const history = useHistory();
+
+  const { resizeBounds } = useBounds();
 
   const insertLayer = useMutation(
     (
@@ -88,14 +93,41 @@ const useCanvas = ({
     [lastUsedColor]
   );
 
+  const resizeSelectedLayer = useMutation(
+    ({ storage, self }, point: Point) => {
+      if (canvasState.mode !== CanvasMode.Resizing) {
+        return;
+      }
+
+      const bounds = resizeBounds(
+        canvasState.initialBounds,
+        canvasState.corner,
+        point
+      );
+
+      const liveLayers = storage.get('layers');
+      const layer = liveLayers.get(self.presence.selection[0]);
+
+      if (layer) {
+        layer.update(bounds);
+      }
+    },
+    [canvasState]
+  );
+
   const onPointerMove = useMutation(
     ({ setMyPresence }, e: React.PointerEvent) => {
       e.preventDefault();
 
       const current = pointerEventToCanvasPoint(e, camera);
+
+      if (canvasState.mode === CanvasMode.Resizing) {
+        resizeSelectedLayer(current);
+      }
+
       setMyPresence({ cursor: current });
     },
-    []
+    [canvasState, resizeSelectedLayer]
   );
 
   const onPointerLeave = useMutation(({ setMyPresence }) => {
@@ -171,6 +203,19 @@ const useCanvas = ({
     return layerIdsToColorSelection;
   }, [selections]);
 
+  const onResizeHandlePointerDown = useCallback(
+    (corner: Side, initialBounds: XYWH) => {
+      history.pause();
+      setCanvasState({
+        mode: CanvasMode.Resizing,
+        initialBounds,
+        corner,
+        layerType: canvasState.layerType as any,
+      });
+    },
+    [history]
+  );
+
   return {
     onPointerMove,
     onPointerLeave,
@@ -178,6 +223,7 @@ const useCanvas = ({
     onPointerUp,
     onLayerPointerDown,
     layerIdsToColorSelection,
+    onResizeHandlePointerDown,
     camera,
     layerIds,
   };
