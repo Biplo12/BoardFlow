@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 export type Color = {
   r: number;
   g: number;
@@ -88,22 +89,22 @@ export enum Side {
 }
 export type TCanvasState =
   | {
-      CanvasMode: CanvasMode.None;
+      mode: CanvasMode.None;
       layerType: undefined;
     }
   | {
-      CanvasMode: CanvasMode.SelectingNet;
+      mode: CanvasMode.SelectingNet;
       origin: Point;
       current?: Point;
       layerType: undefined;
     }
   | {
-      CanvasMode: CanvasMode.Translating;
+      mode: CanvasMode.Translating;
       current: Point;
       layerType: undefined;
     }
   | {
-      CanvasMode: CanvasMode.Inserting;
+      mode: CanvasMode.Inserting;
       layerType:
         | LayerType.Ellipse
         | LayerType.Rectangle
@@ -112,16 +113,16 @@ export type TCanvasState =
         | undefined;
     }
   | {
-      CanvasMode: CanvasMode.Pencil;
+      mode: CanvasMode.Pencil;
       layerType: undefined;
     }
   | {
-      CanvasMode: CanvasMode.Pressing;
+      mode: CanvasMode.Pressing;
       layerType: undefined;
       origin: Point;
     }
   | {
-      CanvasMode: CanvasMode.Resizing;
+      mode: CanvasMode.Resizing;
       layerType: undefined;
       initialBounds: XYWH;
       corner: Side;
@@ -136,3 +137,10 @@ export enum CanvasMode {
   Resizing,
   Pencil,
 }
+
+export type Layer =
+  | RectangleLayer
+  | EllipseLayer
+  | PathLayer
+  | TextLayer
+  | NoteLayer;

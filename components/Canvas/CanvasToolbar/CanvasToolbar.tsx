@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 import {
   Circle,
   MousePointer2,
@@ -12,6 +13,8 @@ import React from 'react';
 
 import ToolbarItem from '@/components/Canvas/CanvasToolbar/Partials/ToolbarItem';
 
+import { useCanRedo, useCanUndo } from '@/liveblocks.config';
+
 import { CanvasMode, LayerType, TCanvasState } from '@/types/TCanvasState';
 
 interface ToolbarProps {
@@ -19,8 +22,6 @@ interface ToolbarProps {
   setCanvasState: (newState: TCanvasState) => void;
   undo: () => void;
   redo: () => void;
-  canUndo: boolean;
-  canRedo: boolean;
 }
 
 const CanvasToolbar: React.FC<ToolbarProps> = ({
@@ -28,9 +29,10 @@ const CanvasToolbar: React.FC<ToolbarProps> = ({
   setCanvasState,
   undo,
   redo,
-  canUndo,
-  canRedo,
 }): JSX.Element => {
+  const canRedo = useCanRedo();
+  const canUndo = useCanUndo();
+
   const selectActiveModes = [
     CanvasMode.None,
     CanvasMode.SelectingNet,
@@ -43,14 +45,14 @@ const CanvasToolbar: React.FC<ToolbarProps> = ({
     {
       label: 'Select',
       Icon: MousePointer2,
-      isActive: selectActiveModes.includes(canvasState.CanvasMode),
+      isActive: selectActiveModes.includes(canvasState.mode),
       mode: CanvasMode.SelectingNet,
     },
     {
       label: 'Text',
       Icon: Type,
       isActive:
-        canvasState.CanvasMode === CanvasMode.Inserting &&
+        canvasState.mode === CanvasMode.Inserting &&
         canvasState.layerType === LayerType.Text,
       mode: CanvasMode.Inserting,
       layerType: LayerType.Text,
@@ -59,7 +61,7 @@ const CanvasToolbar: React.FC<ToolbarProps> = ({
       label: 'Sticky note',
       Icon: StickyNote,
       isActive:
-        canvasState.CanvasMode === CanvasMode.Inserting &&
+        canvasState.mode === CanvasMode.Inserting &&
         canvasState.layerType === LayerType.Note,
       mode: CanvasMode.Inserting,
       layerType: LayerType.Note,
@@ -68,7 +70,7 @@ const CanvasToolbar: React.FC<ToolbarProps> = ({
       label: 'Rectangle',
       Icon: Square,
       isActive:
-        canvasState.CanvasMode === CanvasMode.Inserting &&
+        canvasState.mode === CanvasMode.Inserting &&
         canvasState.layerType === LayerType.Rectangle,
       mode: CanvasMode.Inserting,
       layerType: LayerType.Rectangle,
@@ -77,7 +79,7 @@ const CanvasToolbar: React.FC<ToolbarProps> = ({
       label: 'Ellipse',
       Icon: Circle,
       isActive:
-        canvasState.CanvasMode === CanvasMode.Inserting &&
+        canvasState.mode === CanvasMode.Inserting &&
         canvasState.layerType === LayerType.Ellipse,
       mode: CanvasMode.Inserting,
       layerType: LayerType.Ellipse,
@@ -85,7 +87,7 @@ const CanvasToolbar: React.FC<ToolbarProps> = ({
     {
       label: 'Pen',
       Icon: Pencil,
-      isActive: canvasState.CanvasMode === CanvasMode.Pencil,
+      isActive: canvasState.mode === CanvasMode.Pencil,
       mode: CanvasMode.Pencil,
     },
   ];
@@ -112,13 +114,13 @@ const CanvasToolbar: React.FC<ToolbarProps> = ({
   ) => {
     if (layerType === undefined) {
       return {
-        CanvasMode: mode,
+        mode,
         layerType: undefined,
         ...additionalProps,
       };
     } else if (mode === CanvasMode.Inserting) {
       return {
-        CanvasMode: mode,
+        mode,
         layerType: layerType as
           | LayerType.Rectangle
           | LayerType.Ellipse
@@ -128,7 +130,7 @@ const CanvasToolbar: React.FC<ToolbarProps> = ({
       };
     } else {
       return {
-        CanvasMode: mode as Exclude<CanvasMode, CanvasMode.Inserting>,
+        mode: mode as Exclude<CanvasMode, CanvasMode.Inserting>,
         layerType: undefined,
         ...additionalProps,
       };
