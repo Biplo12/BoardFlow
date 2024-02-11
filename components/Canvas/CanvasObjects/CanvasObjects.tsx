@@ -10,30 +10,26 @@ import CursorsPresence from '@/components/Canvas/CursorsPresence/CursorsPresence
 import { CanvasMode, TCanvasState } from '@/types/TCanvasState';
 
 interface CanvasObjectsProps {
-  setCanvasState: (newState: TCanvasState) => void;
   canvasState: TCanvasState;
+  canvasActions: ReturnType<typeof useCanvas>;
 }
 
 const CanvasObjects: React.FC<CanvasObjectsProps> = ({
-  setCanvasState,
   canvasState,
+  canvasActions,
 }): JSX.Element => {
   const {
+    camera,
+    layerIds,
+    layerIdsToColorSelection,
     onPointerMove,
-    onLayerPointerDown,
     onWheel,
     onPointerLeave,
     onPointerUp,
     onPointerDown,
-    layerIdsToColorSelection,
+    onLayerPointerDown,
     onResizeHandlePointerDown,
-    camera,
-    layerIds,
-  } = useCanvas({
-    setCanvasState,
-    canvasState,
-  });
-
+  } = canvasActions;
   return (
     <svg
       className='h-[100vh] w-[100vw]'

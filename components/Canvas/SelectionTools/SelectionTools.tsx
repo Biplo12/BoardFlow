@@ -12,20 +12,13 @@ import { Button } from '@/components/ui/button';
 
 import { useMutation, useSelf } from '@/liveblocks.config';
 
-import { TCanvasState } from '@/types/TCanvasState';
-
 interface SelectionToolsProps {
-  setCanvasState: (newState: TCanvasState) => void;
-  canvasState: TCanvasState;
+  canvasActions: ReturnType<typeof useCanvas>;
 }
 
 const SelectionTools: React.FC<SelectionToolsProps> = memo(
-  ({ setCanvasState, canvasState }) => {
-    const { camera, setLastUsedColor } = useCanvas({
-      setCanvasState,
-      canvasState,
-    });
-
+  ({ canvasActions }) => {
+    const { camera, setLastUsedColor } = canvasActions;
     const selection = useSelf((me) => me.presence.selection);
 
     const moveToFront = useMutation(

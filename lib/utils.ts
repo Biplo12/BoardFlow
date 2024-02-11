@@ -63,3 +63,18 @@ export function findIntersectingLayersWithRectangle(
 
   return ids;
 }
+
+export function calculateFontSize(width: number, height: number) {
+  const maxFontSize = 96;
+  const scaleFactor = 0.5;
+  const fontSizeBasedOnHeight = height * scaleFactor;
+  const fontSizeBasedOnWidth = width * scaleFactor;
+
+  return Math.min(fontSizeBasedOnHeight, fontSizeBasedOnWidth, maxFontSize);
+}
+
+export function getContrastingTextColor(color: Color) {
+  const brightness = (color.r * 299 + color.g * 587 + color.b * 114) / 1000;
+
+  return brightness > 125 ? '#000' : '#fff';
+}

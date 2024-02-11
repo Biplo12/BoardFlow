@@ -2,7 +2,9 @@
 import React, { memo } from 'react';
 
 import Ellipse from '@/components/Canvas/CanvasObjects/Objects/Ellipse';
+import Note from '@/components/Canvas/CanvasObjects/Objects/Note';
 import Rectangle from '@/components/Canvas/CanvasObjects/Objects/Rectangle';
+import Text from '@/components/Canvas/CanvasObjects/Objects/Text';
 
 import { useStorage } from '@/liveblocks.config';
 
@@ -35,6 +37,24 @@ const LayerPreview: React.FC<LayerPreviewProps> = memo(
       case LayerType.Ellipse:
         return (
           <Ellipse
+            id={layerId}
+            layer={layer}
+            onPointerDown={onLayerPointerDown}
+            selectionColor={selectionColor}
+          />
+        );
+      case LayerType.Text:
+        return (
+          <Text
+            id={layerId}
+            layer={layer}
+            onPointerDown={onLayerPointerDown}
+            selectionColor={selectionColor}
+          />
+        );
+      case LayerType.Note:
+        return (
+          <Note
             id={layerId}
             layer={layer}
             onPointerDown={onLayerPointerDown}

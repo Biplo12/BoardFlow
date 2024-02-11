@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+import useCanvas from '@/hooks/useCanvas';
+
 import CanvasFloatingbar from '@/components/Canvas/CanvasInfo/CanvasFloatingbar';
 import CanvasParticipants from '@/components/Canvas/CanvasInfo/CanvasParticipants';
 import CanvasObjects from '@/components/Canvas/CanvasObjects/CanvasObjects';
@@ -24,6 +26,11 @@ const Canvas: React.FC<CanvasProps> = ({ boardId }): JSX.Element => {
 
   const history = useHistory();
 
+  const canvasActions = useCanvas({
+    setCanvasState,
+    canvasState,
+  });
+
   return (
     <main className='relative h-full w-full bg-neutral-100'>
       <CanvasFloatingbar boardId={boardId} />
@@ -34,14 +41,8 @@ const Canvas: React.FC<CanvasProps> = ({ boardId }): JSX.Element => {
         undo={history.undo}
         redo={history.redo}
       />
-      <SelectionTools
-        setCanvasState={setCanvasState}
-        canvasState={canvasState}
-      />
-      <CanvasObjects
-        setCanvasState={setCanvasState}
-        canvasState={canvasState}
-      />
+      <SelectionTools canvasActions={canvasActions} />
+      <CanvasObjects canvasState={canvasState} canvasActions={canvasActions} />
     </main>
   );
 };
