@@ -9,7 +9,7 @@ interface CursorProps {
   connectionId: number;
 }
 
-const Cursor: React.FC<CursorProps> = memo(({ connectionId }: CursorProps) => {
+const Cursor: React.FC<CursorProps> = memo(({ connectionId }) => {
   const info = useOther(connectionId, (user) => user?.info);
   const cursor = useOther(connectionId, (user) => user.presence.cursor);
 

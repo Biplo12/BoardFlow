@@ -6,6 +6,7 @@ import CanvasFloatingbar from '@/components/Canvas/CanvasInfo/CanvasFloatingbar'
 import CanvasParticipants from '@/components/Canvas/CanvasInfo/CanvasParticipants';
 import CanvasObjects from '@/components/Canvas/CanvasObjects/CanvasObjects';
 import CanvasToolbar from '@/components/Canvas/CanvasToolbar/CanvasToolbar';
+import SelectionTools from '@/components/Canvas/SelectionTools/SelectionTools';
 
 import { useHistory } from '@/liveblocks.config';
 
@@ -32,6 +33,10 @@ const Canvas: React.FC<CanvasProps> = ({ boardId }): JSX.Element => {
         setCanvasState={setCanvasState}
         undo={history.undo}
         redo={history.redo}
+      />
+      <SelectionTools
+        setCanvasState={setCanvasState}
+        canvasState={canvasState}
       />
       <CanvasObjects
         setCanvasState={setCanvasState}

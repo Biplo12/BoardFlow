@@ -290,8 +290,9 @@ const useCanvas = ({
     onPointerUp,
     onPointerDown,
     onLayerPointerDown,
-    layerIdsToColorSelection,
     onResizeHandlePointerDown,
+    setLastUsedColor,
+    layerIdsToColorSelection,
     camera,
     layerIds,
   };
