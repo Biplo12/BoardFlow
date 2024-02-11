@@ -1,10 +1,14 @@
 /* eslint-disable unused-imports/no-unused-vars */
+import { Trash2 } from 'lucide-react';
 import React, { memo } from 'react';
 
 import useBounds from '@/hooks/useBounds';
 import useCanvas from '@/hooks/useCanvas';
+import useDeleteLayer from '@/hooks/useDeleteLayer';
 
 import ColorPicker from '@/components/Canvas/SelectionTools/Tools/ColorPicker';
+import Hint from '@/components/common/Hint';
+import { Button } from '@/components/ui/button';
 
 import { TCanvasState } from '@/types/TCanvasState';
 
@@ -21,6 +25,7 @@ const SelectionTools: React.FC<SelectionToolsProps> = memo(
     });
 
     const { bounds } = useBounds();
+    const deleteLayer = useDeleteLayer();
 
     if (!bounds) {
       return null;
@@ -40,6 +45,13 @@ const SelectionTools: React.FC<SelectionToolsProps> = memo(
         }}
       >
         <ColorPicker setLastUsedColor={setLastUsedColor} />
+        <div className='flex items-center'>
+          <Hint label='Delete'>
+            <Button variant='ghost' size='icon' onClick={deleteLayer}>
+              <Trash2 />
+            </Button>
+          </Hint>
+        </div>
       </div>
     );
   }
