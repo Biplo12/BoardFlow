@@ -12,45 +12,137 @@ import React from 'react';
 
 import ToolbarItem from '@/components/Canvas/CanvasToolbar/Partials/ToolbarItem';
 
-const tools = [
-  {
-    label: 'Select',
-    Icon: MousePointer2,
-  },
-  {
-    label: 'Text',
-    Icon: Type,
-  },
-  {
-    label: 'Sticky note',
-    Icon: StickyNote,
-  },
-  {
-    label: 'Rectangle',
-    Icon: Square,
-  },
-  {
-    label: 'Ellipse',
-    Icon: Circle,
-  },
-  {
-    label: 'Pen',
-    Icon: Pencil,
-  },
-];
+import { CanvasMode, LayerType, TCanvasState } from '@/types/TCanvasState';
 
-const history = [
-  {
-    label: 'Undo',
-    Icon: Undo2,
-  },
-  {
-    label: 'Redo',
-    Icon: Redo2,
-  },
-];
+interface ToolbarProps {
+  canvasState: TCanvasState;
+  setCanvasState: (newState: TCanvasState) => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+}
 
-const CanvasToolbar: React.FC = (): JSX.Element => {
+const CanvasToolbar: React.FC<ToolbarProps> = ({
+  canvasState,
+  setCanvasState,
+  undo,
+  redo,
+  canUndo,
+  canRedo,
+}): JSX.Element => {
+  const selectActiveModes = [
+    CanvasMode.None,
+    CanvasMode.SelectingNet,
+    CanvasMode.Translating,
+    CanvasMode.Pressing,
+    CanvasMode.Resizing,
+  ];
+
+  const tools = [
+    {
+      label: 'Select',
+      Icon: MousePointer2,
+      isActive: selectActiveModes.includes(canvasState.CanvasMode),
+      mode: CanvasMode.SelectingNet,
+    },
+    {
+      label: 'Text',
+      Icon: Type,
+      isActive:
+        canvasState.CanvasMode === CanvasMode.Inserting &&
+        canvasState.layerType === LayerType.Text,
+      mode: CanvasMode.Inserting,
+      layerType: LayerType.Text,
+    },
+    {
+      label: 'Sticky note',
+      Icon: StickyNote,
+      isActive:
+        canvasState.CanvasMode === CanvasMode.Inserting &&
+        canvasState.layerType === LayerType.Note,
+      mode: CanvasMode.Inserting,
+      layerType: LayerType.Note,
+    },
+    {
+      label: 'Rectangle',
+      Icon: Square,
+      isActive:
+        canvasState.CanvasMode === CanvasMode.Inserting &&
+        canvasState.layerType === LayerType.Rectangle,
+      mode: CanvasMode.Inserting,
+      layerType: LayerType.Rectangle,
+    },
+    {
+      label: 'Ellipse',
+      Icon: Circle,
+      isActive:
+        canvasState.CanvasMode === CanvasMode.Inserting &&
+        canvasState.layerType === LayerType.Ellipse,
+      mode: CanvasMode.Inserting,
+      layerType: LayerType.Ellipse,
+    },
+    {
+      label: 'Pen',
+      Icon: Pencil,
+      isActive: canvasState.CanvasMode === CanvasMode.Pencil,
+      mode: CanvasMode.Pencil,
+    },
+  ];
+
+  const history = [
+    {
+      label: 'Undo',
+      Icon: Undo2,
+      handler: undo,
+      isDisabled: !canUndo,
+    },
+    {
+      label: 'Redo',
+      Icon: Redo2,
+      handler: redo,
+      isDisabled: !canRedo,
+    },
+  ];
+
+  const createCanvasState = (
+    mode: CanvasMode,
+    layerType: LayerType | undefined,
+    additionalProps?: Partial<TCanvasState>
+  ) => {
+    if (layerType === undefined) {
+      return {
+        CanvasMode: mode,
+        layerType: undefined,
+        ...additionalProps,
+      };
+    } else if (mode === CanvasMode.Inserting) {
+      return {
+        CanvasMode: mode,
+        layerType: layerType as
+          | LayerType.Rectangle
+          | LayerType.Ellipse
+          | LayerType.Text
+          | LayerType.Note,
+        ...additionalProps,
+      };
+    } else {
+      return {
+        CanvasMode: mode as Exclude<CanvasMode, CanvasMode.Inserting>,
+        layerType: undefined,
+        ...additionalProps,
+      };
+    }
+  };
+
+  const handleToolClick = (
+    mode: CanvasMode,
+    layerType: LayerType | undefined
+  ) => {
+    const canvasState = createCanvasState(mode, layerType);
+    setCanvasState(canvasState as TCanvasState);
+  };
+
   return (
     <div className='absolute left-2 top-[50%] flex -translate-y-[50%] flex-col gap-4'>
       <div className='flex flex-col items-center gap-1 rounded-md bg-white p-2 shadow-md'>
@@ -59,9 +151,9 @@ const CanvasToolbar: React.FC = (): JSX.Element => {
             key={index}
             label={tool.label}
             Icon={tool.Icon}
-            onClick={() => {}}
+            onClick={() => handleToolClick(tool.mode, tool.layerType)}
             isDisabled={false}
-            isActive={false}
+            isActive={tool.isActive}
           />
         ))}
       </div>
@@ -71,8 +163,8 @@ const CanvasToolbar: React.FC = (): JSX.Element => {
             key={index}
             label={tool.label}
             Icon={tool.Icon}
-            onClick={() => {}}
-            isDisabled={false}
+            onClick={tool.handler}
+            isDisabled={tool.isDisabled}
             isActive={false}
           />
         ))}

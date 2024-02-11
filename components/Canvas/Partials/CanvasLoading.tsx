@@ -1,7 +1,7 @@
 import { Loader } from 'lucide-react';
 import React from 'react';
 
-import CanvasFloatingBarLoading from '@/components/Canvas/CanvasInfo/Loading/CanvasFloatingBarLoading';
+import CanvasFloatingBarLoading from '@/components/Canvas/CanvasInfo/Loading/CanvasFloatingbarLoading';
 import CanvasParticipantsLoading from '@/components/Canvas/CanvasInfo/Loading/CanvasParticipantsLoading';
 import CanvasToolbarLoading from '@/components/Canvas/Partials/CanvasToolbarLoading';
 

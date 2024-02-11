@@ -21,7 +21,11 @@ interface BoardListProps {
 }
 
 const BoardList: React.FC<BoardListProps> = ({ orgId, query }): JSX.Element => {
-  const boards = useQuery(api.boards.get, { orgId, ...query });
+  const boards = useQuery(api.boards.get, {
+    orgId,
+    search: query?.search,
+    favorites: query?.favorites,
+  });
 
   if (boards === undefined) {
     return <BoardsLoading query={query} orgId={orgId} />;
