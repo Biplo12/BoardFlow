@@ -19,9 +19,11 @@ const CanvasObjects: React.FC<CanvasObjectsProps> = ({
 }): JSX.Element => {
   const {
     onPointerMove,
+    onLayerPointerDown,
     onWheel,
     onPointerLeave,
     onPointerUp,
+    layerIdsToColorSelection,
     camera,
     layerIds,
   } = useCanvas({
@@ -46,8 +48,8 @@ const CanvasObjects: React.FC<CanvasObjectsProps> = ({
           <LayerPreview
             key={index}
             layerId={layerId}
-            onLayerPointerDown={() => {}}
-            selectionColor='#000'
+            onLayerPointerDown={onLayerPointerDown}
+            selectionColor={layerIdsToColorSelection[layerId]}
           />
         ))}
         <CursorsPresence />
