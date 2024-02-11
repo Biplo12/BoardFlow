@@ -1,6 +1,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import React, { memo } from 'react';
 
+import Ellipse from '@/components/Canvas/CanvasObjects/Objects/Ellipse';
 import Rectangle from '@/components/Canvas/CanvasObjects/Objects/Rectangle';
 
 import { useStorage } from '@/liveblocks.config';
@@ -25,6 +26,15 @@ const LayerPreview: React.FC<LayerPreviewProps> = memo(
       case LayerType.Rectangle:
         return (
           <Rectangle
+            id={layerId}
+            layer={layer}
+            onPointerDown={onLayerPointerDown}
+            selectionColor={selectionColor}
+          />
+        );
+      case LayerType.Ellipse:
+        return (
+          <Ellipse
             id={layerId}
             layer={layer}
             onPointerDown={onLayerPointerDown}
