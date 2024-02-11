@@ -5,7 +5,11 @@ import { LiveObject } from '@liveblocks/client';
 import { nanoid } from 'nanoid';
 import { useCallback, useMemo, useState } from 'react';
 
-import { pointerEventToCanvasPoint, randomBorderColor } from '@/lib/utils';
+import {
+  findIntersectingLayersWithRectangle,
+  pointerEventToCanvasPoint,
+  randomBorderColor,
+} from '@/lib/utils';
 import useBounds from '@/hooks/useBounds';
 
 import {
@@ -27,6 +31,7 @@ import {
 } from '@/types/TCanvasState';
 
 const MAX_LAYERS = 100;
+const SELECTION_NET_THRESHOLD = 5;
 
 const useCanvas = ({
   setCanvasState,
@@ -115,6 +120,42 @@ const useCanvas = ({
     [canvasState]
   );
 
+  const startMultiSelect = useCallback((current: Point, origin: Point) => {
+    if (
+      Math.abs(current.x - origin.x) + Math.abs(current.y - origin.y) >
+      SELECTION_NET_THRESHOLD
+    ) {
+      setCanvasState({
+        mode: CanvasMode.SelectingNet,
+        origin,
+        current,
+        layerType: canvasState.layerType as any,
+      });
+    }
+  }, []);
+
+  const updateSelectionNet = useMutation(
+    ({ storage, setMyPresence }, current: Point, origin: Point) => {
+      const layers = storage.get('layers').toImmutable();
+      setCanvasState({
+        mode: CanvasMode.SelectingNet,
+        origin,
+        current,
+        layerType: canvasState.layerType as any,
+      });
+
+      const ids = findIntersectingLayersWithRectangle(
+        layerIds,
+        layers,
+        origin,
+        current
+      );
+
+      setMyPresence({ selection: ids });
+    },
+    [layerIds]
+  );
+
   const translateSelectedLayers = useMutation(
     ({ storage, self }, point: Point) => {
       if (canvasState.mode !== CanvasMode.Translating) {
@@ -154,7 +195,11 @@ const useCanvas = ({
 
       const current = pointerEventToCanvasPoint(e, camera);
 
-      if (canvasState.mode === CanvasMode.Resizing) {
+      if (canvasState.mode === CanvasMode.Pressing) {
+        startMultiSelect(current, canvasState.origin);
+      } else if (canvasState.mode === CanvasMode.SelectingNet) {
+        updateSelectionNet(current, canvasState.origin);
+      } else if (canvasState.mode === CanvasMode.Resizing) {
         resizeSelectedLayer(current);
       } else if (canvasState.mode === CanvasMode.Translating) {
         translateSelectedLayers(current);

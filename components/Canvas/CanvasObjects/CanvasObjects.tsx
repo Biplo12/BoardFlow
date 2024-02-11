@@ -7,7 +7,7 @@ import LayerPreview from '@/components/Canvas/CanvasObjects/LayerPreview';
 import SelectionBox from '@/components/Canvas/CanvasObjects/SelectionBox';
 import CursorsPresence from '@/components/Canvas/CursorsPresence/CursorsPresence';
 
-import { TCanvasState } from '@/types/TCanvasState';
+import { CanvasMode, TCanvasState } from '@/types/TCanvasState';
 
 interface CanvasObjectsProps {
   setCanvasState: (newState: TCanvasState) => void;
@@ -57,6 +57,16 @@ const CanvasObjects: React.FC<CanvasObjectsProps> = ({
           />
         ))}
         <SelectionBox onResizeHandlePointerDown={onResizeHandlePointerDown} />
+        {canvasState.mode === CanvasMode.SelectingNet &&
+          canvasState.current != null && (
+            <rect
+              className='fill-blue-500/5 stroke-blue-500 stroke-1'
+              x={Math.min(canvasState.origin.x, canvasState.current.x)}
+              y={Math.min(canvasState.origin.y, canvasState.current.y)}
+              width={Math.abs(canvasState.origin.x - canvasState.current.x)}
+              height={Math.abs(canvasState.origin.y - canvasState.current.y)}
+            />
+          )}
         <CursorsPresence />
       </g>
     </svg>
