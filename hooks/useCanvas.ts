@@ -7,10 +7,14 @@ import { useCallback, useMemo, useState } from 'react';
 
 import {
   findIntersectingLayersWithRectangle,
+  penPointsToPathLayer,
   pointerEventToCanvasPoint,
   randomBorderColor,
 } from '@/lib/utils';
 import useBounds from '@/hooks/useBounds';
+import useDeleteLayer from '@/hooks/useDeleteLayer';
+import useDisableScroll from '@/hooks/useDisableScroll';
+import useShortcuts from '@/hooks/useShortcuts';
 
 import {
   useHistory,
@@ -40,6 +44,10 @@ const useCanvas = ({
   setCanvasState: (newState: TCanvasState) => void;
   canvasState: TCanvasState;
 }) => {
+  useDisableScroll();
+  const deleteLayer = useDeleteLayer();
+  useShortcuts(deleteLayer);
+
   const [camera, setCamera] = useState<Camera>({
     x: 0,
     y: 0,
@@ -156,6 +164,73 @@ const useCanvas = ({
     [layerIds]
   );
 
+  const startDrawing = useMutation(
+    ({ setMyPresence }, point: Point, pressure: number) => {
+      setMyPresence({
+        pencilDraft: [[point.x, point.y, pressure]],
+        penColor: lastUsedColor,
+      });
+    },
+    [lastUsedColor]
+  );
+
+  const continueDrawing = useMutation(
+    ({ self, setMyPresence }, point: Point, e: React.PointerEvent) => {
+      const { pencilDraft } = self.presence;
+
+      if (
+        canvasState.mode !== CanvasMode.Pencil ||
+        e.buttons !== 1 ||
+        pencilDraft == null
+      ) {
+        return;
+      }
+
+      setMyPresence({
+        cursor: point,
+        pencilDraft:
+          pencilDraft.length === 1 &&
+          pencilDraft[0][0] === point.x &&
+          pencilDraft[0][1] === point.y
+            ? pencilDraft
+            : [...pencilDraft, [point.x, point.y, e.pressure]],
+      });
+    },
+    [canvasState.mode]
+  );
+
+  const insertPath = useMutation(
+    ({ storage, self, setMyPresence }) => {
+      const liveLayers = storage.get('layers');
+      const { pencilDraft } = self.presence;
+
+      if (
+        pencilDraft == null ||
+        pencilDraft.length < 2 ||
+        liveLayers.size >= MAX_LAYERS
+      ) {
+        setMyPresence({ pencilDraft: null });
+        return;
+      }
+
+      const id = nanoid();
+      liveLayers.set(
+        id,
+        new LiveObject(penPointsToPathLayer(pencilDraft, lastUsedColor))
+      );
+
+      const liveLayerIds = storage.get('layerIds');
+      liveLayerIds.push(id);
+
+      setMyPresence({ pencilDraft: null });
+      setCanvasState({
+        mode: CanvasMode.Pencil,
+        layerType: canvasState.layerType as any,
+      });
+    },
+    [lastUsedColor]
+  );
+
   const translateSelectedLayers = useMutation(
     ({ storage, self }, point: Point) => {
       if (canvasState.mode !== CanvasMode.Translating) {
@@ -203,6 +278,8 @@ const useCanvas = ({
         resizeSelectedLayer(current);
       } else if (canvasState.mode === CanvasMode.Translating) {
         translateSelectedLayers(current);
+      } else if (canvasState.mode === CanvasMode.Pencil) {
+        continueDrawing(current, e);
       }
 
       setMyPresence({ cursor: current });
@@ -235,6 +312,8 @@ const useCanvas = ({
           mode: CanvasMode.None,
           layerType: canvasState.layerType,
         });
+      } else if (canvasState.mode === CanvasMode.Pencil) {
+        insertPath();
       } else if (canvasState.mode === CanvasMode.Inserting) {
         insertLayer(canvasState.layerType as any, point);
       } else {
@@ -257,13 +336,18 @@ const useCanvas = ({
         return;
       }
 
+      if (canvasState.mode === CanvasMode.Pencil) {
+        startDrawing(point, e.pressure);
+        return;
+      }
+
       setCanvasState({
         origin: point,
         mode: CanvasMode.Pressing,
         layerType: canvasState.layerType,
       });
     },
-    [camera, canvasState.mode, setCanvasState]
+    [camera, canvasState.mode, setCanvasState, startDrawing]
   );
 
   const onWheel = useCallback((e: React.WheelEvent) => {
@@ -337,6 +421,7 @@ const useCanvas = ({
     onLayerPointerDown,
     onResizeHandlePointerDown,
     setLastUsedColor,
+    lastUsedColor,
     layerIdsToColorSelection,
     camera,
     layerIds,

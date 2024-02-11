@@ -3,9 +3,15 @@
 import React, { memo } from 'react';
 
 import Cursors from '@/components/Canvas/CursorsPresence/Partials/Cursors';
+import Drafts from '@/components/Canvas/CursorsPresence/Partials/Drafts';
 
 const CursorsPresence: React.FC = memo(() => {
-  return <Cursors />;
+  return (
+    <>
+      <Drafts />
+      <Cursors />
+    </>
+  );
 });
 
 CursorsPresence.displayName = 'CursorsPresence';
