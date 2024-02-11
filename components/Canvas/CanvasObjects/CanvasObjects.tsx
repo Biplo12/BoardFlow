@@ -24,6 +24,7 @@ const CanvasObjects: React.FC<CanvasObjectsProps> = ({
     onWheel,
     onPointerLeave,
     onPointerUp,
+    onPointerDown,
     layerIdsToColorSelection,
     onResizeHandlePointerDown,
     camera,
@@ -40,6 +41,7 @@ const CanvasObjects: React.FC<CanvasObjectsProps> = ({
       onWheel={onWheel}
       onPointerLeave={onPointerLeave}
       onPointerUp={onPointerUp}
+      onPointerDown={onPointerDown}
     >
       <g
         style={{
