@@ -4,7 +4,7 @@ import React from 'react';
 
 import CanvasFloatingbar from '@/components/Canvas/CanvasInfo/CanvasFloatingbar';
 import CanvasParticipants from '@/components/Canvas/CanvasInfo/CanvasParticipants';
-import CanvasObjects from '@/components/Canvas/CanvasObjects';
+import CanvasObjects from '@/components/Canvas/CanvasObjects/CanvasObjects';
 import CanvasToolbar from '@/components/Canvas/CanvasToolbar/CanvasToolbar';
 
 import { useHistory } from '@/liveblocks.config';

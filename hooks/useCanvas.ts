@@ -124,7 +124,14 @@ const useCanvas = ({
     }));
   }, []);
 
-  return { onPointerMove, onPointerLeave, onWheel, onPointerUp, camera };
+  return {
+    onPointerMove,
+    onPointerLeave,
+    onWheel,
+    onPointerUp,
+    camera,
+    layerIds,
+  };
 };
 
 export default useCanvas;

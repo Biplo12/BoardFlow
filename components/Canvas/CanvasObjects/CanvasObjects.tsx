@@ -3,6 +3,7 @@ import React from 'react';
 
 import useCanvas from '@/hooks/useCanvas';
 
+import LayerPreview from '@/components/Canvas/CanvasObjects/LayerPreview';
 import CursorsPresence from '@/components/Canvas/CursorsPresence/CursorsPresence';
 
 import { TCanvasState } from '@/types/TCanvasState';
@@ -16,11 +17,17 @@ const CanvasObjects: React.FC<CanvasObjectsProps> = ({
   setCanvasState,
   canvasState,
 }): JSX.Element => {
-  const { onPointerMove, onWheel, onPointerLeave, onPointerUp, camera } =
-    useCanvas({
-      setCanvasState,
-      canvasState,
-    });
+  const {
+    onPointerMove,
+    onWheel,
+    onPointerLeave,
+    onPointerUp,
+    camera,
+    layerIds,
+  } = useCanvas({
+    setCanvasState,
+    canvasState,
+  });
 
   return (
     <svg
@@ -35,6 +42,14 @@ const CanvasObjects: React.FC<CanvasObjectsProps> = ({
           transform: `translate(${camera.x}px, ${camera.y}px)`,
         }}
       >
+        {layerIds.map((layerId, index) => (
+          <LayerPreview
+            key={index}
+            layerId={layerId}
+            onLayerPointerDown={() => {}}
+            selectionColor='#000'
+          />
+        ))}
         <CursorsPresence />
       </g>
     </svg>

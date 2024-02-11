@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-import { Camera } from '@/types/TCanvasState';
+import { Camera, Color } from '@/types/TCanvasState';
 
 const COLORS = ['#dc2626', '#059669', '#2563eb', '#d97706', '#d97706'];
 
@@ -21,4 +21,8 @@ export function pointerEventToCanvasPoint(
     x: Math.round(e.clientX) - camera.x,
     y: Math.round(e.clientY) - camera.y,
   };
+}
+
+export function colorToCss(color: Color) {
+  return `#${color.r.toString(16).padStart(2, '0')}${color.g.toString(16).padStart(2, '0')}${color.b.toString(16).padStart(2, '0')}`;
 }
