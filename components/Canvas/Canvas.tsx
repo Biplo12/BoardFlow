@@ -4,7 +4,7 @@ import React from 'react';
 
 import useCanvas from '@/hooks/useCanvas';
 
-import CanvasFloatingbar from '@/components/Canvas/CanvasInfo/CanvasFloatingbar';
+import CanvasHeader from '@/components/Canvas/CanvasInfo/CanvasHeader';
 import CanvasParticipants from '@/components/Canvas/CanvasInfo/CanvasParticipants';
 import CanvasObjects from '@/components/Canvas/CanvasObjects/CanvasObjects';
 import CanvasToolbar from '@/components/Canvas/CanvasToolbar/CanvasToolbar';
@@ -33,7 +33,7 @@ const Canvas: React.FC<CanvasProps> = ({ boardId }): JSX.Element => {
 
   return (
     <main className='relative h-full w-full bg-neutral-100'>
-      <CanvasFloatingbar boardId={boardId} />
+      <CanvasHeader boardId={boardId} />
       <CanvasParticipants />
       <CanvasToolbar
         canvasState={canvasState}

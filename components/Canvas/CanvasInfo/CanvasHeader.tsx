@@ -4,7 +4,7 @@ import { useQuery } from 'convex/react';
 import { Menu } from 'lucide-react';
 import React from 'react';
 
-import CanvasFloatingbarLoading from '@/components/Canvas/CanvasInfo/Loading/CanvasFloatingbarLoading';
+import CanvasHeaderLoading from '@/components/Canvas/CanvasInfo/Loading/CanvasHeaderLoading';
 import { Actions } from '@/components/common/Actions';
 import Hint from '@/components/common/Hint';
 import Logo from '@/components/common/Logo';
@@ -17,18 +17,18 @@ import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { openDialog } from '@/state/dialogSlice';
 
-interface CanvasFloatingbarProps {
+interface CanvasHeaderProps {
   boardId: string;
 }
 
-const CanvasFloatingbar: React.FC<CanvasFloatingbarProps> = ({
+const CanvasHeader: React.FC<CanvasHeaderProps> = ({
   boardId,
 }): JSX.Element => {
   const dispatch = useAppDispatch();
   const board = useQuery(api.board.get, { id: boardId as Id<'boards'> });
 
   if (!board) {
-    return <CanvasFloatingbarLoading />;
+    return <CanvasHeaderLoading />;
   }
 
   const handleOpenRenameDialog = (id: string, title: string) => {
@@ -71,4 +71,4 @@ const CanvasFloatingbar: React.FC<CanvasFloatingbarProps> = ({
     </div>
   );
 };
-export default CanvasFloatingbar;
+export default CanvasHeader;
