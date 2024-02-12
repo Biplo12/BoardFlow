@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 import useCanvas from '@/hooks/useCanvas';
 
@@ -9,8 +9,7 @@ import CanvasParticipants from '@/components/Canvas/CanvasInfo/CanvasParticipant
 import CanvasObjects from '@/components/Canvas/CanvasObjects/CanvasObjects';
 import CanvasToolbar from '@/components/Canvas/CanvasToolbar/CanvasToolbar';
 import SelectionTools from '@/components/Canvas/SelectionTools/SelectionTools';
-
-import { useHistory } from '@/liveblocks.config';
+import CanvasDialogController from '@/components/Dialogs/CanvasDialogController';
 
 import { CanvasMode, TCanvasState } from '@/types/TCanvasState';
 
@@ -19,12 +18,10 @@ interface CanvasProps {
 }
 
 const Canvas: React.FC<CanvasProps> = ({ boardId }): JSX.Element => {
-  const [canvasState, setCanvasState] = React.useState<TCanvasState>({
+  const [canvasState, setCanvasState] = useState<TCanvasState>({
     mode: CanvasMode.None,
     layerType: undefined,
   });
-
-  const history = useHistory();
 
   const canvasActions = useCanvas({
     setCanvasState,
@@ -36,15 +33,13 @@ const Canvas: React.FC<CanvasProps> = ({ boardId }): JSX.Element => {
       <CanvasHeader boardId={boardId} />
       <CanvasParticipants />
       <CanvasToolbar
+        canvasActions={canvasActions}
         canvasState={canvasState}
         setCanvasState={setCanvasState}
-        undo={history.undo}
-        redo={history.redo}
-        setLastUsedColor={canvasActions.setLastUsedColor}
-        lastUsedColor={canvasActions.lastUsedColor}
       />
       <SelectionTools canvasActions={canvasActions} />
       <CanvasObjects canvasState={canvasState} canvasActions={canvasActions} />
+      <CanvasDialogController />
     </main>
   );
 };

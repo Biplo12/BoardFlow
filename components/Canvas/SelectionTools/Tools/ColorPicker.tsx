@@ -2,12 +2,13 @@
 import React from 'react';
 
 import { colors } from '@/lib/utils';
+import useIsObjectSelected from '@/hooks/useIsObjectSelected';
 
 import ColorButton from '@/components/Canvas/SelectionTools/Partials/ColorButton';
 
 import { useMutation, useSelf } from '@/liveblocks.config';
 
-import { Color } from '@/types/TCanvasState';
+import { Color, LayerType } from '@/types/TCanvasState';
 
 interface ColorPickerProps {
   setLastUsedColor: (color: Color) => void;
@@ -32,14 +33,17 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
     [selection, setLastUsedColor]
   );
 
+  const isImageSelected = useIsObjectSelected(LayerType.Image);
+
   return (
-    <div className='mr-2 flex max-w-[165px] flex-wrap items-center gap-2 border-r border-neutral-200 pr-2'>
+    <div className='flex max-w-[165px] flex-wrap items-center justify-center gap-2'>
       {colors.map((color, index) => (
         <ColorButton
           key={index}
           color={color}
           handler={setFill}
           lastUsedColor={lastUsedColor}
+          disabled={isImageSelected}
         />
       ))}
     </div>

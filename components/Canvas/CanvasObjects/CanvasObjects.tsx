@@ -37,6 +37,7 @@ const CanvasObjects: React.FC<CanvasObjectsProps> = ({
     onLayerPointerDown,
     onResizeHandlePointerDown,
   } = canvasActions;
+
   return (
     <svg
       className='h-[100vh] w-[100vw]'

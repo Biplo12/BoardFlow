@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google';
 
 import './globals.css';
 
-import DialogController from '@/components/Dialogs/DialogController';
 import { Toaster } from '@/components/ui/sonner';
 
 import { siteConfig } from '@/constant/config';
@@ -38,7 +37,6 @@ export default function RootLayout({
         <ReduxProvider>
           <ConvexClientProvider>
             <Toaster />
-            <DialogController />
             {children}
           </ConvexClientProvider>
         </ReduxProvider>

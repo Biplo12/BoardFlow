@@ -1,6 +1,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import {
   Circle,
+  Image,
   MousePointer2,
   Pencil,
   Redo2,
@@ -11,39 +12,31 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-import { colors } from '@/lib/utils';
+import useCanvas from '@/hooks/useCanvas';
 
 import ToolbarItem from '@/components/Canvas/CanvasToolbar/Partials/ToolbarItem';
-import ColorButton from '@/components/Canvas/SelectionTools/Partials/ColorButton';
+import ColorPicker from '@/components/Canvas/SelectionTools/Tools/ColorPicker';
 
-import { useCanRedo, useCanUndo } from '@/liveblocks.config';
+import { useCanRedo, useCanUndo, useHistory } from '@/liveblocks.config';
 
-import {
-  CanvasMode,
-  Color,
-  LayerType,
-  TCanvasState,
-} from '@/types/TCanvasState';
+import { CanvasMode, LayerType, TCanvasState } from '@/types/TCanvasState';
 
 interface ToolbarProps {
+  canvasActions: ReturnType<typeof useCanvas>;
   canvasState: TCanvasState;
-  setCanvasState: (newState: TCanvasState) => void;
-  undo: () => void;
-  redo: () => void;
-  setLastUsedColor: (color: Color) => void;
-  lastUsedColor?: Color;
+  setCanvasState: React.Dispatch<React.SetStateAction<TCanvasState>>;
 }
 
 const CanvasToolbar: React.FC<ToolbarProps> = ({
+  canvasActions,
   canvasState,
   setCanvasState,
-  undo,
-  redo,
-  setLastUsedColor,
-  lastUsedColor,
 }): JSX.Element => {
+  const { setLastUsedColor } = canvasActions;
   const canRedo = useCanRedo();
   const canUndo = useCanUndo();
+
+  const { redo, undo } = useHistory();
 
   const selectActiveModes = [
     CanvasMode.None,
@@ -101,6 +94,15 @@ const CanvasToolbar: React.FC<ToolbarProps> = ({
       Icon: Pencil,
       isActive: canvasState.mode === CanvasMode.Pencil,
       mode: CanvasMode.Pencil,
+    },
+    {
+      label: 'Image',
+      Icon: Image,
+      isActive:
+        canvasState.mode === CanvasMode.Inserting &&
+        canvasState.layerType === LayerType.Image,
+      mode: CanvasMode.Inserting,
+      layerType: LayerType.Image,
     },
   ];
 
@@ -183,15 +185,8 @@ const CanvasToolbar: React.FC<ToolbarProps> = ({
           />
         ))}
       </div>
-      <div className='flex flex-col items-center gap-1 rounded-md bg-white p-2 shadow-md'>
-        {colors.map((color, index) => (
-          <ColorButton
-            key={index}
-            color={color}
-            handler={setLastUsedColor}
-            lastUsedColor={lastUsedColor}
-          />
-        ))}
+      <div className='flex max-w-16 flex-col items-center gap-1 rounded-md bg-white p-2 shadow-md'>
+        <ColorPicker setLastUsedColor={setLastUsedColor} />
       </div>
     </div>
   );

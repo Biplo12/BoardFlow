@@ -1,16 +1,22 @@
 /* eslint-disable unused-imports/no-unused-vars */
-import { BringToFront, SendToBack, Trash2 } from 'lucide-react';
+import { BringToFront, Link, SendToBack, Trash2 } from 'lucide-react';
 import React, { memo } from 'react';
 
 import useBounds from '@/hooks/useBounds';
 import useCanvas from '@/hooks/useCanvas';
 import useDeleteLayer from '@/hooks/useDeleteLayer';
+import useIsObjectSelected from '@/hooks/useIsObjectSelected';
 
 import ColorPicker from '@/components/Canvas/SelectionTools/Tools/ColorPicker';
 import Hint from '@/components/common/Hint';
 import { Button } from '@/components/ui/button';
 
+import { useAppDispatch } from '@/store/store-hooks';
+
 import { useMutation, useSelf } from '@/liveblocks.config';
+import { openDialog } from '@/state/dialogSlice';
+
+import { LayerType } from '@/types/TCanvasState';
 
 interface SelectionToolsProps {
   canvasActions: ReturnType<typeof useCanvas>;
@@ -18,8 +24,19 @@ interface SelectionToolsProps {
 
 const SelectionTools: React.FC<SelectionToolsProps> = memo(
   ({ canvasActions }) => {
+    const dispatch = useAppDispatch();
     const { camera, setLastUsedColor } = canvasActions;
     const selection = useSelf((me) => me.presence.selection);
+
+    const isImageSelected = useIsObjectSelected(LayerType.Image);
+
+    const handleOpenUrlDialog = () => {
+      dispatch(
+        openDialog({
+          currentDialog: 'SET_URL_DIALOG',
+        })
+      );
+    };
 
     const moveToFront = useMutation(
       ({ storage }) => {
@@ -85,7 +102,7 @@ const SelectionTools: React.FC<SelectionToolsProps> = memo(
         }}
       >
         <ColorPicker setLastUsedColor={setLastUsedColor} />
-        <div className='flex flex-col gap-y-0.5'>
+        <div className='border-neutral ml-2 flex flex-col gap-y-0.5 border-l pl-2'>
           <Hint label='Bring to front'>
             <Button onClick={moveToFront} variant='ghost' size='icon'>
               <BringToFront />
@@ -104,6 +121,15 @@ const SelectionTools: React.FC<SelectionToolsProps> = memo(
             </Button>
           </Hint>
         </div>
+        {isImageSelected && (
+          <div className='ml-2 flex items-center border-l border-neutral-200 pl-2'>
+            <Hint label='Add url'>
+              <Button variant='ghost' size='icon' onClick={handleOpenUrlDialog}>
+                <Link />
+              </Button>
+            </Hint>
+          </div>
+        )}
       </div>
     );
   }

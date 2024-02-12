@@ -1,3 +1,4 @@
+import DialogController from '@/components/Dialogs/DialogController';
 import Navbar from '@/components/Layout/Navbar/Navbar';
 import OrganizationSidebar from '@/components/Layout/OrganizationSidebar/OrganizationSidebar';
 import Sidebar from '@/components/Layout/Sidebar/Sidebar';
@@ -13,6 +14,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className='h-full pl-16'>
         <div className='flex h-full gap-3'>
           <OrganizationSidebar />
+          <DialogController />
           <div className='h-full flex-1'>
             <Navbar />
             {children}

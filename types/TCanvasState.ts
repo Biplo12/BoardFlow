@@ -16,6 +16,7 @@ export enum LayerType {
   Path,
   Text,
   Note,
+  Image,
 }
 
 export type RectangleLayer = {
@@ -69,6 +70,16 @@ export type NoteLayer = {
   value?: string;
 };
 
+export type ImageLayer = {
+  type: LayerType.Image;
+  x: number;
+  y: number;
+  height: number;
+  width: number;
+  fill: Color;
+  value?: string;
+};
+
 export type Point = {
   x: number;
   y: number;
@@ -110,6 +121,7 @@ export type TCanvasState =
         | LayerType.Rectangle
         | LayerType.Text
         | LayerType.Note
+        | LayerType.Image
         | undefined;
     }
   | {
@@ -143,4 +155,5 @@ export type Layer =
   | EllipseLayer
   | PathLayer
   | TextLayer
-  | NoteLayer;
+  | NoteLayer
+  | ImageLayer;

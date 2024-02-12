@@ -1,9 +1,11 @@
+/* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable unused-imports/no-unused-vars */
 import React, { memo } from 'react';
 
 import { colorToCss } from '@/lib/utils';
 
 import Ellipse from '@/components/Canvas/CanvasObjects/Objects/Ellipse';
+import ImageObjectProps from '@/components/Canvas/CanvasObjects/Objects/ImageObject';
 import Note from '@/components/Canvas/CanvasObjects/Objects/Note';
 import Path from '@/components/Canvas/CanvasObjects/Objects/Path';
 import Rectangle from '@/components/Canvas/CanvasObjects/Objects/Rectangle';
@@ -74,6 +76,15 @@ const LayerPreview: React.FC<LayerPreviewProps> = memo(
             y={layer.y}
             fill={layer.fill ? colorToCss(layer.fill) : '#000'}
             stroke={selectionColor}
+          />
+        );
+      case LayerType.Image:
+        return (
+          <ImageObjectProps
+            id={layerId}
+            layer={layer}
+            onPointerDown={onLayerPointerDown}
+            selectionColor={selectionColor}
           />
         );
       default:

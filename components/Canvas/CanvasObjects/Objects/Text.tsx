@@ -4,8 +4,7 @@ import React from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
 import { calculateFontSize, cn, colorToCss } from '@/lib/utils';
-
-import { useMutation } from '@/liveblocks.config';
+import useUpdateValue from '@/hooks/useUpdateValue';
 
 import { TextLayer } from '@/types/TCanvasState';
 
@@ -29,14 +28,10 @@ const Text: React.FC<TextProps> = ({
 }): JSX.Element => {
   const { x, y, width, height, fill, value = 'Text' } = layer;
 
-  const updateValue = useMutation(({ storage }, newValue: string) => {
-    const liveLayers = storage.get('layers');
-
-    liveLayers.get(id)?.set('value', newValue);
-  }, []);
+  const { updateValue } = useUpdateValue();
 
   const handleContentChange = (e: ContentEditableEvent) => {
-    updateValue(e.target.value);
+    updateValue(e.target.value, id);
   };
 
   return (

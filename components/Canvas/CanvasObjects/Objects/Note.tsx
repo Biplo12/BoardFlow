@@ -7,8 +7,7 @@ import {
   colorToCss,
   getContrastingTextColor,
 } from '@/lib/utils';
-
-import { useMutation } from '@/liveblocks.config';
+import useUpdateValue from '@/hooks/useUpdateValue';
 
 import { NoteLayer } from '@/types/TCanvasState';
 
@@ -32,14 +31,10 @@ const Note: React.FC<NoteProps> = ({
 }): JSX.Element => {
   const { x, y, width, height, fill, value = 'Text' } = layer;
 
-  const updateValue = useMutation(({ storage }, newValue: string) => {
-    const liveLayers = storage.get('layers');
-
-    liveLayers.get(id)?.set('value', newValue);
-  }, []);
+  const { updateValue } = useUpdateValue();
 
   const handleContentChange = (e: ContentEditableEvent) => {
-    updateValue(e.target.value);
+    updateValue(e.target.value, id);
   };
 
   return (
