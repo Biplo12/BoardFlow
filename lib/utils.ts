@@ -10,14 +10,25 @@ import {
   Point,
 } from '@/types/TCanvasState';
 
-const COLORS = ['#dc2626', '#059669', '#2563eb', '#d97706', '#d97706'];
+const BORDER_COLORS = ['#dc2626', '#059669', '#2563eb', '#d97706', '#d97706'];
+
+export const colors = [
+  { r: 243, g: 82, b: 35 },
+  { r: 255, g: 249, b: 177 },
+  { r: 68, g: 202, b: 99 },
+  { r: 39, g: 142, b: 237 },
+  { r: 155, g: 105, b: 245 },
+  { r: 252, g: 142, b: 42 },
+  { r: 0, g: 0, b: 0 },
+  { r: 255, g: 255, b: 255 },
+];
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 export function randomBorderColor(index: number) {
-  return COLORS[index % COLORS.length];
+  return BORDER_COLORS[index % BORDER_COLORS.length];
 }
 
 export function pointerEventToCanvasPoint(

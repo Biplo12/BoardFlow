@@ -1,17 +1,16 @@
-import { Loader } from 'lucide-react';
+import Image from 'next/image';
 import React from 'react';
-
-import CanvasHeaderLoading from '@/components/Canvas/CanvasInfo/Loading/CanvasHeaderLoading';
-import CanvasParticipantsLoading from '@/components/Canvas/CanvasInfo/Loading/CanvasParticipantsLoading';
-import CanvasToolbarLoading from '@/components/Canvas/Partials/CanvasToolbarLoading';
 
 const CanvasLoading: React.FC = (): JSX.Element => {
   return (
-    <main className='relative flex h-full w-full items-center justify-center bg-neutral-100'>
-      <Loader className='h-6 w-6 animate-spin text-muted-foreground' />
-      <CanvasHeaderLoading />
-      <CanvasParticipantsLoading />
-      <CanvasToolbarLoading />
+    <main className='relative flex h-full w-full flex-col items-center justify-center gap-2 bg-white'>
+      <Image
+        src='/images/logo/logo-white-name.png'
+        alt='Logo'
+        width={75}
+        height={75}
+        className='animate-pulse duration-1000 ease-in-out'
+      />
     </main>
   );
 };

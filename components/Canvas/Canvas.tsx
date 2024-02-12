@@ -40,6 +40,8 @@ const Canvas: React.FC<CanvasProps> = ({ boardId }): JSX.Element => {
         setCanvasState={setCanvasState}
         undo={history.undo}
         redo={history.redo}
+        setLastUsedColor={canvasActions.setLastUsedColor}
+        lastUsedColor={canvasActions.lastUsedColor}
       />
       <SelectionTools canvasActions={canvasActions} />
       <CanvasObjects canvasState={canvasState} canvasActions={canvasActions} />

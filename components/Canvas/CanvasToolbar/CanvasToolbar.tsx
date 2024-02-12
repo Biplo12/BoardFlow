@@ -11,17 +11,27 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
+import { colors } from '@/lib/utils';
+
 import ToolbarItem from '@/components/Canvas/CanvasToolbar/Partials/ToolbarItem';
+import ColorButton from '@/components/Canvas/SelectionTools/Partials/ColorButton';
 
 import { useCanRedo, useCanUndo } from '@/liveblocks.config';
 
-import { CanvasMode, LayerType, TCanvasState } from '@/types/TCanvasState';
+import {
+  CanvasMode,
+  Color,
+  LayerType,
+  TCanvasState,
+} from '@/types/TCanvasState';
 
 interface ToolbarProps {
   canvasState: TCanvasState;
   setCanvasState: (newState: TCanvasState) => void;
   undo: () => void;
   redo: () => void;
+  setLastUsedColor: (color: Color) => void;
+  lastUsedColor?: Color;
 }
 
 const CanvasToolbar: React.FC<ToolbarProps> = ({
@@ -29,6 +39,8 @@ const CanvasToolbar: React.FC<ToolbarProps> = ({
   setCanvasState,
   undo,
   redo,
+  setLastUsedColor,
+  lastUsedColor,
 }): JSX.Element => {
   const canRedo = useCanRedo();
   const canUndo = useCanUndo();
@@ -168,6 +180,16 @@ const CanvasToolbar: React.FC<ToolbarProps> = ({
             onClick={tool.handler}
             isDisabled={tool.isDisabled}
             isActive={false}
+          />
+        ))}
+      </div>
+      <div className='flex flex-col items-center gap-1 rounded-md bg-white p-2 shadow-md'>
+        {colors.map((color, index) => (
+          <ColorButton
+            key={index}
+            color={color}
+            handler={setLastUsedColor}
+            lastUsedColor={lastUsedColor}
           />
         ))}
       </div>
