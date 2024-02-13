@@ -3,9 +3,9 @@
 import { useOrganization, UserButton } from '@clerk/nextjs';
 import React from 'react';
 
-import InviteButton from '@/components/Layout/Navbar/Partials/InviteButton';
-import SearchInput from '@/components/Layout/Navbar/Partials/SearchInput';
-import OrgSwitcher from '@/components/Layout/OrganizationSidebar/Partials/OrgSwitcher';
+import InviteButton from '@/components/Layout/Dashboard/Navbar/Partials/InviteButton';
+import SearchInput from '@/components/Layout/Dashboard/Navbar/Partials/SearchInput';
+import OrgSwitcher from '@/components/Layout/Dashboard/OrganizationSidebar/Partials/OrgSwitcher';
 
 const Navbar: React.FC = (): JSX.Element => {
   const { organization } = useOrganization();

@@ -1,3 +1,4 @@
+import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
@@ -6,7 +7,6 @@ import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
 
 import { siteConfig } from '@/constant/config';
-import { ConvexClientProvider } from '@/providers/convex-client-provider';
 import { ReduxProvider } from '@/providers/redux-provider';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -35,10 +35,10 @@ export default function RootLayout({
     <html lang='en'>
       <body className={inter.className}>
         <ReduxProvider>
-          <ConvexClientProvider>
+          <ClerkProvider>
             <Toaster />
             {children}
-          </ConvexClientProvider>
+          </ClerkProvider>
         </ReduxProvider>
       </body>
     </html>

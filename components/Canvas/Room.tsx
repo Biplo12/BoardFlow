@@ -4,6 +4,7 @@ import { ClientSideSuspense } from '@liveblocks/react';
 import React from 'react';
 
 import { RoomProvider } from '@/liveblocks.config';
+import { ConvexClientProvider } from '@/providers/convex-client-provider';
 
 import { Layer } from '@/types/TCanvasState';
 
@@ -28,9 +29,11 @@ const Room: React.FC<RoomProps> = ({ children, roomId, fallback }) => {
         layerIds: new LiveList<string>(),
       }}
     >
-      <ClientSideSuspense fallback={fallback}>
-        {() => children}
-      </ClientSideSuspense>
+      <ConvexClientProvider>
+        <ClientSideSuspense fallback={fallback}>
+          {() => children}
+        </ClientSideSuspense>
+      </ConvexClientProvider>
     </RoomProvider>
   );
 };

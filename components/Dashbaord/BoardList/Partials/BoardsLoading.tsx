@@ -1,6 +1,6 @@
 import React from 'react';
 
-import NewBoardButton from '@/components/BoardList/Partials/NewBoardButton';
+import NewBoardButton from '@/components/Dashbaord/BoardList/Partials/NewBoardButton';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const SKELETON_COUNT = 5;

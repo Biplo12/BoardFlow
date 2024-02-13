@@ -44,7 +44,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
     <div className='absolute left-2 top-2 flex h-12 items-center rounded-md bg-white px-1.5 shadow-md'>
       <Hint label='Go to boards' side='bottom' sideOffset={10}>
         <Button asChild className='px-2'>
-          <Logo />
+          <Logo href='/dashboard' />
         </Button>
       </Hint>
       <TabSeparator />

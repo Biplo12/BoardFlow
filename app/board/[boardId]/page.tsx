@@ -2,7 +2,7 @@
 
 import Canvas from '@/components/Canvas/Canvas';
 import CanvasLoading from '@/components/Canvas/Partials/CanvasLoading';
-import Room from '@/components/Room';
+import Room from '@/components/Canvas/Room';
 
 interface BoardPageProps {
   params: {

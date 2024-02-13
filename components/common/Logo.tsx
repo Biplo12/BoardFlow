@@ -10,9 +10,13 @@ const font = Poppins({
   weight: ['600'],
 });
 
-const Logo: React.FC = (): JSX.Element => {
+interface LogoProps {
+  href?: string;
+}
+
+const Logo: React.FC<LogoProps> = ({ href }): JSX.Element => {
   return (
-    <Link href='/' className='flex items-center gap-2'>
+    <Link href={href || '/'} className='flex items-center gap-2'>
       <Image
         src='/images/logo/logo-white-no-bg.png'
         alt='Logo'
