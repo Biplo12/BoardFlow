@@ -3,12 +3,12 @@
 import { useQuery } from 'convex/react';
 import React from 'react';
 
-import BoardCard from '@/components/BoardList/Partials/BoardCard';
-import BoardsLoading from '@/components/BoardList/Partials/BoardsLoading';
-import NewBoardButton from '@/components/BoardList/Partials/NewBoardButton';
-import EmptyBoards from '@/components/EmptyBoards';
-import EmptyFavorites from '@/components/EmptyFavorites';
-import EmptySearch from '@/components/EmptySearch';
+import BoardCard from '@/components/Dashbaord/BoardList/Partials/BoardCard';
+import BoardsLoading from '@/components/Dashbaord/BoardList/Partials/BoardsLoading';
+import NewBoardButton from '@/components/Dashbaord/BoardList/Partials/NewBoardButton';
+import EmptyBoards from '@/components/Dashbaord/EmptyBoards';
+import EmptyFavorites from '@/components/Dashbaord/EmptyFavorites';
+import EmptySearch from '@/components/Dashbaord/EmptySearch';
 
 import { api } from '@/convex/_generated/api';
 

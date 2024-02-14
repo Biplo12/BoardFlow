@@ -2,8 +2,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
-import BoardFooter from '@/components/BoardList/Partials/BoardFooter';
-import MoreButton from '@/components/BoardList/Partials/MoreButton';
+import BoardFooter from '@/components/Dashbaord/BoardList/Partials/BoardFooter';
+import MoreButton from '@/components/Dashbaord/BoardList/Partials/MoreButton';
 import Overlay from '@/components/common/Overlay';
 
 import Board from '@/constant/interfaces/Board';

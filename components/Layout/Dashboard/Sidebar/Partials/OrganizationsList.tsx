@@ -3,7 +3,7 @@
 import { useOrganizationList } from '@clerk/nextjs';
 import React from 'react';
 
-import OrgItem from '@/components/Layout/Sidebar/Partials/OrgItem';
+import OrgItem from '@/components/Layout/Dashboard/Sidebar/Partials/OrgItem';
 
 const OrgsList: React.FC = (): JSX.Element | null => {
   const { userMemberships } = useOrganizationList({

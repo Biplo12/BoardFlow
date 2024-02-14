@@ -12,6 +12,7 @@ import {
   randomBorderColor,
 } from '@/lib/utils';
 import useBounds from '@/hooks/useBounds';
+import useCamera from '@/hooks/useCamera';
 import useDeleteLayer from '@/hooks/useDeleteLayer';
 import useDisableScroll from '@/hooks/useDisableScroll';
 import useShortcuts from '@/hooks/useShortcuts';
@@ -24,7 +25,6 @@ import {
 } from '@/liveblocks.config';
 
 import {
-  Camera,
   CanvasMode,
   Color,
   LayerType,
@@ -45,13 +45,9 @@ const useCanvas = ({
   canvasState: TCanvasState;
 }) => {
   useDisableScroll();
+
   const deleteLayer = useDeleteLayer();
   useShortcuts(deleteLayer);
-
-  const [camera, setCamera] = useState<Camera>({
-    x: 0,
-    y: 0,
-  });
 
   const [lastUsedColor, setLastUsedColor] = useState<Color>({
     r: 255,
@@ -64,6 +60,8 @@ const useCanvas = ({
   const history = useHistory();
 
   const { resizeBounds } = useBounds();
+
+  const { camera, onWheel } = useCamera();
 
   const insertLayer = useMutation(
     (
@@ -349,13 +347,6 @@ const useCanvas = ({
     },
     [camera, canvasState.mode, setCanvasState, startDrawing]
   );
-
-  const onWheel = useCallback((e: React.WheelEvent) => {
-    setCamera((camera) => ({
-      x: camera.x - e.deltaX,
-      y: camera.y - e.deltaY,
-    }));
-  }, []);
 
   const onLayerPointerDown = useMutation(
     ({ self, setMyPresence }, e: React.PointerEvent, layerId: string) => {

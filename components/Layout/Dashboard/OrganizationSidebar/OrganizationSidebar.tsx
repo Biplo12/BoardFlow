@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import React from 'react';
 
 import Logo from '@/components/common/Logo';
-import OrgSwitcher from '@/components/Layout/OrganizationSidebar/Partials/OrgSwitcher';
+import OrgSwitcher from '@/components/Layout/Dashboard/OrganizationSidebar/Partials/OrgSwitcher';
 import { Button } from '@/components/ui/button';
 
 const OrganizationSidebar: React.FC = (): JSX.Element => {

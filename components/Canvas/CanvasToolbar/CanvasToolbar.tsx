@@ -160,7 +160,7 @@ const CanvasToolbar: React.FC<ToolbarProps> = ({
   };
 
   return (
-    <div className='absolute left-2 top-[50%] flex -translate-y-[50%] flex-col gap-4'>
+    <div className='absolute left-2 top-[70%] flex -translate-y-[70%] flex-col gap-4'>
       <div className='flex flex-col items-center gap-1 rounded-md bg-white p-2 shadow-md'>
         {tools.map((tool, index) => (
           <ToolbarItem

@@ -1,7 +1,7 @@
 import React from 'react';
 
-import NewButton from '@/components/Layout/Sidebar/Partials/NewButton';
-import OrgsList from '@/components/Layout/Sidebar/Partials/OrganizationsList';
+import NewButton from '@/components/Layout/Dashboard/Sidebar/Partials/NewButton';
+import OrgsList from '@/components/Layout/Dashboard/Sidebar/Partials/OrganizationsList';
 
 const Sidebar: React.FC = (): JSX.Element => {
   return (
