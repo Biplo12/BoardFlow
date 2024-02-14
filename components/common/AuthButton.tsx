@@ -10,7 +10,7 @@ const AuthButton: React.FC = (): JSX.Element => {
   const { userId, isLoaded } = useAuth();
 
   return (
-    <Link href={DASHBOARD_URL}>
+    <Link href={DASHBOARD_URL} className='hidden sm:block'>
       <Button disabled={!isLoaded}>
         {userId ? 'Go to Dashboard' : 'Sign in to continue'}
       </Button>
