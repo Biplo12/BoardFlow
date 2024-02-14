@@ -16,7 +16,7 @@ interface LogoProps {
 
 const Logo: React.FC<LogoProps> = ({ href }): JSX.Element => {
   return (
-    <Link href={href || '/'} className='flex items-center gap-2'>
+    <Link href={href || '/'} className='flex items-center gap-1'>
       <Image
         src='/images/logo/logo-white-no-bg.png'
         alt='Logo'
