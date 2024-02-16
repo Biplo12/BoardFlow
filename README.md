@@ -56,7 +56,7 @@ Make sure you have the following installed:
 - [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework.
 - [TypeScript](https://www.typescriptlang.org/) - Superset of JavaScript that adds static typing.
 - [Clerk](https://clerk.dev/) - Authentication and user management.
-- [Convex](https://convex.so/) - Real-time collaboration and synchronization.
+- [Convex](https://convex.dev/) - Real-time collaboration and synchronization.
 - [Liveblocks](https://liveblocks.io/) - Real-time collaboration infrastructure.
 
 ## Usage
