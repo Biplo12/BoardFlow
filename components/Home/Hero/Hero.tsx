@@ -1,9 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import { Poppins } from 'next/font/google';
+import Link from 'next/link';
 import React from 'react';
 
 import { cn } from '@/lib/utils';
 
+import Backgrounds from '@/components/Home/Hero/Partials/Backgrounds';
 import { Button } from '@/components/ui/button';
 
 const font = Poppins({
@@ -20,22 +22,13 @@ const Hero: React.FC = (): JSX.Element => {
         backgroundSize: 'cover',
       }}
     >
-      <img
-        src='/images/home/hero-bg.png'
-        alt='hero bg'
-        className='absolute left-0 top-16 z-10 hidden h-full w-full object-cover sm:flex'
-      />
-      <img
-        src='/images/home/hero-bg-mobile.png'
-        alt='hero bg'
-        className='absolute left-0 top-0 z-10 h-full w-full object-cover sm:hidden'
-      />
-      <div className='bg-black-10 absolute left-0 top-0 z-20 h-full w-full sm:bg-black/5' />
+      <Backgrounds />
       <div
         className={cn(
           'z-40 flex h-full w-full items-center justify-center gap-6 px-6 text-black',
           font.className
         )}
+        id='home'
       >
         <div className='flex flex-col items-center justify-start gap-3'>
           <img
@@ -51,8 +44,12 @@ const Hero: React.FC = (): JSX.Element => {
             real-time.
           </p>
           <div className='flex gap-4'>
-            <Button>Get Started</Button>
-            <Button variant='outline'>Learn More</Button>
+            <Link href='/dashboard'>
+              <Button>Get Started</Button>
+            </Link>
+            <Link href='#about'>
+              <Button variant='outline'>Learn More</Button>
+            </Link>
           </div>
         </div>
       </div>

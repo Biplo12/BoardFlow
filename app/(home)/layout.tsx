@@ -1,3 +1,4 @@
+import Footer from '@/components/Layout/Home/Footer/Footer';
 import Navbar from '@/components/Layout/Home/Navbar/Navbar';
 
 interface MainPageLayoutProps {
@@ -9,6 +10,7 @@ export default function MainPageLayout({ children }: MainPageLayoutProps) {
     <main className='flex min-h-screen flex-col items-center justify-center'>
       <Navbar />
       {children}
+      <Footer />
     </main>
   );
 }

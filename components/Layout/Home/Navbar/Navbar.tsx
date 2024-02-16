@@ -9,19 +9,15 @@ import Logo from '@/components/common/Logo';
 const navItems = [
   {
     name: 'Home',
-    href: '/',
+    href: '#home',
   },
   {
-    name: 'Features',
-    href: '/features',
-  },
-  {
-    name: 'Pricing',
-    href: '/pricing',
+    name: 'About',
+    href: '#about',
   },
   {
     name: 'Contact',
-    href: '/contact',
+    href: '#contact',
   },
 ];
 

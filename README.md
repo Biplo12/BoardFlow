@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# BoardFlow - Cooperative Whiteboard App
+
+Welcome to BoardFlow, a collaborative whiteboard application built using Next.js 14.0, Tailwind CSS, TypeScript, Clerk, Convex, and Liveblocks. This app empowers users to create organizations, join existing ones, and collaboratively work on boards where they can utilize various tools such as text, notes, rectangles, circles, images, and pencils. Users can manipulate objects on the whiteboard by selecting, resizing, deleting, or changing their layering order.
+
+## Table of Contents
+
+- [Features](#features)
+- [Getting Started](#getting-started)
+- [Technologies Used](#technologies-used)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+- **Organization Management:** Users can create and join organizations to collaborate with teammates.
+- **Interactive Whiteboard:** Create boards within organizations and use various tools to express ideas collaboratively.
+- **Object Manipulation:** Select, resize, delete, or change the layering order of objects on the whiteboard.
+- **Toolset:** Utilize a diverse set of tools, including text, notes, rectangles, circles, images, and pencils.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Make sure you have the following installed:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- [Node.js](https://nodejs.org/)
+- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Installation
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+1. Clone the repository:
 
-## Learn More
+   ```bash
+   git clone https://github.com/your-username/boardflow.git
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. Navigate to the project directory:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```bash
+   cd boardflow
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+3. Install dependencies:
 
-## Deploy on Vercel
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Technologies Used
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- [Next.js](https://nextjs.org/) - React framework for server-rendered React applications.
+- [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework.
+- [TypeScript](https://www.typescriptlang.org/) - Superset of JavaScript that adds static typing.
+- [Clerk](https://clerk.dev/) - Authentication and user management.
+- [Convex](https://convex.so/) - Real-time collaboration and synchronization.
+- [Liveblocks](https://liveblocks.io/) - Real-time collaboration infrastructure.
+
+## Usage
+
+1. Run the development server:
+
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+2. Open your browser and navigate to [http://localhost:3000](http://localhost:3000).
+
+3. Start collaborating with your team on the cooperative whiteboard!
+
+## Contributing
+
+Contributions are welcome!
+
+## License
+
+This project is licensed under the MIT License
