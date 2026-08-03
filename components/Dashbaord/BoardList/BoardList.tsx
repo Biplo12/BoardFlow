@@ -11,13 +11,14 @@ import EmptyFavorites from '@/components/Dashbaord/EmptyFavorites';
 import EmptySearch from '@/components/Dashbaord/EmptySearch';
 
 import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 
 interface BoardListProps {
   query: {
     search?: string;
     favorites?: string;
   };
-  orgId: string;
+  orgId: Id<'organizations'>;
 }
 
 const BoardList: React.FC<BoardListProps> = ({ orgId, query }): JSX.Element => {

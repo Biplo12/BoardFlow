@@ -1,8 +1,10 @@
 'use client';
 
-import { useOrganization, UserButton } from '@clerk/nextjs';
 import React from 'react';
 
+import { useOrganization } from '@/hooks/useOrganization';
+
+import UserButton from '@/components/common/UserButton';
 import InviteButton from '@/components/Layout/Dashboard/Navbar/Partials/InviteButton';
 import SearchInput from '@/components/Layout/Dashboard/Navbar/Partials/SearchInput';
 import OrgSwitcher from '@/components/Layout/Dashboard/OrganizationSidebar/Partials/OrgSwitcher';

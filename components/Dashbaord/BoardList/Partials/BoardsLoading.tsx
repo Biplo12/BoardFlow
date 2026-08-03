@@ -3,6 +3,8 @@ import React from 'react';
 import NewBoardButton from '@/components/Dashbaord/BoardList/Partials/NewBoardButton';
 import { Skeleton } from '@/components/ui/skeleton';
 
+import { Id } from '@/convex/_generated/dataModel';
+
 const SKELETON_COUNT = 5;
 
 interface BoardsLoadingProps {
@@ -10,7 +12,7 @@ interface BoardsLoadingProps {
     search?: string;
     favorites?: string;
   };
-  orgId: string;
+  orgId: Id<'organizations'>;
 }
 
 const BoardsLoading: React.FC<BoardsLoadingProps> = ({

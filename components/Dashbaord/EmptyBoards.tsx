@@ -1,12 +1,12 @@
 'use client';
 
-import { useOrganization } from '@clerk/nextjs';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { toast } from 'sonner';
 
 import { useApiMutation } from '@/hooks/useApiMutation';
+import { useOrganization } from '@/hooks/useOrganization';
 
 import { Button } from '@/components/ui/button';
 
@@ -21,7 +21,7 @@ const EmptyBoards: React.FC = (): JSX.Element => {
     if (!organization) return;
     try {
       const boardId = await mutate({
-        orgId: organization.id,
+        orgId: organization._id,
         title: 'New Board',
       });
       toast.success('Board created successfully');

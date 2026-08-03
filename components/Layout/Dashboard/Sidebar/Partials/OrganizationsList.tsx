@@ -1,31 +1,26 @@
 'use client';
 
-import { useOrganizationList } from '@clerk/nextjs';
 import React from 'react';
+
+import { useOrganizationList } from '@/hooks/useOrganizationList';
 
 import OrgItem from '@/components/Layout/Dashboard/Sidebar/Partials/OrgItem';
 
 const OrgsList: React.FC = (): JSX.Element | null => {
-  const { userMemberships } = useOrganizationList({
-    userMemberships: {
-      infinite: true,
-    },
-  });
+  const { organizations } = useOrganizationList();
 
-  if (!userMemberships.data?.length) return null;
+  if (!organizations.length) return null;
 
   return (
     <ul className='flex flex-col gap-2'>
-      {userMemberships.data?.map((membership) => {
-        return (
-          <OrgItem
-            key={membership.organization.id}
-            id={membership.organization.id}
-            name={membership.organization.name}
-            imageUrl={membership.organization.imageUrl}
-          />
-        );
-      })}
+      {organizations.map((organization) => (
+        <OrgItem
+          key={organization._id}
+          id={organization._id}
+          name={organization.name}
+          imageUrl={organization.imageUrl}
+        />
+      ))}
     </ul>
   );
 };

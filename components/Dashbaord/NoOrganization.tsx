@@ -1,11 +1,10 @@
 'use client';
 
-import { CreateOrganization } from '@clerk/nextjs';
 import Image from 'next/image';
 import React from 'react';
 
+import CreateOrganizationDialog from '@/components/Layout/Dashboard/Organizations/CreateOrganizationDialog';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
 const NoOrganization: React.FC = (): JSX.Element => {
   return (
@@ -32,14 +31,9 @@ const NoOrganization: React.FC = (): JSX.Element => {
         </p>
       </div>
 
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button size='lg'>Create organization</Button>
-        </DialogTrigger>
-        <DialogContent className='max-w-[480px] border-none bg-transparent p-0'>
-          <CreateOrganization />
-        </DialogContent>
-      </Dialog>
+      <CreateOrganizationDialog>
+        <Button size='lg'>Create organization</Button>
+      </CreateOrganizationDialog>
     </div>
   );
 };

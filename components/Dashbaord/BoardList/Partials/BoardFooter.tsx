@@ -1,4 +1,4 @@
-import { useAuth } from '@clerk/nextjs';
+import { useQuery } from 'convex/react';
 import { Star } from 'lucide-react';
 import React from 'react';
 import { toast } from 'sonner';
@@ -14,8 +14,8 @@ interface BoardFooterProps {
 }
 
 const BoardFooter: React.FC<BoardFooterProps> = ({ board }): JSX.Element => {
-  const { userId } = useAuth();
-  const author = board.authorName === userId ? 'You' : board.authorName;
+  const user = useQuery(api.users.viewer);
+  const author = board.authorId === user?._id ? 'You' : board.authorName;
 
   const { mutate: onFavorite, pending: pendingFavorite } = useApiMutation(
     api.board.favorite

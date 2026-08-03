@@ -1,16 +1,24 @@
-import { useOrganization, useOrganizationList } from '@clerk/nextjs';
-import Image from 'next/image';
+'use client';
+
 import React from 'react';
 
 import { cn } from '@/lib/utils';
+import { useOrganization } from '@/hooks/useOrganization';
+import { useOrganizationList } from '@/hooks/useOrganizationList';
 
 import Hint from '@/components/common/Hint';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
+import { Id } from '@/convex/_generated/dataModel';
 
 interface OrgItemProps {
-  id: string;
+  id: Id<'organizations'>;
   name: string;
-  imageUrl: string;
+  imageUrl?: string;
 }
+
+const getInitials = (name: string) =>
+  name.trim().slice(0, 2).toUpperCase() || 'OR';
 
 const OrgItem: React.FC<OrgItemProps> = ({
   id,
@@ -20,26 +28,24 @@ const OrgItem: React.FC<OrgItemProps> = ({
   const { organization } = useOrganization();
   const { setActive } = useOrganizationList();
 
-  const isActive = organization?.id === id;
+  const isActive = organization?._id === id;
 
-  const handleClickOrg = () => {
-    if (!setActive) return;
-    setActive({ organization: id });
-  };
   return (
     <div className='relative aspect-square'>
       <Hint label={name} side='right' align='start' sideOffset={18}>
-        <Image
-          src={imageUrl}
-          alt={name}
-          layout='fill'
-          fill
-          className={cn(
-            'cursor-pointer rounded-md opacity-75 transition hover:opacity-100',
-            isActive && 'opacity-100'
-          )}
-          onClick={handleClickOrg}
-        />
+        <button onClick={() => setActive(id)} className='h-full w-full'>
+          <Avatar
+            className={cn(
+              'h-full w-full cursor-pointer rounded-md opacity-75 transition hover:opacity-100',
+              isActive && 'opacity-100 ring-2 ring-white'
+            )}
+          >
+            {imageUrl && <AvatarImage src={imageUrl} />}
+            <AvatarFallback className='rounded-md text-sm font-semibold'>
+              {getInitials(name)}
+            </AvatarFallback>
+          </Avatar>
+        </button>
       </Hint>
     </div>
   );

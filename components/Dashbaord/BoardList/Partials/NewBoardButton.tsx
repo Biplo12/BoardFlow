@@ -7,9 +7,10 @@ import { cn } from '@/lib/utils';
 import { useApiMutation } from '@/hooks/useApiMutation';
 
 import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 
 interface NewBoardButtonProps {
-  orgId: string;
+  orgId: Id<'organizations'>;
   disabled?: boolean;
 }
 
