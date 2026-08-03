@@ -23,7 +23,7 @@ interface LayerPreviewProps {
 
 const LayerPreview: React.FC<LayerPreviewProps> = memo(
   ({ layerId, onLayerPointerDown, selectionColor }) => {
-    const layer = useStorage((root) => root.layers.get(layerId));
+    const layer = useStorage((root) => root.layers[layerId]);
 
     if (!layer) {
       return null;

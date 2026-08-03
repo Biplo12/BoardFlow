@@ -79,7 +79,7 @@ const useBounds = () => {
   const selection = useSelf((me) => me.presence.selection);
   const bounds = useStorage((root) => {
     const selectedLayers = selection
-      .map((layerId) => root.layers.get(layerId)!)
+      .map((layerId) => root.layers[layerId]!)
       .filter(Boolean);
 
     return boundingBox(selectedLayers);

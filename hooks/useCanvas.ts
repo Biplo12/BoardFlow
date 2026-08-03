@@ -142,7 +142,7 @@ const useCanvas = ({
 
   const updateSelectionNet = useMutation(
     ({ storage, setMyPresence }, current: Point, origin: Point) => {
-      const layers = storage.get('layers').toImmutable();
+      const layers = new Map(Object.entries(storage.get('layers').toJSON()));
       setCanvasState({
         mode: CanvasMode.SelectingNet,
         origin,
