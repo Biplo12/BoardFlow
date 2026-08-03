@@ -1,18 +1,21 @@
-import { useAuth } from '@clerk/nextjs';
+'use client';
+
+import { useConvexAuth } from 'convex/react';
 import Link from 'next/link';
 import React from 'react';
 
 import { Button } from '@/components/ui/button';
 
-const DASHBOARD_URL = '/dashboard';
-
 const AuthButton: React.FC = (): JSX.Element => {
-  const { userId, isLoaded } = useAuth();
+  const { isAuthenticated, isLoading } = useConvexAuth();
 
   return (
-    <Link href={DASHBOARD_URL} className='hidden sm:block'>
-      <Button disabled={!isLoaded}>
-        {userId ? 'Go to Dashboard' : 'Sign in to continue'}
+    <Link
+      href={isAuthenticated ? '/dashboard' : '/signin'}
+      className='hidden sm:block'
+    >
+      <Button disabled={isLoading}>
+        {isAuthenticated ? 'Go to Dashboard' : 'Sign in to continue'}
       </Button>
     </Link>
   );
