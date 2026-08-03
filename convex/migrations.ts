@@ -249,3 +249,60 @@ export const importFromClerk = internalAction({
     return { userCount, orgCount, membershipCount };
   },
 });
+
+// Rewrites boards/userFavorites that still hold Clerk string ids to the new
+// Convex ids, looked up by clerkId. Run after importFromClerk while the schema
+// has `schemaValidation: false`, then re-enable validation and push again.
+export const remapBoards = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    let boardCount = 0;
+    let favoriteCount = 0;
+
+    const boards = await ctx.db.query('boards').collect();
+
+    for (const board of boards) {
+      const org = await ctx.db
+        .query('organizations')
+        .withIndex('by_clerk_id', (q) => q.eq('clerkId', board.orgId))
+        .unique();
+
+      const author = await ctx.db
+        .query('users')
+        .withIndex('by_clerk_id', (q) => q.eq('clerkId', board.authorId))
+        .unique();
+
+      if (org || author) {
+        await ctx.db.patch(board._id, {
+          ...(org ? { orgId: org._id } : {}),
+          ...(author ? { authorId: author._id } : {}),
+        });
+        boardCount += 1;
+      }
+    }
+
+    const favorites = await ctx.db.query('userFavorites').collect();
+
+    for (const favorite of favorites) {
+      const org = await ctx.db
+        .query('organizations')
+        .withIndex('by_clerk_id', (q) => q.eq('clerkId', favorite.orgId))
+        .unique();
+
+      const user = await ctx.db
+        .query('users')
+        .withIndex('by_clerk_id', (q) => q.eq('clerkId', favorite.userId))
+        .unique();
+
+      if (org || user) {
+        await ctx.db.patch(favorite._id, {
+          ...(org ? { orgId: org._id } : {}),
+          ...(user ? { userId: user._id } : {}),
+        });
+        favoriteCount += 1;
+      }
+    }
+
+    return { boardCount, favoriteCount };
+  },
+});
