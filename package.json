@@ -9,7 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^7.6.4",
+    "@auth/core": "0.37.0",
+    "@convex-dev/auth": "^0.0.94",
     "@liveblocks/client": "^3.23.0",
     "@liveblocks/node": "^3.23.0",
     "@liveblocks/react": "^3.23.0",

@@ -1,7 +1,7 @@
 export default {
   providers: [
     {
-      domain: 'https://fit-opossum-27.clerk.accounts.dev',
+      domain: process.env.CONVEX_SITE_URL,
       applicationID: 'convex',
     },
   ],

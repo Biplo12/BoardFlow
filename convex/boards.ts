@@ -1,3 +1,4 @@
+import { getAuthUserId } from '@convex-dev/auth/server';
 import { v } from 'convex/values';
 import { getAllOrThrow } from 'convex-helpers/server/relationships';
 
@@ -5,22 +6,33 @@ import { query } from '@/convex/_generated/server';
 
 export const get = query({
   args: {
-    orgId: v.string(),
+    orgId: v.id('organizations'),
     search: v.optional(v.string()),
     favorites: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
+    const userId = await getAuthUserId(ctx);
 
-    if (!identity) {
+    if (!userId) {
       throw new Error('Not authenticated');
+    }
+
+    const membership = await ctx.db
+      .query('memberships')
+      .withIndex('by_user_org', (q) =>
+        q.eq('userId', userId).eq('orgId', args.orgId)
+      )
+      .unique();
+
+    if (!membership) {
+      throw new Error('Not a member of this organization');
     }
 
     if (args.favorites) {
       const favoritedBoards = await ctx.db
         .query('userFavorites')
         .withIndex('by_user_org', (q) =>
-          q.eq('userId', identity.subject).eq('orgId', args.orgId)
+          q.eq('userId', userId).eq('orgId', args.orgId)
         )
         .order('desc')
         .collect();
@@ -58,7 +70,7 @@ export const get = query({
       const favorite = await ctx.db
         .query('userFavorites')
         .withIndex('by_user_board', (q) =>
-          q.eq('userId', identity.subject).eq('boardId', board._id)
+          q.eq('userId', userId).eq('boardId', board._id)
         )
         .unique();
 
