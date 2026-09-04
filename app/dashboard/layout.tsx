@@ -1,3 +1,5 @@
+'use client';
+
 import { Authenticated, AuthLoading } from 'convex/react';
 
 import Loading from '@/components/auth/loading';
