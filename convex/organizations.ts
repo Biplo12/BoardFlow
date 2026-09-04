@@ -14,6 +14,8 @@ const slugify = (name: string, seed: string) => {
 
 const TOKEN_BYTES = 32;
 
+const INVITATION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
 const randomToken = () => {
   const bytes = new Uint8Array(TOKEN_BYTES);
   crypto.getRandomValues(bytes);
@@ -182,6 +184,7 @@ export const invite = mutation({
       role: args.role ?? 'member',
       invitedBy: userId,
       token,
+      expiresAt: Date.now() + INVITATION_TTL_MS,
     });
 
     return token;
@@ -205,6 +208,26 @@ export const acceptInvitation = mutation({
 
     if (!invitation) {
       throw new Error('Invitation not found');
+    }
+
+    if (
+      invitation.expiresAt !== undefined &&
+      invitation.expiresAt < Date.now()
+    ) {
+      throw new Error('Invitation expired');
+    }
+
+    const user = await ctx.db.get(userId);
+    const email = user?.email?.trim().toLowerCase();
+
+    // An unverified address proves nothing, so anyone could claim an
+    // invitation by signing up with the invited email.
+    if (!email || !user?.emailVerificationTime) {
+      throw new Error('Verified email required to accept an invitation');
+    }
+
+    if (email !== invitation.email) {
+      throw new Error('Invitation was sent to a different email');
     }
 
     const existing = await ctx.db

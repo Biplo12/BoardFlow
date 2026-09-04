@@ -45,6 +45,7 @@ export default defineSchema({
     role: v.union(v.literal('admin'), v.literal('member')),
     invitedBy: v.id('users'),
     token: v.string(),
+    expiresAt: v.optional(v.number()),
   })
     .index('by_org', ['orgId'])
     .index('by_email', ['email'])
