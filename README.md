@@ -1,6 +1,6 @@
 # BoardFlow - Cooperative Whiteboard App
 
-Welcome to BoardFlow, a collaborative whiteboard application built using Next.js 14.0, Tailwind CSS, TypeScript, Clerk, Convex, and Liveblocks. This app empowers users to create organizations, join existing ones, and collaboratively work on boards where they can utilize various tools such as text, notes, rectangles, circles, images, and pencils. Users can manipulate objects on the whiteboard by selecting, resizing, deleting, or changing their layering order.
+Welcome to BoardFlow, a collaborative whiteboard application built using Next.js 16, Tailwind CSS, TypeScript, Convex Auth, Convex, and Liveblocks. This app empowers users to create organizations, join existing ones, and collaboratively work on boards where they can utilize various tools such as text, notes, rectangles, circles, images, and pencils. Users can manipulate objects on the whiteboard by selecting, resizing, deleting, or changing their layering order.
 
 ## Table of Contents
 
@@ -55,7 +55,7 @@ Make sure you have the following installed:
 - [Next.js](https://nextjs.org/) - React framework for server-rendered React applications.
 - [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework.
 - [TypeScript](https://www.typescriptlang.org/) - Superset of JavaScript that adds static typing.
-- [Clerk](https://clerk.dev/) - Authentication and user management.
+- [Convex Auth](https://labs.convex.dev/auth) - Authentication and user management.
 - [Convex](https://convex.dev/) - Real-time collaboration and synchronization.
 - [Liveblocks](https://liveblocks.io/) - Real-time collaboration infrastructure.
 
