@@ -12,8 +12,16 @@ const slugify = (name: string, seed: string) => {
   return `${base || 'org'}-${seed.slice(-6)}`;
 };
 
-const randomToken = () =>
-  Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+const TOKEN_BYTES = 32;
+
+const randomToken = () => {
+  const bytes = new Uint8Array(TOKEN_BYTES);
+  crypto.getRandomValues(bytes);
+
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join(
+    ''
+  );
+};
 
 export const list = query({
   args: {},

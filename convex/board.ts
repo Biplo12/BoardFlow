@@ -130,6 +130,21 @@ export const favorite = mutation({
       throw new Error('Board not found');
     }
 
+    if (board.orgId !== args.orgId) {
+      throw new Error('Not authorized');
+    }
+
+    const membership = await ctx.db
+      .query('memberships')
+      .withIndex('by_user_org', (q) =>
+        q.eq('userId', userId).eq('orgId', board.orgId)
+      )
+      .unique();
+
+    if (!membership) {
+      throw new Error('Not a member of this organization');
+    }
+
     const existingFavorite = await ctx.db
       .query('userFavorites')
       .withIndex('by_user_board', (q) =>
@@ -187,7 +202,27 @@ export const get = query({
     id: v.id('boards'),
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
+
     const board = await ctx.db.get(args.id);
+
+    if (!board) {
+      return null;
+    }
+
+    const membership = await ctx.db
+      .query('memberships')
+      .withIndex('by_user_org', (q) =>
+        q.eq('userId', userId).eq('orgId', board.orgId)
+      )
+      .unique();
+
+    if (!membership) {
+      throw new Error('Not a member of this organization');
+    }
 
     return board;
   },

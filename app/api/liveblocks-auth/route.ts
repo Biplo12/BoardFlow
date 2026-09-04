@@ -27,18 +27,18 @@ export async function POST(req: Request) {
 
   const { room: roomId } = await req.json();
 
-  const board = await convex.query(api.board.get, {
-    id: roomId as Id<'boards'>,
-  });
+  let board;
+
+  try {
+    board = await convex.query(api.board.get, {
+      id: roomId as Id<'boards'>,
+    });
+  } catch {
+    return new Response('Unauthorized', { status: 403 });
+  }
 
   if (!board) {
     return new Response('Not Found', { status: 404 });
-  }
-
-  try {
-    await convex.query(api.organizations.get, { id: board.orgId });
-  } catch {
-    return new Response('Unauthorized', { status: 403 });
   }
 
   const userInfo = {
