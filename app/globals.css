@@ -79,4 +79,9 @@ body,
   body {
     @apply bg-background text-foreground;
   }
+  /* Tailwind v4 dropped the v3 default of cursor: pointer on buttons. */
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
 }
