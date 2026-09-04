@@ -1,7 +1,7 @@
 import { v } from 'convex/values';
 
-import { internalAction, internalMutation } from './_generated/server';
 import { internal } from './_generated/api';
+import { internalAction, internalMutation } from './_generated/server';
 
 const CLERK_API = 'https://api.clerk.com/v1';
 
@@ -11,7 +11,11 @@ interface ClerkUser {
   last_name: string | null;
   image_url: string | null;
   primary_email_address_id: string | null;
-  email_addresses: { id: string; email_address: string }[];
+  email_addresses: {
+    id: string;
+    email_address: string;
+    verification: { status: string } | null;
+  }[];
 }
 
 interface ClerkOrganization {
@@ -53,6 +57,7 @@ export const upsertUser = internalMutation({
     name: v.optional(v.string()),
     email: v.optional(v.string()),
     image: v.optional(v.string()),
+    emailVerified: v.boolean(),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -60,11 +65,17 @@ export const upsertUser = internalMutation({
       .withIndex('by_clerk_id', (q) => q.eq('clerkId', args.clerkId))
       .unique();
 
+    // Convex Auth only links a sign-in to an existing user when the row has a
+    // verified email, so without this the imported accounts stay orphaned.
+    const emailVerificationTime =
+      args.email && args.emailVerified ? Date.now() : undefined;
+
     if (existing) {
       await ctx.db.patch(existing._id, {
         name: args.name,
         email: args.email,
         image: args.image,
+        emailVerificationTime,
       });
 
       return existing._id;
@@ -75,6 +86,7 @@ export const upsertUser = internalMutation({
       name: args.name,
       email: args.email,
       image: args.image,
+      emailVerificationTime,
     });
   },
 });
@@ -180,9 +192,9 @@ export const importFromClerk = internalAction({
       if (!users.length) break;
 
       for (const user of users) {
-        const email = user.email_addresses.find(
+        const primaryAddress = user.email_addresses.find(
           (address) => address.id === user.primary_email_address_id
-        )?.email_address;
+        );
 
         const name = [user.first_name, user.last_name]
           .filter(Boolean)
@@ -191,8 +203,9 @@ export const importFromClerk = internalAction({
         await ctx.runMutation(internal.migrations.upsertUser, {
           clerkId: user.id,
           name: name || undefined,
-          email: email || undefined,
+          email: primaryAddress?.email_address || undefined,
           image: user.image_url || undefined,
+          emailVerified: primaryAddress?.verification?.status === 'verified',
         });
 
         userCount += 1;
