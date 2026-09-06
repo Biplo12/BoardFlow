@@ -11,7 +11,7 @@ const AuthButton: React.FC = (): JSX.Element => {
 
   return (
     <Link
-      href={isAuthenticated ? '/dashboard' : '/signin'}
+      href={isAuthenticated ? '/dashboard' : '/login'}
       className='hidden sm:block'
     >
       <Button disabled={isLoading}>

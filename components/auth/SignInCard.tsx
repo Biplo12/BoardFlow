@@ -1,7 +1,8 @@
 'use client';
 
 import { useAuthActions } from '@convex-dev/auth/react';
-import { LayoutDashboard, Mail } from 'lucide-react';
+import { LayoutDashboard } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
@@ -30,17 +31,20 @@ const GoogleIcon = () => (
   </svg>
 );
 
-const SignInCard: React.FC = (): JSX.Element => {
+interface SignInCardProps {
+  flow: 'signIn' | 'signUp';
+}
+
+const SignInCard: React.FC<SignInCardProps> = ({ flow }): JSX.Element => {
   const { signIn } = useAuthActions();
   const router = useRouter();
-  const [step, setStep] = useState<'signIn' | 'signUp'>('signIn');
   const [pending, setPending] = useState(false);
 
   const handlePassword = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    formData.set('flow', step);
+    formData.set('flow', flow);
     setPending(true);
 
     try {
@@ -48,23 +52,6 @@ const SignInCard: React.FC = (): JSX.Element => {
       router.push('/dashboard');
     } catch (error) {
       toast.error('Could not authenticate. Check your credentials.');
-      console.error(error);
-    } finally {
-      setPending(false);
-    }
-  };
-
-  const handleMagicLink = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    setPending(true);
-
-    try {
-      await signIn('resend', formData);
-      toast.success('Check your email for a sign-in link');
-    } catch (error) {
-      toast.error('Could not send sign-in link');
       console.error(error);
     } finally {
       setPending(false);
@@ -79,10 +66,10 @@ const SignInCard: React.FC = (): JSX.Element => {
         </div>
         <div className='flex flex-col gap-1'>
           <h1 className='text-2xl font-semibold tracking-tight'>
-            {step === 'signIn' ? 'Welcome back' : 'Create your account'}
+            {flow === 'signIn' ? 'Welcome back' : 'Create your account'}
           </h1>
           <p className='text-muted-foreground text-sm'>
-            {step === 'signIn'
+            {flow === 'signIn'
               ? 'Sign in to continue to BoardFlow'
               : 'Start collaborating on boards with your team'}
           </p>
@@ -124,46 +111,21 @@ const SignInCard: React.FC = (): JSX.Element => {
           required
         />
         <Button type='submit' className='h-11' disabled={pending}>
-          {step === 'signIn' ? 'Sign in' : 'Sign up'}
+          {flow === 'signIn' ? 'Sign in' : 'Sign up'}
         </Button>
       </form>
 
       <p className='text-muted-foreground mt-4 text-center text-sm'>
-        {step === 'signIn'
+        {flow === 'signIn'
           ? "Don't have an account? "
           : 'Already have an account? '}
-        <button
-          type='button'
-          onClick={() => setStep(step === 'signIn' ? 'signUp' : 'signIn')}
+        <Link
+          href={flow === 'signIn' ? '/register' : '/login'}
           className='text-foreground font-medium underline-offset-4 hover:underline'
         >
-          {step === 'signIn' ? 'Sign up' : 'Sign in'}
-        </button>
+          {flow === 'signIn' ? 'Sign up' : 'Sign in'}
+        </Link>
       </p>
-
-      <div className='bg-muted/40 mt-6 rounded-xl border border-dashed p-4'>
-        <p className='text-muted-foreground mb-3 text-center text-xs font-medium tracking-wide uppercase'>
-          Prefer a magic link?
-        </p>
-        <form onSubmit={handleMagicLink} className='flex flex-col gap-2.5'>
-          <Input
-            name='email'
-            type='email'
-            placeholder='you@example.com'
-            className='bg-background h-11'
-            required
-          />
-          <Button
-            type='submit'
-            variant='secondary'
-            className='h-11 gap-2'
-            disabled={pending}
-          >
-            <Mail className='h-4 w-4' />
-            Send sign-in link
-          </Button>
-        </form>
-      </div>
     </div>
   );
 };
