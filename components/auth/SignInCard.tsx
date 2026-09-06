@@ -71,10 +71,12 @@ const SignInCard: React.FC<SignInCardProps> = ({ flow }): JSX.Element => {
       toast.success('Cleared. Taking you to your boards.');
       router.push('/dashboard');
     } catch (error) {
+      // Convex Auth returns a generic failure, so the client cannot tell a
+      // taken email from a rejected password - and must not imply either.
       toast.error(
         isSignIn
           ? "That email and password don't match."
-          : 'That email already has an account. Sign in instead.'
+          : "Couldn't create the account. Check the email and password, then try again."
       );
       console.error(error);
       setPending(null);
