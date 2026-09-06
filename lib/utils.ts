@@ -10,7 +10,7 @@ import {
   Point,
 } from '@/types/TCanvasState';
 
-const BORDER_COLORS = ['#c6007e', '#036d93', '#0f7b4f', '#5b34c8', '#e17e05'];
+const BORDER_COLORS = ['#dc2626', '#059669', '#2563eb', '#d97706', '#d97706'];
 
 export const colors = [
   { r: 243, g: 82, b: 35 },

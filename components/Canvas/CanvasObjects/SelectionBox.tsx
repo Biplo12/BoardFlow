@@ -20,7 +20,8 @@ const SelectionBox: React.FC<SelectionBoxProps> = memo(
     );
 
     const isShowingHandles = useStorage(
-      (root) => soleLayerId && root.layers[soleLayerId]?.type !== LayerType.Path
+      (root) =>
+        soleLayerId && root.layers[soleLayerId]?.type !== LayerType.Path
     );
 
     const { bounds } = useBounds();
@@ -83,7 +84,7 @@ const SelectionBox: React.FC<SelectionBoxProps> = memo(
     return (
       <>
         <rect
-          className='pointer-events-none fill-transparent stroke-[hsl(var(--route-cyan))] stroke-1'
+          className='pointer-events-none fill-transparent stroke-blue-500 stroke-1'
           style={{
             transform: `translate(${bounds.x}px, ${bounds.y}px)`,
           }}
@@ -97,7 +98,7 @@ const SelectionBox: React.FC<SelectionBoxProps> = memo(
             {handlePositions.map((handle, index) => (
               <rect
                 key={index}
-                className='fill-white stroke-[hsl(var(--route-cyan))] stroke-1'
+                className='fill-white stroke-blue-500 stroke-1'
                 x={0}
                 y={0}
                 style={{

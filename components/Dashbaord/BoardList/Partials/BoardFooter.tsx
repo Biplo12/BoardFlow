@@ -57,18 +57,18 @@ const BoardFooter: React.FC<BoardFooterProps> = ({ board }): JSX.Element => {
   return (
     <div className='relative bg-white p-3'>
       <p className='max-w-[calc(100%-20px)] truncate text-sm'>{board.title}</p>
-      <p className='text-muted-foreground truncate text-sm opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100'>
+      <p className='truncate text-sm text-muted-foreground opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100'>
         {author}
       </p>
       <button
         className={cn(
-          'text-muted-foreground hover:text-primary absolute top-3 right-3 opacity-100 transition lg:opacity-0 lg:group-hover:opacity-100',
+          'absolute right-3 top-3 text-muted-foreground opacity-100 transition hover:text-blue-950 lg:opacity-0 lg:group-hover:opacity-100',
           disabled && 'cursor-not-allowed opacity-75'
         )}
         onClick={handleToggleFavorite}
       >
         <Star
-          className={cn('h-4 w-4', isFavorite && 'fill-primary text-primary')}
+          className={cn('h-4 w-4', isFavorite && 'fill-blue-950 text-blue-950')}
         />
       </button>
     </div>

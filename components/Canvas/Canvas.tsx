@@ -29,7 +29,7 @@ const Canvas: React.FC<CanvasProps> = ({ boardId }): JSX.Element => {
   });
 
   return (
-    <main className='bg-background relative h-full w-full'>
+    <main className='relative h-full w-full bg-neutral-100'>
       <CanvasHeader boardId={boardId} />
       <CanvasParticipants />
       <CanvasToolbar

@@ -32,7 +32,9 @@ const Room: React.FC<RoomProps> = ({ children, roomId, fallback }) => {
           layerIds: new LiveList<string>([]),
         }}
       >
-        <ClientSideSuspense fallback={fallback}>{children}</ClientSideSuspense>
+        <ClientSideSuspense fallback={fallback}>
+          {children}
+        </ClientSideSuspense>
       </RoomProvider>
     </LiveblocksProvider>
   );

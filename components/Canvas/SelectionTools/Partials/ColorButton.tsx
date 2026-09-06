@@ -29,8 +29,8 @@ const ColorButton: React.FC<ColorButtonProps> = ({
     >
       <div
         className={cn(
-          'border-border h-8 w-8 rounded-md border',
-          lastUsedColor === color && 'border-foreground/70 border-2'
+          'h-8 w-8 rounded-md border border-neutral-300',
+          lastUsedColor === color && 'border-2 border-neutral-600'
         )}
         style={{
           background: colorToCss(color),

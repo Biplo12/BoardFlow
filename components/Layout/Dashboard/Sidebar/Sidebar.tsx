@@ -5,7 +5,7 @@ import OrgsList from '@/components/Layout/Dashboard/Sidebar/Partials/Organizatio
 
 const Sidebar: React.FC = (): JSX.Element => {
   return (
-    <aside className='bg-foreground fixed left-0 z-10 flex h-full w-16 flex-col gap-4 p-3 text-white'>
+    <aside className='fixed left-0 z-10 flex h-full w-16 flex-col gap-4 bg-blue-950 p-3 text-white'>
       <OrgsList />
       <NewButton />
     </aside>

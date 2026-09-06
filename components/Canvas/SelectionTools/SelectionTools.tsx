@@ -93,7 +93,7 @@ const SelectionTools: React.FC<SelectionToolsProps> = memo(
 
     return (
       <div
-        className='absolute flex rounded-xl border bg-white p-3 shadow-sm select-none'
+        className='absolute flex select-none rounded-xl border bg-white p-3 shadow-sm'
         style={{
           transform: `translate(
           calc(${x}px - 50%),
@@ -114,7 +114,7 @@ const SelectionTools: React.FC<SelectionToolsProps> = memo(
             </Button>
           </Hint>
         </div>
-        <div className='border-border ml-2 flex items-center border-l pl-2'>
+        <div className='ml-2 flex items-center border-l border-neutral-200 pl-2'>
           <Hint label='Delete'>
             <Button variant='ghost' size='icon' onClick={deleteLayer}>
               <Trash2 />
@@ -122,7 +122,7 @@ const SelectionTools: React.FC<SelectionToolsProps> = memo(
           </Hint>
         </div>
         {isImageSelected && (
-          <div className='border-border ml-2 flex items-center border-l pl-2'>
+          <div className='ml-2 flex items-center border-l border-neutral-200 pl-2'>
             <Hint label='Add url'>
               <Button variant='ghost' size='icon' onClick={handleOpenUrlDialog}>
                 <Link />
