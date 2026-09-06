@@ -85,3 +85,47 @@ body,
     cursor: pointer;
   }
 }
+
+/* Auth surface palette. Scoped here so the dashboard and canvas keep their
+   own tokens until this direction is signed off. */
+:root {
+  --candy-sky: #c9e9ff;
+  --candy-ink: #111111;
+  --candy-pink: #ff3d7f;
+  --candy-violet: #9466e8;
+  --candy-lime: #c3e776;
+  --candy-butter: #edf072;
+  --candy-surface: rgba(0, 18, 52, 0.06);
+  --candy-muted: rgba(0, 0, 0, 0.54);
+}
+
+/* One setting carries the whole personality: heaviest weight, uppercase,
+   negative tracking, and a line box tighter than the type size. */
+.candy-display {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.032em;
+  line-height: 0.86;
+}
+
+.candy-field {
+  background: #fff;
+  border: 0;
+  border-radius: 14px;
+  height: 52px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--candy-ink);
+  box-shadow: none;
+  padding-inline: 18px;
+}
+
+.candy-field::placeholder {
+  color: var(--candy-muted);
+  font-weight: 400;
+}
+
+.candy-field:focus-visible {
+  outline: 3px solid var(--candy-ink);
+  outline-offset: 2px;
+}

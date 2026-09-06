@@ -1,17 +1,13 @@
 'use client';
 
 import { useAuthActions } from '@convex-dev/auth/react';
-import { LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-
 const GoogleIcon = () => (
-  <svg viewBox='0 0 24 24' className='h-4 w-4'>
+  <svg viewBox='0 0 24 24' className='h-5 w-5'>
     <path
       fill='#4285F4'
       d='M23.06 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h6.19a5.29 5.29 0 0 1-2.3 3.47v2.88h3.72c2.18-2 3.45-4.96 3.45-8.36z'
@@ -38,17 +34,20 @@ interface SignInCardProps {
 const SignInCard: React.FC<SignInCardProps> = ({ flow }): JSX.Element => {
   const { signIn } = useAuthActions();
   const router = useRouter();
-  const [pending, setPending] = useState(false);
+  const [pending, setPending] = useState<'google' | 'password' | null>(null);
+
+  const isSignIn = flow === 'signIn';
+  const busy = pending !== null;
 
   const handleGoogle = async () => {
-    setPending(true);
+    setPending('google');
 
     try {
       await signIn('google');
     } catch (error) {
       toast.error('Could not reach Google. Try again.');
       console.error(error);
-      setPending(false);
+      setPending(null);
     }
   };
 
@@ -57,86 +56,128 @@ const SignInCard: React.FC<SignInCardProps> = ({ flow }): JSX.Element => {
 
     const formData = new FormData(event.currentTarget);
     formData.set('flow', flow);
-    setPending(true);
+    setPending('password');
 
     try {
       await signIn('password', formData);
       router.push('/dashboard');
     } catch (error) {
-      toast.error('Could not authenticate. Check your credentials.');
+      toast.error(
+        isSignIn
+          ? "That email and password don't match."
+          : "Couldn't create the account. Check the email and password."
+      );
       console.error(error);
-    } finally {
-      setPending(false);
+      setPending(null);
     }
   };
 
   return (
-    <div className='bg-card w-full max-w-md rounded-2xl border p-8 shadow-xl shadow-black/5'>
-      <div className='mb-8 flex flex-col items-center gap-3 text-center'>
-        <div className='bg-primary text-primary-foreground flex h-12 w-12 items-center justify-center rounded-xl shadow-sm'>
-          <LayoutDashboard className='h-6 w-6' />
-        </div>
-        <div className='flex flex-col gap-1'>
-          <h1 className='text-2xl font-semibold tracking-tight'>
-            {flow === 'signIn' ? 'Welcome back' : 'Create your account'}
-          </h1>
-          <p className='text-muted-foreground text-sm'>
-            {flow === 'signIn'
-              ? 'Sign in to continue to BoardFlow'
-              : 'Start collaborating on boards with your team'}
-          </p>
-        </div>
-      </div>
+    <div
+      className='rounded-[28px] p-8 sm:p-10'
+      style={{ backgroundColor: '#fff', color: 'var(--candy-ink)' }}
+    >
+      <h1 className='candy-display text-[38px] sm:text-[46px]'>
+        {isSignIn ? (
+          <>
+            Welcome
+            <br />
+            back
+          </>
+        ) : (
+          <>
+            Make your
+            <br />
+            first board
+          </>
+        )}
+      </h1>
+      <p
+        className='mt-4 text-[16px] font-medium'
+        style={{ color: 'var(--candy-muted)' }}
+      >
+        {isSignIn
+          ? 'Your team is already drawing. Jump in.'
+          : 'Free to start. No card, no setup.'}
+      </p>
 
-      <div className='flex flex-col gap-2.5'>
-        <Button
-          variant='outline'
-          className='h-11 justify-center gap-2.5'
-          onClick={handleGoogle}
-          disabled={pending}
+      <button
+        type='button'
+        onClick={handleGoogle}
+        disabled={busy}
+        className='mt-7 flex h-14 w-full items-center justify-center gap-3 rounded-[22px] text-[17px] font-semibold transition-opacity disabled:opacity-60'
+        style={{
+          backgroundColor: 'var(--candy-surface)',
+          color: 'var(--candy-ink)',
+        }}
+      >
+        {pending !== 'google' && <GoogleIcon />}
+        {pending === 'google' ? 'Opening Google…' : 'Continue with Google'}
+      </button>
+
+      <div className='my-6 flex items-center gap-4'>
+        <span
+          className='h-[2px] flex-1 rounded-full'
+          style={{ backgroundColor: 'var(--candy-surface)' }}
+        />
+        <span
+          className='text-[13px] font-semibold'
+          style={{ color: 'var(--candy-muted)' }}
         >
-          {!pending && <GoogleIcon />}
-          {pending ? 'Opening Google…' : 'Continue with Google'}
-        </Button>
-      </div>
-
-      <div className='my-6 flex items-center gap-3'>
-        <span className='bg-border h-px flex-1' />
-        <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
-          or continue with email
+          or
         </span>
-        <span className='bg-border h-px flex-1' />
+        <span
+          className='h-[2px] flex-1 rounded-full'
+          style={{ backgroundColor: 'var(--candy-surface)' }}
+        />
       </div>
 
       <form onSubmit={handlePassword} className='flex flex-col gap-3'>
-        <Input
+        <input
           name='email'
           type='email'
           placeholder='Email'
-          className='h-11'
+          autoComplete='email'
+          disabled={busy}
           required
+          className='candy-field w-full'
+          style={{ backgroundColor: 'var(--candy-surface)' }}
         />
-        <Input
+        <input
           name='password'
           type='password'
           placeholder='Password'
-          className='h-11'
+          autoComplete={isSignIn ? 'current-password' : 'new-password'}
+          disabled={busy}
           required
+          className='candy-field w-full'
+          style={{ backgroundColor: 'var(--candy-surface)' }}
         />
-        <Button type='submit' className='h-11' disabled={pending}>
-          {flow === 'signIn' ? 'Sign in' : 'Sign up'}
-        </Button>
+        <button
+          type='submit'
+          disabled={busy}
+          className='mt-2 h-14 w-full rounded-[22px] text-[19px] font-semibold text-white transition-opacity disabled:opacity-60'
+          style={{ backgroundColor: 'var(--candy-pink)' }}
+        >
+          {pending === 'password'
+            ? 'One moment…'
+            : isSignIn
+              ? 'Log in'
+              : 'Sign up — it’s free'}
+        </button>
       </form>
 
-      <p className='text-muted-foreground mt-4 text-center text-sm'>
-        {flow === 'signIn'
-          ? "Don't have an account? "
-          : 'Already have an account? '}
+      <p
+        className='mt-7 text-[15px] font-medium'
+        style={{ color: 'var(--candy-muted)' }}
+      >
+        {isSignIn ? 'New to BoardFlow? ' : 'Already have an account? '}
         <Link
-          href={flow === 'signIn' ? '/register' : '/login'}
-          className='text-foreground font-medium underline-offset-4 hover:underline'
+          href={isSignIn ? '/register' : '/login'}
+          className='font-semibold underline underline-offset-4'
+          style={{ color: 'var(--candy-ink)' }}
         >
-          {flow === 'signIn' ? 'Sign up' : 'Sign in'}
+          {isSignIn ? 'Sign up' : 'Log in'}
         </Link>
       </p>
     </div>
