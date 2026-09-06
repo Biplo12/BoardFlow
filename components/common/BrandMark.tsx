@@ -2,6 +2,8 @@ import React from 'react';
 
 import { cn } from '@/lib/utils';
 
+const LINE = 'rgba(0,18,52,0.32)';
+
 interface BrandMarkProps {
   className?: string;
 }
@@ -14,48 +16,26 @@ const BrandMark: React.FC<BrandMarkProps> = ({ className }): JSX.Element => {
       aria-label='BoardFlow'
       className={cn('h-8 w-8', className)}
     >
-      <defs>
-        <clipPath id='brandmark-first'>
-          <rect
-            x='2'
-            y='7'
-            width='19'
-            height='19'
-            rx='6'
-            transform='rotate(-9 11.5 16.5)'
-          />
-        </clipPath>
-      </defs>
-
+      {/* the board */}
       <rect
-        x='2'
-        y='7'
-        width='19'
-        height='19'
+        x='3'
+        y='4'
+        width='21'
+        height='21'
         rx='6'
-        transform='rotate(-9 11.5 16.5)'
+        transform='rotate(-6 13.5 14.5)'
         fill='var(--candy-pink, #ff3d7f)'
+        stroke={LINE}
+        strokeWidth='1.8'
       />
-      <rect
-        x='11'
-        y='6'
-        width='19'
-        height='19'
-        rx='6'
-        transform='rotate(9 20.5 15.5)'
-        fill='var(--candy-violet, #9466e8)'
+      {/* somebody on it, breaking the edge */}
+      <path
+        d='M15 12 15 25 18.6 21.7 20.8 28.6 24.4 27.1 21.8 20.6 27.6 19.9Z'
+        fill='#fff'
+        stroke={LINE}
+        strokeWidth='1.8'
+        strokeLinejoin='round'
       />
-      <g clipPath='url(#brandmark-first)'>
-        <rect
-          x='11'
-          y='6'
-          width='19'
-          height='19'
-          rx='6'
-          transform='rotate(9 20.5 15.5)'
-          fill='#5a2ea6'
-        />
-      </g>
     </svg>
   );
 };

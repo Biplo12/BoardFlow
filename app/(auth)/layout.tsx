@@ -3,7 +3,6 @@ import React from 'react';
 
 import BoardArtifacts from '@/components/auth/BoardArtifacts';
 import BrandMark from '@/components/common/BrandMark';
-import BrandPattern from '@/components/common/BrandPattern';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -15,7 +14,6 @@ export default function AuthLayout({ children }: AuthLayoutProps): JSX.Element {
       className='relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-4 py-24'
       style={{ backgroundColor: 'var(--candy-sky)' }}
     >
-      <BrandPattern className='absolute inset-0 h-full w-full opacity-70' />
       <BoardArtifacts />
 
       <Link

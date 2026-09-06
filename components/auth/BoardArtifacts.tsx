@@ -2,30 +2,59 @@ import React from 'react';
 
 import { cn } from '@/lib/utils';
 
-const INK = 'rgba(0,18,52,0.28)';
-const INK_SOFT = 'rgba(0,18,52,0.16)';
+/* One rule for every artifact: a chunky dark outline around a flat fill,
+   the same treatment the cursor already had. */
+const LINE = 'rgba(0,18,52,0.32)';
+const STROKE = 3.5;
 
 const Checklist = () => (
   <svg viewBox='0 0 92 92' className='h-full w-full'>
-    <rect width='92' height='92' rx='14' fill='var(--candy-butter)' />
-    <g stroke={INK} strokeWidth='3.5' strokeLinecap='round' fill='none'>
-      <rect x='14' y='20' width='14' height='14' rx='4' />
-      <path d='M17 27l4 4 7-8' />
-      <rect x='14' y='44' width='14' height='14' rx='4' />
-      <rect x='14' y='68' width='14' height='14' rx='4' />
-      <path d='M36 27h40M36 51h32M36 75h38' strokeWidth='4' />
+    <rect
+      x='2'
+      y='2'
+      width='88'
+      height='88'
+      rx='14'
+      fill='var(--candy-butter)'
+      stroke={LINE}
+      strokeWidth={STROKE}
+    />
+    <g stroke={LINE} strokeWidth={STROKE} strokeLinecap='round' fill='#fff'>
+      <rect x='14' y='19' width='15' height='15' rx='4' />
+      <rect x='14' y='42' width='15' height='15' rx='4' />
+      <rect x='14' y='65' width='15' height='15' rx='4' />
+    </g>
+    <path
+      d='M17.5 27l4 4 7-8'
+      fill='none'
+      stroke={LINE}
+      strokeWidth={STROKE}
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+    <g stroke={LINE} strokeWidth={STROKE} strokeLinecap='round'>
+      <path d='M38 27h38M38 50h30M38 73h35' />
     </g>
   </svg>
 );
 
 const Doodle = () => (
   <svg viewBox='0 0 92 92' className='h-full w-full'>
-    <rect width='92' height='92' rx='14' fill='var(--candy-pink)' />
+    <rect
+      x='2'
+      y='2'
+      width='88'
+      height='88'
+      rx='14'
+      fill='var(--candy-pink)'
+      stroke={LINE}
+      strokeWidth={STROKE}
+    />
     <path
-      d='M46 16l8.5 20.5L76 38l-16 14 5 22-19-11.5L27 74l5-22-16-14 21.5-1.5Z'
-      fill='none'
-      stroke='#fff'
-      strokeWidth='4.5'
+      d='M46 17l8 19.5 20.5 1.5-15.5 13.5 4.8 20.5L46 61.5 28.2 72l4.8-20.5L17.5 38 38 36.5Z'
+      fill='#fff'
+      stroke={LINE}
+      strokeWidth={STROKE}
       strokeLinejoin='round'
     />
   </svg>
@@ -33,48 +62,95 @@ const Doodle = () => (
 
 const Chart = () => (
   <svg viewBox='0 0 92 92' className='h-full w-full'>
-    <rect width='92' height='92' rx='14' fill='var(--candy-lime)' />
-    <g fill={INK}>
-      <rect x='16' y='50' width='13' height='26' rx='4' />
-      <rect x='36' y='34' width='13' height='42' rx='4' />
-      <rect x='56' y='20' width='13' height='56' rx='4' />
-    </g>
-    <path
-      d='M16 40 36 26 56 30 74 14'
-      fill='none'
-      stroke='#fff'
-      strokeWidth='4'
-      strokeLinecap='round'
-      strokeLinejoin='round'
+    <rect
+      x='2'
+      y='2'
+      width='88'
+      height='88'
+      rx='14'
+      fill='var(--candy-lime)'
+      stroke={LINE}
+      strokeWidth={STROKE}
     />
+    <g fill='#fff' stroke={LINE} strokeWidth={STROKE} strokeLinejoin='round'>
+      <rect x='17' y='50' width='14' height='24' rx='4' />
+      <rect x='39' y='36' width='14' height='38' rx='4' />
+      <rect x='61' y='24' width='14' height='50' rx='4' />
+    </g>
   </svg>
 );
 
 const Photo = () => (
   <svg viewBox='0 0 92 92' className='h-full w-full'>
-    <rect width='92' height='92' rx='14' fill='var(--candy-violet)' />
-    <circle cx='30' cy='30' r='9' fill='#fff' opacity='0.9' />
-    <path
-      d='M8 76 34 46l16 15 12-11 22 26v2a12 12 0 0 1-12 0H8Z'
-      fill='rgba(255,255,255,0.55)'
+    <rect
+      x='2'
+      y='2'
+      width='88'
+      height='88'
+      rx='14'
+      fill='var(--candy-violet)'
+      stroke={LINE}
+      strokeWidth={STROKE}
     />
-    <path d='M8 76 34 46l16 15 12-11 22 26Z' fill='rgba(0,18,52,0.22)' />
+    <circle
+      cx='31'
+      cy='30'
+      r='9'
+      fill='#fff'
+      stroke={LINE}
+      strokeWidth={STROKE}
+    />
+    <path
+      d='M12 74 35 47l14 14 11-11 20 24Z'
+      fill='#fff'
+      stroke={LINE}
+      strokeWidth={STROKE}
+      strokeLinejoin='round'
+    />
   </svg>
 );
 
 const Flow = () => (
   <svg viewBox='0 0 92 92' className='h-full w-full'>
-    <rect width='92' height='92' rx='14' fill='#ffffff' />
-    <g fill={INK_SOFT}>
-      <rect x='12' y='14' width='30' height='18' rx='6' />
-      <rect x='50' y='40' width='30' height='18' rx='6' />
-      <rect x='12' y='64' width='30' height='16' rx='6' />
+    <rect
+      x='2'
+      y='2'
+      width='88'
+      height='88'
+      rx='14'
+      fill='#fff'
+      stroke={LINE}
+      strokeWidth={STROKE}
+    />
+    <g stroke={LINE} strokeWidth={STROKE} strokeLinejoin='round'>
+      <rect
+        x='13'
+        y='14'
+        width='30'
+        height='18'
+        rx='6'
+        fill='var(--candy-lime)'
+      />
+      <rect
+        x='49'
+        y='38'
+        width='30'
+        height='18'
+        rx='6'
+        fill='var(--candy-butter)'
+      />
+      <rect
+        x='13'
+        y='62'
+        width='30'
+        height='18'
+        rx='6'
+        fill='var(--candy-pink)'
+      />
     </g>
-    <g stroke={INK} strokeWidth='3' fill='none' strokeLinecap='round'>
-      <path d='M42 23h14a6 6 0 0 1 6 6v7' />
-      <path d='M50 49H33a6 6 0 0 0-6 6v7' />
-      <path d='M59 32l3 5 3-5' strokeLinejoin='round' />
-      <path d='M24 59l3 5 3-5' strokeLinejoin='round' />
+    <g stroke={LINE} strokeWidth={STROKE} fill='none' strokeLinecap='round'>
+      <path d='M43 23h15a6 6 0 0 1 6 6v5' />
+      <path d='M49 47H34a6 6 0 0 0-6 6v5' />
     </g>
   </svg>
 );
@@ -84,8 +160,8 @@ const Cursor = () => (
     <path
       d='M6 4 6 40 16 31 22 50 32 46 25 28 41 26Z'
       fill='#fff'
-      stroke='rgba(0,18,52,0.32)'
-      strokeWidth='3.5'
+      stroke={LINE}
+      strokeWidth={STROKE}
       strokeLinejoin='round'
     />
     <rect
@@ -95,6 +171,8 @@ const Cursor = () => (
       height='26'
       rx='13'
       fill='var(--candy-pink)'
+      stroke={LINE}
+      strokeWidth={STROKE}
     />
     <path
       d='M46 43h30'
