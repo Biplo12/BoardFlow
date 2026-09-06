@@ -20,7 +20,7 @@ const EmptyFavorites: React.FC = (): JSX.Element => {
       />
       <div className='flex flex-col gap-2'>
         <h1 className='text-2xl font-semibold'>No favorites found!</h1>
-        <p className='text-sm text-muted-foreground'>
+        <p className='text-muted-foreground text-sm'>
           Add boards to your favorites to see them here.
         </p>
       </div>

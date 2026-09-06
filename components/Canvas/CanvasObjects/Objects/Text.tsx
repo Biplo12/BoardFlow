@@ -49,7 +49,7 @@ const Text: React.FC<TextProps> = ({
         html={value || ''}
         onChange={handleContentChange}
         className={cn(
-          'flex h-full w-full items-center justify-center text-center outline-none drop-shadow-md',
+          'flex h-full w-full items-center justify-center text-center drop-shadow-md outline-none',
           font.className
         )}
         style={{

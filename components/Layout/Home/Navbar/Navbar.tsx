@@ -23,14 +23,14 @@ const navItems = [
 
 const Navbar: React.FC = (): JSX.Element => {
   return (
-    <div className='fixed left-0 top-0 z-50 flex h-16 w-full items-center justify-between bg-white px-4 shadow-sm sm:px-6'>
+    <div className='fixed top-0 left-0 z-50 flex h-16 w-full items-center justify-between bg-white px-4 shadow-sm sm:px-6'>
       <Logo />
       <div className='hidden gap-4 px-2 sm:flex'>
         {navItems.map((item) => (
           <a
             key={item.name}
             href={item.href}
-            className='text-gray-600 hover:text-gray-800'
+            className='text-muted-foreground hover:text-foreground'
           >
             {item.name}
           </a>

@@ -13,7 +13,7 @@ const OrganizationSidebar: React.FC = (): JSX.Element => {
   const favorites = searchParams.get('favorites');
 
   return (
-    <div className='hidden w-[200px] flex-col items-center gap-4 pl-5 pt-5 lg:flex'>
+    <div className='hidden w-[200px] flex-col items-center gap-4 pt-5 pl-5 lg:flex'>
       <Logo />
       <OrgSwitcher />
       <div className='flex w-full flex-col gap-2'>

@@ -31,7 +31,7 @@ const SearchInput: React.FC = (): JSX.Element => {
 
   return (
     <div className='relative hidden w-full flex-1 lg:flex'>
-      <Search className='m absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground' />
+      <Search className='m text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform' />
       <Input
         className='w-full max-w-[500px] pl-9'
         placeholder='Search boards'

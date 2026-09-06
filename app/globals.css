@@ -10,65 +10,76 @@ body,
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    /* Plan Position: chart paper, enamel plates, route colours. */
+    --background: 168 12% 92%;
+    --foreground: 204 44% 11%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card: 150 33% 99%;
+    --card-foreground: 204 44% 11%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
+    --popover: 150 33% 99%;
+    --popover-foreground: 204 44% 11%;
 
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 322 100% 39%;
+    --primary-foreground: 150 33% 99%;
 
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
+    --secondary: 168 12% 88%;
+    --secondary-foreground: 204 44% 11%;
 
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    --muted: 168 12% 88%;
+    --muted-foreground: 204 18% 38%;
 
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
+    --accent: 168 14% 89%;
+    --accent-foreground: 204 44% 11%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 6 78% 45%;
+    --destructive-foreground: 150 33% 99%;
 
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
+    --border: 204 20% 84%;
+    --input: 204 20% 84%;
+    --ring: 196 96% 29%;
 
     --radius: 0.5rem;
+
+    --route-magenta: 322 100% 39%;
+    --route-cyan: 196 96% 29%;
+    --route-green: 156 78% 27%;
+    --route-violet: 256 59% 49%;
+    --route-amber: 33 96% 45%;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
+    --background: 204 44% 8%;
+    --foreground: 168 12% 94%;
 
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --card: 204 40% 12%;
+    --card-foreground: 168 12% 94%;
 
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 204 40% 12%;
+    --popover-foreground: 168 12% 94%;
 
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
+    --primary: 322 88% 52%;
+    --primary-foreground: 204 44% 8%;
 
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 204 30% 18%;
+    --secondary-foreground: 168 12% 94%;
 
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted: 204 30% 18%;
+    --muted-foreground: 204 12% 66%;
 
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 204 30% 20%;
+    --accent-foreground: 168 12% 94%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 6 74% 54%;
+    --destructive-foreground: 168 12% 94%;
 
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    --border: 204 24% 22%;
+    --input: 204 24% 22%;
+    --ring: 196 84% 48%;
+
+    --route-cyan: 196 84% 48%;
+    --route-green: 156 62% 42%;
+    --route-violet: 256 72% 66%;
   }
 }
 
@@ -83,5 +94,99 @@ body,
   button:not(:disabled),
   [role='button']:not(:disabled) {
     cursor: pointer;
+  }
+}
+
+/* Enamel plate: a 1px ink edge plus a keyline inset, never a blurred shadow. */
+.plate {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--foreground) / 0.14);
+  box-shadow:
+    inset 0 0 0 3px hsl(var(--card)),
+    inset 0 0 0 4px hsl(var(--foreground) / 0.07);
+}
+
+.sign-band {
+  background-color: hsl(var(--foreground));
+  color: hsl(var(--card));
+}
+
+/* Route ribbon: unequal segments in route order, full bleed. */
+.route-ribbon {
+  background-image: linear-gradient(
+    to right,
+    hsl(var(--route-magenta)) 0 22%,
+    hsl(var(--route-cyan)) 22% 41%,
+    hsl(var(--route-green)) 41% 52%,
+    hsl(var(--route-violet)) 52% 74%,
+    hsl(var(--route-amber)) 74% 83%,
+    hsl(var(--foreground)) 83% 100%
+  );
+}
+
+/* Field route bar: ink at rest, fills with the focus route colour. */
+.field-route {
+  position: relative;
+}
+
+.field-route > input {
+  padding-left: 0.875rem;
+}
+
+.field-route::before {
+  content: '';
+  position: absolute;
+  inset-block: 1px;
+  left: 1px;
+  width: 3px;
+  border-radius: 2px 0 0 2px;
+  background-color: hsl(var(--foreground) / 0.14);
+  transition: background-color 140ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.field-route:focus-within::before {
+  background-color: hsl(var(--route-cyan));
+}
+
+@keyframes sector-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(var(--leg-x), var(--leg-y), 0);
+  }
+}
+
+@keyframes range-ping {
+  from {
+    transform: scale(0.05);
+    opacity: 0.28;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.sector-target {
+  animation: sector-drift var(--leg-duration) linear infinite alternate;
+}
+
+.range-ping {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: range-ping 6s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sector-target,
+  .range-ping {
+    animation: none;
+  }
+
+  .range-ping {
+    display: none;
   }
 }

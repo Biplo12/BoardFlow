@@ -1,11 +1,12 @@
 'use client';
 
 import { useAuthActions } from '@convex-dev/auth/react';
-import { LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
+
+import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +32,9 @@ const GoogleIcon = () => (
   </svg>
 );
 
+const FIELD_LABEL =
+  'text-muted-foreground font-display block text-[11px] font-semibold uppercase';
+
 interface SignInCardProps {
   flow: 'signIn' | 'signUp';
 }
@@ -38,92 +42,146 @@ interface SignInCardProps {
 const SignInCard: React.FC<SignInCardProps> = ({ flow }): JSX.Element => {
   const { signIn } = useAuthActions();
   const router = useRouter();
-  const [pending, setPending] = useState(false);
+  const [pending, setPending] = useState<'google' | 'password' | null>(null);
+
+  const isSignIn = flow === 'signIn';
+  const busy = pending !== null;
+
+  const handleGoogle = async () => {
+    setPending('google');
+
+    try {
+      await signIn('google');
+    } catch (error) {
+      toast.error('Could not reach Google. Try again.');
+      console.error(error);
+      setPending(null);
+    }
+  };
 
   const handlePassword = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
     formData.set('flow', flow);
-    setPending(true);
+    setPending('password');
 
     try {
       await signIn('password', formData);
+      toast.success('Cleared. Taking you to your boards.');
       router.push('/dashboard');
     } catch (error) {
-      toast.error('Could not authenticate. Check your credentials.');
+      toast.error(
+        isSignIn
+          ? "That email and password don't match."
+          : 'That email already has an account. Sign in instead.'
+      );
       console.error(error);
-    } finally {
-      setPending(false);
+      setPending(null);
     }
   };
 
   return (
-    <div className='bg-card w-full max-w-md rounded-2xl border p-8 shadow-xl shadow-black/5'>
-      <div className='mb-8 flex flex-col items-center gap-3 text-center'>
-        <div className='bg-primary text-primary-foreground flex h-12 w-12 items-center justify-center rounded-xl shadow-sm'>
-          <LayoutDashboard className='h-6 w-6' />
-        </div>
-        <div className='flex flex-col gap-1'>
-          <h1 className='text-2xl font-semibold tracking-tight'>
-            {flow === 'signIn' ? 'Welcome back' : 'Create your account'}
-          </h1>
-          <p className='text-muted-foreground text-sm'>
-            {flow === 'signIn'
-              ? 'Sign in to continue to BoardFlow'
-              : 'Start collaborating on boards with your team'}
-          </p>
-        </div>
-      </div>
+    <div className='plate w-full max-w-[420px] rounded-[14px] p-6 md:p-8'>
+      <h1
+        className='font-display text-foreground text-[28px] leading-[32px] font-bold md:text-[36px] md:leading-[40px]'
+        style={{ fontStretch: '112%', letterSpacing: '-0.015em' }}
+      >
+        {isSignIn
+          ? "Everyone's already on the board."
+          : 'Put your whole team on one surface.'}
+      </h1>
+      <p className='text-muted-foreground mt-2.5 text-[15px] leading-[1.5]'>
+        {isSignIn
+          ? 'Sign in and your cursor joins theirs — same canvas, same second.'
+          : 'Create an account, open a board, and everyone lands on the same canvas.'}
+      </p>
 
-      <div className='flex flex-col gap-2.5'>
-        <Button
-          variant='outline'
-          className='h-11 justify-center gap-2.5'
-          onClick={() => void signIn('google')}
-        >
-          <GoogleIcon />
-          Continue with Google
-        </Button>
-      </div>
+      <Button
+        variant='outline'
+        className='bg-card mt-6 h-12 w-full justify-center gap-2.5 rounded-lg text-[15px]'
+        onClick={handleGoogle}
+        disabled={busy}
+      >
+        {pending === 'google' ? null : <GoogleIcon />}
+        {pending === 'google' ? 'Opening Google…' : 'Continue with Google'}
+      </Button>
 
-      <div className='my-6 flex items-center gap-3'>
+      <div className='my-5 flex items-center gap-3'>
         <span className='bg-border h-px flex-1' />
-        <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
-          or continue with email
+        <span
+          className='text-muted-foreground font-display text-[11px] font-semibold uppercase'
+          style={{ letterSpacing: '0.1em' }}
+        >
+          {isSignIn ? 'Or sign in with email' : 'Or sign up with email'}
         </span>
         <span className='bg-border h-px flex-1' />
       </div>
 
-      <form onSubmit={handlePassword} className='flex flex-col gap-3'>
-        <Input
-          name='email'
-          type='email'
-          placeholder='Email'
-          className='h-11'
-          required
-        />
-        <Input
-          name='password'
-          type='password'
-          placeholder='Password'
-          className='h-11'
-          required
-        />
-        <Button type='submit' className='h-11' disabled={pending}>
-          {flow === 'signIn' ? 'Sign in' : 'Sign up'}
+      <form onSubmit={handlePassword} className='flex flex-col gap-4'>
+        <div className='flex flex-col gap-2'>
+          <label htmlFor='email' className={FIELD_LABEL}>
+            Email
+          </label>
+          <div className='field-route'>
+            <Input
+              id='email'
+              name='email'
+              type='email'
+              placeholder='you@team.com'
+              autoComplete='email'
+              className='bg-card h-12 rounded-lg text-[15px]'
+              disabled={busy}
+              required
+            />
+          </div>
+        </div>
+
+        <div className='flex flex-col gap-2'>
+          <label htmlFor='password' className={FIELD_LABEL}>
+            Password
+          </label>
+          <div className='field-route'>
+            <Input
+              id='password'
+              name='password'
+              type='password'
+              placeholder='••••••••'
+              autoComplete={isSignIn ? 'current-password' : 'new-password'}
+              className='bg-card h-12 rounded-lg text-[15px]'
+              disabled={busy}
+              required
+            />
+          </div>
+          {!isSignIn && (
+            <p className='text-muted-foreground text-[13px]'>
+              8 characters minimum. No other rules.
+            </p>
+          )}
+        </div>
+
+        <Button
+          type='submit'
+          className={cn('h-12 w-full rounded-lg text-[15px] font-semibold')}
+          disabled={busy}
+        >
+          {pending === 'password'
+            ? isSignIn
+              ? 'Signing in…'
+              : 'Setting you up…'
+            : isSignIn
+              ? 'Sign in'
+              : 'Create account'}
         </Button>
       </form>
 
-      <p className='text-muted-foreground mt-4 text-center text-sm'>
-        {flow === 'signIn'
-          ? "Don't have an account? "
-          : 'Already have an account? '}
+      <p className='text-muted-foreground mt-5 text-[13px]'>
+        {isSignIn ? 'First time here? ' : 'Already on BoardFlow? '}
         <Link
-          href={flow === 'signIn' ? '/register' : '/login'}
-          className='text-foreground font-medium underline-offset-4 hover:underline'
+          href={isSignIn ? '/register' : '/login'}
+          className='text-foreground font-medium underline decoration-1 underline-offset-4'
         >
-          {flow === 'signIn' ? 'Sign up' : 'Sign in'}
+          {isSignIn ? 'Create an account' : 'Sign in'}
         </Link>
       </p>
     </div>

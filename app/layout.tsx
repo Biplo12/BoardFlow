@@ -1,6 +1,6 @@
 import { ConvexAuthNextjsServerProvider } from '@convex-dev/auth/nextjs/server';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Archivo, Instrument_Sans } from 'next/font/google';
 
 import './globals.css';
 
@@ -10,7 +10,18 @@ import { siteConfig } from '@/constant/config';
 import { ConvexClientProvider } from '@/providers/convex-client-provider';
 import { ReduxProvider } from '@/providers/redux-provider';
 
-const inter = Inter({ subsets: ['latin'] });
+const display = Archivo({
+  subsets: ['latin'],
+  axes: ['wdth'],
+  display: 'swap',
+  variable: '--font-display',
+});
+
+const sans = Instrument_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sans',
+});
 
 export const metadata: Metadata = {
   title: {
@@ -34,7 +45,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body className={inter.className}>
+      <body className={`${display.variable} ${sans.variable} font-sans`}>
         <ReduxProvider>
           <ConvexAuthNextjsServerProvider>
             <ConvexClientProvider>

@@ -64,7 +64,7 @@ const CanvasObjects: React.FC<CanvasObjectsProps> = ({
         {canvasState.mode === CanvasMode.SelectingNet &&
           canvasState.current != null && (
             <rect
-              className='fill-blue-500/5 stroke-blue-500 stroke-1'
+              className='fill-[hsl(var(--route-cyan)/0.06)] stroke-[hsl(var(--route-cyan))] stroke-1'
               x={Math.min(canvasState.origin?.x, canvasState.current.x)}
               y={Math.min(canvasState.origin?.y, canvasState.current.y)}
               width={Math.abs(canvasState.origin?.x - canvasState.current.x)}

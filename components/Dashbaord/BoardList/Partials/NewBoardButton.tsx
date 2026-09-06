@@ -39,9 +39,9 @@ const NewBoardButton: React.FC<NewBoardButtonProps> = ({
       disabled={pending || disabled}
       onClick={handleCreateBoard}
       className={cn(
-        'col-span-1 flex aspect-[100/127] flex-col items-center justify-center rounded-lg bg-blue-950 py-6 hover:bg-blue-900',
+        'bg-primary hover:bg-primary/90 col-span-1 flex aspect-[100/127] flex-col items-center justify-center rounded-lg py-6',
         (pending || disabled) &&
-          'cursor-not-allowed opacity-75 hover:bg-blue-950'
+          'hover:bg-primary cursor-not-allowed opacity-75'
       )}
     >
       <div />

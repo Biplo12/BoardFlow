@@ -50,7 +50,7 @@ const EmptyBoards: React.FC = (): JSX.Element => {
       />
       <div className='flex flex-col gap-2'>
         <h1 className='text-2xl font-semibold'>Create your first board!</h1>
-        <p className='text-sm text-muted-foreground'>
+        <p className='text-muted-foreground text-sm'>
           Create a board by clicking the button below.
         </p>
       </div>
