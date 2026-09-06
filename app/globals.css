@@ -129,3 +129,52 @@ body,
   outline: 3px solid var(--candy-ink);
   outline-offset: 2px;
 }
+
+.candy-field:hover:not(:disabled) {
+  background: rgba(0, 18, 52, 0.1) !important;
+}
+
+/* Flat controls: press into the page instead of lifting off it. */
+.candy-button {
+  transition:
+    filter 140ms ease,
+    transform 140ms ease;
+}
+
+.candy-button:hover:not(:disabled) {
+  filter: brightness(0.94);
+}
+
+.candy-button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
+}
+
+.candy-button:focus-visible {
+  outline: 3px solid var(--candy-ink);
+  outline-offset: 3px;
+}
+
+@keyframes artifact-float {
+  from {
+    transform: translateY(-7px);
+  }
+  to {
+    transform: translateY(7px);
+  }
+}
+
+.artifact-float > * {
+  animation: artifact-float var(--float-duration, 8s) ease-in-out infinite
+    alternate;
+  animation-delay: var(--float-delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .artifact-float > * {
+    animation: none;
+  }
+
+  .candy-button:active:not(:disabled) {
+    transform: none;
+  }
+}

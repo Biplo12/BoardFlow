@@ -105,7 +105,7 @@ const SignInCard: React.FC<SignInCardProps> = ({ flow }): JSX.Element => {
         type='button'
         onClick={handleGoogle}
         disabled={busy}
-        className='mt-7 flex h-14 w-full items-center justify-center gap-3 rounded-[22px] text-[17px] font-semibold transition-opacity disabled:opacity-60'
+        className='candy-button mt-7 flex h-14 w-full items-center justify-center gap-3 rounded-[22px] text-[17px] font-semibold disabled:opacity-60'
         style={{
           backgroundColor: 'var(--candy-surface)',
           color: 'var(--candy-ink)',
@@ -156,7 +156,7 @@ const SignInCard: React.FC<SignInCardProps> = ({ flow }): JSX.Element => {
         <button
           type='submit'
           disabled={busy}
-          className='mt-2 h-14 w-full rounded-[22px] text-[19px] font-semibold text-white transition-opacity disabled:opacity-60'
+          className='candy-button mt-2 h-14 w-full rounded-[22px] text-[19px] font-semibold text-white disabled:opacity-60'
           style={{ backgroundColor: 'var(--candy-pink)' }}
         >
           {pending === 'password'
@@ -174,7 +174,7 @@ const SignInCard: React.FC<SignInCardProps> = ({ flow }): JSX.Element => {
         {isSignIn ? 'New to BoardFlow? ' : 'Already have an account? '}
         <Link
           href={isSignIn ? '/register' : '/login'}
-          className='font-semibold underline underline-offset-4'
+          className='font-semibold underline underline-offset-4 transition-opacity hover:opacity-60'
           style={{ color: 'var(--candy-ink)' }}
         >
           {isSignIn ? 'Sign up' : 'Log in'}
