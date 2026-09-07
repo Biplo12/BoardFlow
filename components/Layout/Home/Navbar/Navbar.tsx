@@ -1,43 +1,48 @@
 'use client';
 
-import { Menu } from 'lucide-react';
 import React from 'react';
 
 import AuthButton from '@/components/common/AuthButton';
-import Logo from '@/components/common/Logo';
+import BrandMark from '@/components/common/BrandMark';
 
-const navItems = [
-  {
-    name: 'Home',
-    href: '#home',
-  },
-  {
-    name: 'About',
-    href: '#about',
-  },
-  {
-    name: 'Contact',
-    href: '#contact',
-  },
+const NAV_ITEMS = [
+  { name: 'How it works', href: '#how' },
+  { name: 'Features', href: '#about' },
+  { name: 'Questions', href: '#faq' },
 ];
 
 const Navbar: React.FC = (): JSX.Element => {
   return (
-    <div className='fixed left-0 top-0 z-50 flex h-16 w-full items-center justify-between bg-white px-4 shadow-sm sm:px-6'>
-      <Logo />
-      <div className='hidden gap-4 px-2 sm:flex'>
-        {navItems.map((item) => (
-          <a
-            key={item.name}
-            href={item.href}
-            className='text-gray-600 hover:text-gray-800'
+    <div className='fixed top-0 left-0 z-50 flex w-full justify-center p-3 sm:p-4'>
+      <div
+        className='enter-drop flex w-full max-w-[1120px] items-center justify-between rounded-[22px] py-2.5 pr-2.5 pl-4'
+        style={{ backgroundColor: 'rgba(255,255,255,0.82)' }}
+      >
+        <a href='#home' className='group flex items-center gap-2.5'>
+          <BrandMark className='h-8 w-8 transition-transform duration-300 group-hover:-rotate-6' />
+          <span
+            className='text-[18px] font-black tracking-[-0.03em]'
+            style={{ color: 'var(--candy-ink)' }}
           >
-            {item.name}
-          </a>
-        ))}
+            BoardFlow
+          </span>
+        </a>
+
+        <div className='hidden items-center gap-7 md:flex'>
+          {NAV_ITEMS.map((item) => (
+            <a
+              key={item.name}
+              href={item.href}
+              className='nav-link text-[15px] font-semibold'
+              style={{ color: 'var(--candy-ink)' }}
+            >
+              {item.name}
+            </a>
+          ))}
+        </div>
+
+        <AuthButton />
       </div>
-      <AuthButton />
-      <Menu className='sm:hidden' size={24} />
     </div>
   );
 };

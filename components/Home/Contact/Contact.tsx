@@ -1,55 +1,56 @@
-/* eslint-disable @next/next/no-img-element */
-import { Mail } from 'lucide-react';
+import Link from 'next/link';
 import React from 'react';
 
-const MAIL = 'robert.sinski@outlook.com';
-const GITHUB = 'https://github.com/biplo12';
-const LINKEDIN = 'https://www.linkedin.com/in/robert-si%C5%84ski/';
-
-const GitHub = () => <img src='/svg/github.svg' alt='GitHub' className='w-6' />;
-const LinkedIn = () => (
-  <img src='/svg/linkedin.png' alt='LinkedIn' className='w-6' />
-);
+import PersonAvatar from '@/components/common/PersonAvatar';
 
 const Contact: React.FC = (): JSX.Element => {
-  const medias = [
-    {
-      name: 'Mail',
-      link: `mailto:${MAIL}`,
-      icon: <Mail />,
-    },
-    {
-      name: 'GitHub',
-      link: GITHUB,
-      icon: <GitHub />,
-    },
-    {
-      name: 'LinkedIn',
-      link: LINKEDIN,
-      icon: <LinkedIn />,
-    },
-  ];
-
   return (
-    <div className='relative flex min-h-[55vh] w-full flex-col items-center justify-center gap-2 overflow-hidden bg-black/5 px-6 text-black'>
-      <div className='flex flex-col items-center justify-center gap-2'>
-        <h1 className='text-center text-4xl font-bold' id='contact'>
-          Get in touch with me.
-        </h1>
-        <p className='max-w-xl text-center'>
-          If you have any questions, suggestions, or feedback, feel free to
-          contact me. Also, if you want to contribute to the project, you are
-          more than welcome.
-        </p>
-        <div className='flex flex-row gap-2'>
-          {medias.map((media, index) => (
-            <a href={media.link} target='_blank' rel='noreferrer' key={index}>
-              {media.icon}
-            </a>
-          ))}
+    <section
+      id='contact'
+      className='w-full px-4 py-24 sm:px-8'
+      style={{ backgroundColor: '#fff' }}
+    >
+      <div className='mx-auto max-w-[1160px]'>
+        <div
+          className='flex flex-col items-center rounded-[32px] px-8 py-16 text-center sm:px-14 sm:py-20'
+          style={{ backgroundColor: 'var(--candy-ink)' }}
+        >
+          <div className='avatar-row flex -space-x-4'>
+            {[2, 0, 4, 5, 1, 6].map((seed) => (
+              <PersonAvatar
+                key={seed}
+                seed={seed}
+                className='avatar-chip h-16 w-16 border-[3px] border-[#111111]'
+              />
+            ))}
+          </div>
+
+          <h2 className='candy-display mt-8 max-w-[720px] text-[38px] text-white sm:text-[58px]'>
+            Put your team on one surface
+          </h2>
+          <p className='mt-5 max-w-[460px] text-[17px] font-medium text-white/60'>
+            Making your first board takes about ten seconds, and the people you
+            invite need nothing but the link.
+          </p>
+
+          <div className='mt-10 flex flex-col gap-3 sm:flex-row sm:items-center'>
+            <Link
+              href='/register'
+              className='candy-button flex h-14 items-center justify-center rounded-[22px] px-8 text-[17px] font-semibold whitespace-nowrap text-white'
+              style={{ backgroundColor: 'var(--candy-pink)' }}
+            >
+              Start a board for free
+            </Link>
+            <Link
+              href='/login'
+              className='flex h-14 items-center justify-center rounded-[22px] px-6 text-[17px] font-semibold text-white/70 transition-colors hover:text-white'
+            >
+              I already have an account
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 export default Contact;

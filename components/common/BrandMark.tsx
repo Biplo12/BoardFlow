@@ -2,7 +2,7 @@ import React from 'react';
 
 import { cn } from '@/lib/utils';
 
-const LINE = 'rgba(0,18,52,0.32)';
+const LINE = '#16283c';
 
 interface BrandMarkProps {
   className?: string;
@@ -22,18 +22,18 @@ const BrandMark: React.FC<BrandMarkProps> = ({ className }): JSX.Element => {
         y='4'
         width='21'
         height='21'
-        rx='6'
+        rx='7'
         transform='rotate(-6 13.5 14.5)'
         fill='var(--candy-pink, #ff3d7f)'
         stroke={LINE}
-        strokeWidth='1.8'
+        strokeWidth='2'
       />
       {/* somebody on it, breaking the edge */}
       <path
-        d='M15 12 15 25 18.6 21.7 20.8 28.6 24.4 27.1 21.8 20.6 27.6 19.9Z'
+        d='M14 10 14 25.1 18.2 21.3 20.7 29.3 24.9 27.6 22 20.1 28.7 19.2Z'
         fill='#fff'
         stroke={LINE}
-        strokeWidth='1.8'
+        strokeWidth='2'
         strokeLinejoin='round'
       />
     </svg>

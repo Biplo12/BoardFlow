@@ -74,8 +74,13 @@ const SignInCard: React.FC<SignInCardProps> = ({ flow }): JSX.Element => {
 
   return (
     <div
-      className='rounded-[28px] p-8 sm:p-10'
-      style={{ backgroundColor: '#fff', color: 'var(--candy-ink)' }}
+      className='enter-board rounded-[28px] border-[3px] p-8 sm:p-10'
+      style={{
+        backgroundColor: '#fff',
+        borderColor: 'var(--candy-ink)',
+        boxShadow: '12px 14px 0 0 rgba(17,17,17,0.16)',
+        color: 'var(--candy-ink)',
+      }}
     >
       <h1 className='candy-display text-[38px] sm:text-[46px]'>
         {isSignIn ? (
@@ -163,7 +168,7 @@ const SignInCard: React.FC<SignInCardProps> = ({ flow }): JSX.Element => {
             ? 'One moment…'
             : isSignIn
               ? 'Log in'
-              : 'Sign up — it’s free'}
+              : 'Create a free account'}
         </button>
       </form>
 

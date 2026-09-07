@@ -4,19 +4,19 @@ import { useConvexAuth } from 'convex/react';
 import Link from 'next/link';
 import React from 'react';
 
-import { Button } from '@/components/ui/button';
-
 const AuthButton: React.FC = (): JSX.Element => {
   const { isAuthenticated, isLoading } = useConvexAuth();
 
   return (
     <Link
       href={isAuthenticated ? '/dashboard' : '/login'}
-      className='hidden sm:block'
+      className='candy-button flex h-11 items-center rounded-[18px] px-5 text-[15px] font-semibold text-white'
+      style={{
+        backgroundColor: 'var(--candy-pink)',
+        opacity: isLoading ? 0.6 : 1,
+      }}
     >
-      <Button disabled={isLoading}>
-        {isAuthenticated ? 'Go to Dashboard' : 'Sign in to continue'}
-      </Button>
+      {isAuthenticated ? 'Open dashboard' : 'Log in'}
     </Link>
   );
 };
