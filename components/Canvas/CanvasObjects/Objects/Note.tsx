@@ -1,4 +1,5 @@
 import { Kalam } from 'next/font/google';
+import React, { useEffect, useRef } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
 import {
@@ -6,6 +7,8 @@ import {
   cn,
   colorToCss,
   getContrastingTextColor,
+  htmlToPlainText,
+  plainTextToHtml,
 } from '@/lib/utils';
 import useUpdateValue from '@/hooks/useUpdateValue';
 
@@ -20,21 +23,37 @@ interface NoteProps {
   id: string;
   layer: NoteLayer;
   onPointerDown: (e: React.PointerEvent, id: string) => void;
-  selectionColor?: string;
 }
 
 const Note: React.FC<NoteProps> = ({
   id,
   layer,
   onPointerDown,
-  selectionColor,
 }): JSX.Element => {
-  const { x, y, width, height, fill, value = 'Text' } = layer;
+  const { x, y, width, height, fill, opacity, value = '' } = layer;
 
   const { updateValue } = useUpdateValue();
+  const editable = useRef<HTMLElement>(
+    null
+  ) as React.RefObject<HTMLElement>;
+
+  /* A fresh note is placed to be written on, so it takes the caret at once. */
+  useEffect(() => {
+    if (!editable.current?.textContent) {
+      editable.current?.focus({ preventScroll: true });
+    }
+  }, []);
 
   const handleContentChange = (e: ContentEditableEvent) => {
-    updateValue(e.target.value, id);
+    updateValue(htmlToPlainText(e.target.value), id);
+  };
+
+  /* Paste as plain text so a copied web page cannot push its markup into
+     shared board storage. */
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
   };
 
   return (
@@ -44,22 +63,22 @@ const Note: React.FC<NoteProps> = ({
       width={width}
       height={height}
       onPointerDown={(e) => onPointerDown(e, id)}
-      style={{
-        outline: selectionColor ? `1px solid ${selectionColor}` : 'none',
-        backgroundColor: fill ? colorToCss(fill) : '#000',
-      }}
+      opacity={(opacity ?? 100) / 100}
+      style={{ backgroundColor: colorToCss(fill) }}
       className='shadow-md drop-shadow-xl'
     >
       <ContentEditable
-        html={value || ''}
+        innerRef={editable}
+        html={plainTextToHtml(value)}
         onChange={handleContentChange}
+        onPaste={handlePaste}
         className={cn(
           'flex h-full w-full items-center justify-center text-center outline-none',
           font.className
         )}
         style={{
           fontSize: calculateFontSize(width, height),
-          color: fill ? getContrastingTextColor(fill) : '#000',
+          color: getContrastingTextColor(fill),
         }}
       />
     </foreignObject>

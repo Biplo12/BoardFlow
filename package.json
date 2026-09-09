@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@auth/core": "0.41.3",
@@ -44,6 +46,7 @@
     "@types/node": "^26.4.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
     "autoprefixer": "^10.5.4",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.3.4",
@@ -57,7 +60,10 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.3.3",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^8.2.2",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^5.0.0"
   },
   "resolutions": {
     "postcss": "^8.5.28",

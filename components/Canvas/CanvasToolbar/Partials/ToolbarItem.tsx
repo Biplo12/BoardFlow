@@ -1,11 +1,10 @@
 import React from 'react';
 
 import Hint from '@/components/common/Hint';
-import { Button } from '@/components/ui/button';
 
 interface ToolbarItemProps {
   label: string;
-  Icon: React.FC;
+  Icon: React.FC<{ className?: string }>;
   onClick: () => void;
   isDisabled?: boolean;
   isActive?: boolean;
@@ -20,14 +19,14 @@ const ToolbarItem: React.FC<ToolbarItemProps> = ({
 }): JSX.Element => {
   return (
     <Hint label={label} side='right' sideOffset={14}>
-      <Button
+      <button
         disabled={isDisabled}
         onClick={onClick}
-        size='sm'
-        variant={isActive ? 'default' : 'ghost'}
+        data-active={Boolean(isActive)}
+        className='tool-button'
       >
-        <Icon />
-      </Button>
+        <Icon className='h-[19px] w-[19px]' />
+      </button>
     </Hint>
   );
 };

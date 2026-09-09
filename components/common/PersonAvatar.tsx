@@ -1,29 +1,20 @@
 import Image from 'next/image';
 import React from 'react';
 
-import { cn } from '@/lib/utils';
-
-const PEOPLE = [
-  { face: 'ada', tint: '#ffd8e6' },
-  { face: 'dev', tint: '#c9e9ff' },
-  { face: 'gia', tint: '#c3e776' },
-  { face: 'lou', tint: '#edf072' },
-  { face: 'cira', tint: '#e3d4ff' },
-  { face: 'nils', tint: '#ffe0c2' },
-  { face: 'iris', tint: '#c9e9ff' },
-  { face: 'huck', tint: '#ffd8e6' },
-];
+import { cn, peepFace } from '@/lib/utils';
 
 interface PersonAvatarProps {
-  seed: number;
+  seed: string | number;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 const PersonAvatar: React.FC<PersonAvatarProps> = ({
   seed,
   className,
+  style,
 }): JSX.Element => {
-  const person = PEOPLE[seed % PEOPLE.length];
+  const { face, tint } = peepFace(seed);
 
   return (
     <span
@@ -31,10 +22,10 @@ const PersonAvatar: React.FC<PersonAvatarProps> = ({
         'relative block h-10 w-10 shrink-0 overflow-hidden rounded-[32%]',
         className
       )}
-      style={{ backgroundColor: person.tint }}
+      style={{ backgroundColor: tint, ...style }}
     >
       <Image
-        src={`/illustrations/peeps/avatar/${person.face}.svg`}
+        src={`/illustrations/peeps/avatar/${face}.svg`}
         alt=''
         aria-hidden
         fill

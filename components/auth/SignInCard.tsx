@@ -27,6 +27,8 @@ const GoogleIcon = () => (
   </svg>
 );
 
+const DASHBOARD_URL = '/dashboard';
+
 interface SignInCardProps {
   flow: 'signIn' | 'signUp';
 }
@@ -43,7 +45,7 @@ const SignInCard: React.FC<SignInCardProps> = ({ flow }): JSX.Element => {
     setPending('google');
 
     try {
-      await signIn('google');
+      await signIn('google', { redirectTo: DASHBOARD_URL });
     } catch (error) {
       toast.error('Could not reach Google. Try again.');
       console.error(error);
@@ -59,8 +61,10 @@ const SignInCard: React.FC<SignInCardProps> = ({ flow }): JSX.Element => {
     setPending('password');
 
     try {
+      formData.set('redirectTo', DASHBOARD_URL);
       await signIn('password', formData);
-      router.push('/dashboard');
+      router.replace(DASHBOARD_URL);
+      router.refresh();
     } catch (error) {
       toast.error(
         isSignIn
@@ -74,7 +78,7 @@ const SignInCard: React.FC<SignInCardProps> = ({ flow }): JSX.Element => {
 
   return (
     <div
-      className='enter-board rounded-[28px] border-[3px] p-8 sm:p-10'
+      className='rounded-[28px] border-[3px] p-8 sm:p-10'
       style={{
         backgroundColor: '#fff',
         borderColor: 'var(--candy-ink)',

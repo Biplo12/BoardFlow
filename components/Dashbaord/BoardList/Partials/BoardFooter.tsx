@@ -6,8 +6,8 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useApiMutation } from '@/hooks/useApiMutation';
 
-import { api } from '@/convex/_generated/api';
 import Board from '@/constant/interfaces/Board';
+import { api } from '@/convex/_generated/api';
 
 interface BoardFooterProps {
   board: Board;
@@ -55,20 +55,36 @@ const BoardFooter: React.FC<BoardFooterProps> = ({ board }): JSX.Element => {
   };
 
   return (
-    <div className='relative bg-white p-3'>
-      <p className='max-w-[calc(100%-20px)] truncate text-sm'>{board.title}</p>
-      <p className='truncate text-sm text-muted-foreground opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100'>
+    <div
+      className='relative border-t-2 bg-white p-3.5'
+      style={{ borderColor: 'var(--candy-ink)' }}
+    >
+      <p
+        className='max-w-[calc(100%-24px)] truncate text-[15px] font-bold'
+        style={{ color: 'var(--candy-ink)' }}
+      >
+        {board.title}
+      </p>
+      <p
+        className='truncate text-[13px] font-medium opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100'
+        style={{ color: 'var(--candy-muted)' }}
+      >
         {author}
       </p>
       <button
         className={cn(
-          'absolute right-3 top-3 text-muted-foreground opacity-100 transition hover:text-blue-950 lg:opacity-0 lg:group-hover:opacity-100',
+          'absolute top-3.5 right-3.5 transition-transform hover:scale-115 lg:opacity-0 lg:group-hover:opacity-100',
+          isFavorite && 'lg:opacity-100',
           disabled && 'cursor-not-allowed opacity-75'
         )}
         onClick={handleToggleFavorite}
       >
         <Star
-          className={cn('h-4 w-4', isFavorite && 'fill-blue-950 text-blue-950')}
+          className='h-[18px] w-[18px]'
+          style={{
+            color: isFavorite ? 'var(--candy-pink)' : 'var(--candy-muted)',
+            fill: isFavorite ? 'var(--candy-pink)' : 'transparent',
+          }}
         />
       </button>
     </div>

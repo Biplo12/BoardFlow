@@ -1,29 +1,27 @@
 import React from 'react';
 
+import { cn } from '@/lib/utils';
+
 import Hint from '@/components/common/Hint';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import PersonAvatar from '@/components/common/PersonAvatar';
 
 interface UserAvatarProps {
-  src: string;
   name: string;
-  fallback: string;
-  borderColor?: string;
+  seed?: string;
+  className?: string;
 }
 
 const UserAvatar: React.FC<UserAvatarProps> = ({
-  src,
   name,
-  fallback,
-  borderColor,
+  seed,
+  className,
 }): JSX.Element => {
   return (
     <Hint label={name} side='bottom' sideOffset={18}>
-      <Avatar className='h-8 w-8 border-2' style={{ borderColor }}>
-        <AvatarImage src={src} />
-        <AvatarFallback className='text-xs font-semibold'>
-          {fallback}
-        </AvatarFallback>
-      </Avatar>
+      <PersonAvatar
+        seed={seed ?? name}
+        className={cn('h-12 w-12 border-[3px] border-[#111111]', className)}
+      />
     </Hint>
   );
 };

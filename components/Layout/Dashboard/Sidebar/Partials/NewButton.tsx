@@ -16,7 +16,7 @@ const NewButton: React.FC = (): JSX.Element => {
           align='start'
           sideOffset={18}
         >
-          <button className='flex h-full w-full items-center justify-center rounded-md bg-white/25 opacity-60 transition hover:opacity-100'>
+          <button className='flex h-full w-full items-center justify-center rounded-[14px] border-2 border-dashed border-white/45 text-white/70 transition hover:border-white hover:text-white'>
             <Plus />
           </button>
         </Hint>

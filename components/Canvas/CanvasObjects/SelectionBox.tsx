@@ -1,29 +1,23 @@
-/* eslint-disable unused-imports/no-unused-vars */
+ 
 import React, { memo } from 'react';
 
+import { claimPointer, surfaceOf } from '@/lib/canvas-pointer';
 import useBounds from '@/hooks/useBounds';
 
-import { useSelf, useStorage } from '@/liveblocks.config';
-
-import { LayerType, Side, XYWH } from '@/types/TCanvasState';
+import { Side, XYWH } from '@/types/TCanvasState';
 
 interface SelectionBoxProps {
   onResizeHandlePointerDown: (corner: Side, initialBounds: XYWH) => void;
+  scale?: number;
 }
 
-const HANDLE_WIDTH = 8;
+const BASE_HANDLE_WIDTH = 8;
 
 const SelectionBox: React.FC<SelectionBoxProps> = memo(
-  ({ onResizeHandlePointerDown }) => {
-    const soleLayerId = useSelf((me) =>
-      me.presence.selection.length === 1 ? me.presence.selection[0] : null
-    );
-
-    const isShowingHandles = useStorage(
-      (root) =>
-        soleLayerId && root.layers[soleLayerId]?.type !== LayerType.Path
-    );
-
+  ({ onResizeHandlePointerDown, scale = 1 }) => {
+    /* The whole surface is scaled, so handles and outlines are divided back
+       out to keep the same size on screen at any zoom. */
+    const HANDLE_WIDTH = BASE_HANDLE_WIDTH / scale;
     const { bounds } = useBounds();
 
     if (!bounds) {
@@ -84,7 +78,8 @@ const SelectionBox: React.FC<SelectionBoxProps> = memo(
     return (
       <>
         <rect
-          className='pointer-events-none fill-transparent stroke-blue-500 stroke-1'
+          className='pointer-events-none fill-transparent stroke-[#0f8fd6]'
+          strokeWidth={1 / scale}
           style={{
             transform: `translate(${bounds.x}px, ${bounds.y}px)`,
           }}
@@ -93,28 +88,26 @@ const SelectionBox: React.FC<SelectionBoxProps> = memo(
           width={bounds.width}
           height={bounds.height}
         />
-        {isShowingHandles && (
-          <>
-            {handlePositions.map((handle, index) => (
-              <rect
-                key={index}
-                className='fill-white stroke-blue-500 stroke-1'
-                x={0}
-                y={0}
-                style={{
-                  cursor: handle.cursor,
-                  width: `${HANDLE_WIDTH}px`,
-                  height: `${HANDLE_WIDTH}px`,
-                  transform: `translate(${handle.x}px, ${handle.y}px)`,
-                }}
-                onPointerDown={(e) => {
-                  e.stopPropagation();
-                  onResizeHandlePointerDown(handle.side, bounds);
-                }}
-              />
-            ))}
-          </>
-        )}
+        {handlePositions.map((handle, index) => (
+          <rect
+            key={index}
+            className='fill-white stroke-[#0f8fd6]'
+            strokeWidth={1 / scale}
+            x={0}
+            y={0}
+            style={{
+              cursor: handle.cursor,
+              width: `${HANDLE_WIDTH}px`,
+              height: `${HANDLE_WIDTH}px`,
+              transform: `translate(${handle.x}px, ${handle.y}px)`,
+            }}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              claimPointer(e, surfaceOf(e.currentTarget));
+              onResizeHandlePointerDown(handle.side, bounds);
+            }}
+          />
+        ))}
       </>
     );
   }

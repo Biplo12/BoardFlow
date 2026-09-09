@@ -40,6 +40,7 @@ const Faq: React.FC = (): JSX.Element => {
     >
       <div className='mx-auto max-w-[1160px]'>
         <h2
+          data-reveal
           className='candy-display text-[38px] sm:text-[58px]'
           style={{ color: 'var(--candy-ink)' }}
         >
@@ -47,11 +48,17 @@ const Faq: React.FC = (): JSX.Element => {
         </h2>
 
         <div className='mt-12 grid grid-cols-1 gap-x-16 md:grid-cols-2'>
-          {QUESTIONS.map((item) => (
+          {QUESTIONS.map((item, index) => (
             <div
               key={item.q}
+              data-reveal
               className='border-t py-7'
-              style={{ borderColor: 'rgba(0,18,52,0.12)' }}
+              style={
+                {
+                  borderColor: 'rgba(0,18,52,0.12)',
+                  '--reveal-delay': `${(index % 2) * 70}ms`,
+                } as React.CSSProperties
+              }
             >
               <h3
                 className='text-[19px] font-black tracking-[-0.015em]'

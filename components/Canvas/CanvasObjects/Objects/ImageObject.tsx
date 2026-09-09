@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-/* eslint-disable unused-imports/no-unused-vars */
 import React from 'react';
 
 import { ImageLayer } from '@/types/TCanvasState';
@@ -11,16 +10,15 @@ interface ImageObjectProps {
   id: string;
   layer: ImageLayer;
   onPointerDown: (e: React.PointerEvent, layerId: string) => void;
-  selectionColor?: string;
 }
 
 const ImageObject: React.FC<ImageObjectProps> = ({
   id,
   layer,
   onPointerDown,
-  selectionColor,
 }): JSX.Element => {
-  const { x, y, width, height, value } = layer;
+  const { x, y, width, height, opacity, value } = layer;
+
   return (
     <foreignObject
       x={x}
@@ -28,11 +26,8 @@ const ImageObject: React.FC<ImageObjectProps> = ({
       width={width}
       height={height}
       onPointerDown={(e) => onPointerDown(e, id)}
-      style={{
-        outline: selectionColor ? `1px solid ${selectionColor}` : 'none',
-      }}
+      opacity={(opacity ?? 100) / 100}
     >
-      {' '}
       <img
         src={value || PLACEHOLDER_IMAGE}
         alt='image'

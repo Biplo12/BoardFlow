@@ -30,6 +30,7 @@ const About: React.FC = (): JSX.Element => {
     >
       <div className='mx-auto max-w-[1160px]'>
         <h2
+          data-reveal
           className='candy-display max-w-[680px] text-[38px] sm:text-[58px]'
           style={{ color: 'var(--candy-ink)' }}
         >
@@ -44,6 +45,7 @@ const About: React.FC = (): JSX.Element => {
 
         <div className='mt-14 grid grid-cols-1 gap-4 lg:grid-cols-3'>
           <div
+            data-reveal
             className='peep-card group relative flex min-h-[340px] flex-col justify-end lg:col-span-2'
             style={{ backgroundColor: 'var(--candy-pink)' }}
           >
@@ -76,6 +78,7 @@ const About: React.FC = (): JSX.Element => {
           </div>
 
           <div
+            data-reveal
             className='hover-lift relative flex min-h-[340px] flex-col overflow-hidden rounded-[26px] p-8'
             style={{ backgroundColor: 'var(--candy-violet)' }}
           >
@@ -121,6 +124,7 @@ const About: React.FC = (): JSX.Element => {
           </div>
 
           <div
+            data-reveal
             className='hover-lift group relative flex flex-col justify-between overflow-hidden rounded-[26px] p-8 lg:col-span-2'
             style={{ backgroundColor: 'var(--candy-lime)' }}
           >
@@ -185,7 +189,7 @@ const About: React.FC = (): JSX.Element => {
               </span>
 
               <span
-                className='board-word relative overflow-hidden rounded-[10px] border-[4px] px-4 pt-2 pb-4'
+                className='board-word relative overflow-hidden rounded-[10px] border-[4px] px-5 pt-2.5 pb-7'
                 style={
                   {
                     backgroundColor: '#d8eeff',
@@ -195,7 +199,7 @@ const About: React.FC = (): JSX.Element => {
                 }
               >
                 <svg
-                  className='absolute inset-x-0 bottom-0 h-[26px] w-full'
+                  className='absolute inset-x-0 bottom-0 h-[22px] w-full'
                   viewBox='0 0 120 26'
                   preserveAspectRatio='none'
                   aria-hidden
@@ -207,13 +211,13 @@ const About: React.FC = (): JSX.Element => {
               </span>
 
               <span
-                className='board-word relative pb-4'
+                className='board-word relative pb-6'
                 style={{ '--tilt': '1.5deg' } as React.CSSProperties}
               >
                 Lines
                 <svg
-                  className='absolute bottom-0 left-0 h-3 w-full'
-                  viewBox='0 0 120 10'
+                  className='absolute bottom-0 left-0 h-[18px] w-full'
+                  viewBox='-3 -2 126 16'
                   preserveAspectRatio='none'
                   fill='none'
                   aria-hidden
@@ -229,7 +233,11 @@ const About: React.FC = (): JSX.Element => {
             </div>
           </div>
 
-          <div className='hover-lift flex flex-col rounded-[26px] border-[3px] bg-white p-8' style={{ borderColor: 'var(--candy-ink)' }}>
+          <div
+            data-reveal
+            className='hover-lift flex flex-col rounded-[26px] border-[3px] bg-white p-8'
+            style={{ borderColor: 'var(--candy-ink)' }}
+          >
             <h3
               className='text-[24px] font-black tracking-[-0.025em]'
               style={{ color: 'var(--candy-ink)' }}
@@ -283,6 +291,7 @@ const About: React.FC = (): JSX.Element => {
           </div>
 
           <div
+            data-reveal
             className='peep-card group relative flex min-h-[300px] flex-col justify-end lg:col-span-3'
             style={{ backgroundColor: 'var(--candy-butter)' }}
           >

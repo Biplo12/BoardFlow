@@ -38,7 +38,10 @@ const HowItWorks: React.FC = (): JSX.Element => {
   return (
     <section id='how' className='w-full bg-white px-4 py-24 sm:px-8'>
       <div className='mx-auto max-w-[1160px]'>
-        <div className='flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between'>
+        <div
+          data-reveal
+          className='flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between'
+        >
           <h2
             className='candy-display max-w-[520px] text-[38px] sm:text-[58px]'
             style={{ color: 'var(--candy-ink)' }}
@@ -54,11 +57,17 @@ const HowItWorks: React.FC = (): JSX.Element => {
         </div>
 
         <div className='mt-16 grid grid-cols-1 gap-6 md:grid-cols-3'>
-          {STEPS.map((step) => (
+          {STEPS.map((step, index) => (
             <div
               key={step.step}
+              data-reveal
               className={cn('peep-card group relative flex flex-col', step.tilt)}
-              style={{ backgroundColor: step.tint }}
+              style={
+                {
+                  backgroundColor: step.tint,
+                  '--reveal-delay': `${index * 90}ms`,
+                } as React.CSSProperties
+              }
             >
               <div className='relative z-10 px-8 pt-8 pb-6'>
                 <span

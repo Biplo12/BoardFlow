@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import { useApiMutation } from '@/hooks/useApiMutation';
 import { useOrganizationList } from '@/hooks/useOrganizationList';
 
-import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -14,7 +13,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 
 import { api } from '@/convex/_generated/api';
 
@@ -48,20 +46,25 @@ const CreateOrganizationDialog: React.FC<CreateOrganizationDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className='max-w-[480px]'>
+      <DialogContent className='max-w-[520px]'>
         <DialogHeader>
           <DialogTitle>Create organization</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-          <Input
+          <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder='Organization name'
             required
           />
-          <Button type='submit' disabled={pending || !name.trim()}>
-            Create
-          </Button>
+          <button
+            type='submit'
+            disabled={pending || !name.trim()}
+            className='candy-button flex h-[50px] items-center justify-center rounded-[14px] text-[15px] font-semibold text-white disabled:opacity-50'
+            style={{ backgroundColor: 'var(--candy-pink)' }}
+          >
+            {pending ? 'Creating…' : 'Create organization'}
+          </button>
         </form>
       </DialogContent>
     </Dialog>

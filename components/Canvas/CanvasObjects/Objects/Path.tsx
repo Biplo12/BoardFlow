@@ -3,13 +3,16 @@ import React from 'react';
 
 import { getSvgPathFromStroke } from '@/lib/utils';
 
+const NIB_SCALE = 4;
+
 interface PathProps {
   x: number;
   y: number;
   points: number[][];
   fill: string;
+  strokeWidth?: number;
+  opacity?: number;
   onPointerDown?: (e: React.PointerEvent) => void;
-  stroke?: string;
 }
 
 const Path: React.FC<PathProps> = ({
@@ -17,16 +20,16 @@ const Path: React.FC<PathProps> = ({
   y,
   points,
   fill,
+  strokeWidth = 4,
+  opacity = 1,
   onPointerDown,
-  stroke,
 }): JSX.Element => {
   return (
     <path
-      className='drop-shadow-md'
       onPointerDown={onPointerDown}
       d={getSvgPathFromStroke(
         getStroke(points, {
-          size: 16,
+          size: strokeWidth * NIB_SCALE,
           thinning: 0.5,
           smoothing: 0.5,
           streamline: 0.5,
@@ -38,8 +41,7 @@ const Path: React.FC<PathProps> = ({
       x={0}
       y={0}
       fill={fill}
-      stroke={stroke}
-      strokeWidth={1}
+      opacity={opacity}
     />
   );
 };

@@ -15,7 +15,7 @@ const Navbar: React.FC = (): JSX.Element => {
   return (
     <div className='fixed top-0 left-0 z-50 flex w-full justify-center p-3 sm:p-4'>
       <div
-        className='enter-drop flex w-full max-w-[1120px] items-center justify-between rounded-[22px] py-2.5 pr-2.5 pl-4'
+        className='flex w-full max-w-[1120px] items-center justify-between rounded-[22px] py-2.5 pr-2.5 pl-4'
         style={{ backgroundColor: 'rgba(255,255,255,0.82)' }}
       >
         <a href='#home' className='group flex items-center gap-2.5'>

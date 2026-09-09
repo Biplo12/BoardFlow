@@ -1,7 +1,8 @@
-/* eslint-disable unused-imports/no-unused-vars */
 import React from 'react';
 
-import { colorToCss } from '@/lib/utils';
+import { shapeStyle } from '@/lib/canvas-style';
+
+import { HIT_STROKE_PADDING } from '@/constant/canvas';
 
 import { EllipseLayer } from '@/types/TCanvasState';
 
@@ -9,33 +10,40 @@ interface EllipseProps {
   id: string;
   layer: EllipseLayer;
   onPointerDown: (e: React.PointerEvent, id: string) => void;
-  selectionColor?: string;
 }
 
 const Ellipse: React.FC<EllipseProps> = ({
   id,
   layer,
   onPointerDown,
-  selectionColor,
 }): JSX.Element => {
+  const { x, y, width, height } = layer;
+  const style = shapeStyle(layer);
+
+  const geometry = {
+    cx: x + width / 2,
+    cy: y + height / 2,
+    rx: width / 2,
+    ry: height / 2,
+  };
+
   return (
-    <ellipse
-      className='drop-shadow-md'
-      onPointerDown={(e) => onPointerDown(e, id)}
-      style={{
-        transform: `translate(
-          ${layer.x}px,
-          ${layer.y}px
-        )`,
-      }}
-      cx={layer.width / 2}
-      cy={layer.height / 2}
-      rx={layer.width / 2}
-      ry={layer.height / 2}
-      fill={layer.fill ? colorToCss(layer.fill) : '#000'}
-      stroke={selectionColor || 'transparent'}
-      strokeWidth='1'
-    />
+    <g onPointerDown={(e) => onPointerDown(e, id)} opacity={style.opacity}>
+      <ellipse
+        {...geometry}
+        fill={style.fill}
+        stroke={style.stroke}
+        strokeWidth={style.strokeWidth}
+        strokeDasharray={style.strokeDasharray}
+      />
+      <ellipse
+        {...geometry}
+        fill='none'
+        stroke='transparent'
+        strokeWidth={style.strokeWidth + HIT_STROKE_PADDING}
+        pointerEvents='stroke'
+      />
+    </g>
   );
 };
 export default Ellipse;

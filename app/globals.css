@@ -79,9 +79,20 @@ body,
   body {
     @apply bg-background text-foreground;
   }
-  /* Tailwind v4 dropped the v3 default of cursor: pointer on buttons. */
+  /* Tailwind v4 dropped the v3 default of cursor: pointer on buttons, and
+     Radix renders menu entries and switches as divs with a role. */
   button:not(:disabled),
-  [role='button']:not(:disabled) {
+  summary,
+  select:not(:disabled),
+  input[type='checkbox']:not(:disabled),
+  input[type='radio']:not(:disabled),
+  [role='button']:not(:disabled),
+  [role='menuitem']:not([aria-disabled='true']),
+  [role='menuitemcheckbox']:not([aria-disabled='true']),
+  [role='menuitemradio']:not([aria-disabled='true']),
+  [role='option']:not([aria-disabled='true']),
+  [role='tab']:not([aria-disabled='true']),
+  [role='switch']:not([aria-disabled='true']) {
     cursor: pointer;
   }
 }
@@ -118,6 +129,12 @@ body,
   color: var(--candy-ink);
   box-shadow: none;
   padding-inline: 18px;
+}
+
+/* .candy-field sets padding-inline outside Tailwind's layers, so a utility
+   like pl-11 loses to it. Fields with a leading icon opt in here instead. */
+.candy-field.has-icon {
+  padding-inline-start: 46px;
 }
 
 .candy-field::placeholder {
@@ -494,78 +511,367 @@ body,
   }
 }
 
-/* Page entrance: the hero assembles itself the way a board fills up. */
-@keyframes rise-in {
-  from {
-    opacity: 0;
-    translate: 0 22px;
-  }
-  to {
+/* Sections fade up the first time they come into view. The hidden state is
+   only applied once the observer is running, so no script means no blank
+   page. */
+.reveal-ready [data-reveal] {
+  opacity: 0;
+  translate: 0 10px;
+}
+
+[data-reveal] {
+  transition:
+    opacity 420ms ease-out,
+    translate 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal-ready [data-reveal].is-revealed {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-ready [data-reveal] {
     opacity: 1;
-    translate: 0 0;
+    translate: none;
+  }
+
+  [data-reveal] {
+    transition: none;
   }
 }
 
-@keyframes drop-in {
-  from {
-    opacity: 0;
-    translate: 0 -16px;
+/* Dashboard tiles use the same outlined, pressable language as the buttons. */
+.board-tile {
+  border: 2px solid var(--candy-ink);
+  border-radius: 18px;
+  box-shadow: 0 3px 0 0 rgba(0, 18, 52, 0.16);
+  transition:
+    translate 180ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 180ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* An open card menu counts as hover, so the tile does not drop back down
+   while you are choosing from it. */
+.board-tile:hover,
+.board-tile:has([data-state='open']) {
+  translate: 0 -3px;
+  box-shadow: 0 6px 0 0 rgba(0, 18, 52, 0.16);
+}
+
+.board-overlay {
+  background-color: rgba(255, 61, 127, 0.16);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.board-tile:hover .board-overlay,
+.board-tile:has([data-state='open']) .board-overlay {
+  opacity: 1;
+}
+
+.board-tile:active {
+  translate: 0 2px;
+  box-shadow: 0 0 0 0 rgba(0, 18, 52, 0.16);
+}
+
+/* Sidebar entries: the current one sits on a solid pink chip. */
+.rail-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border-radius: 16px;
+  padding: 11px 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--candy-ink);
+  transition:
+    background-color 160ms ease,
+    translate 160ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.rail-link:hover {
+  background-color: rgba(255, 255, 255, 0.66);
+  translate: 2px 0;
+}
+
+.rail-link[data-active='true'] {
+  background-color: var(--candy-pink);
+  color: #fff;
+  box-shadow: 0 4px 0 0 rgba(0, 18, 52, 0.24);
+}
+
+.rail-link[data-active='true']:hover {
+  background-color: var(--candy-pink);
+  translate: 0 -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board-tile,
+  .board-overlay,
+  .rail-link {
+    transition: none;
   }
-  to {
-    opacity: 1;
-    translate: 0 0;
+
+  .board-tile:hover,
+  .board-tile:active,
+  .rail-link:hover,
+  .rail-link[data-active='true']:hover {
+    translate: none;
   }
 }
 
-@keyframes board-in {
-  from {
-    opacity: 0;
-    translate: 0 34px;
-    scale: 0.97;
-  }
+/* Toasts wear the same outlined, ledge-backed card as everything else. */
+.candy-toast {
+  background: #fff !important;
+  border: 3px solid var(--candy-ink) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 5px 0 0 rgba(0, 18, 52, 0.22) !important;
+  color: var(--candy-ink) !important;
+  gap: 12px !important;
+  padding: 15px 18px !important;
+}
+
+.candy-toast-title {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
+}
+
+.candy-toast-description {
+  color: var(--candy-muted) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.candy-toast [data-icon] {
+  width: 20px;
+  height: 20px;
+  margin-inline-end: 2px;
+}
+
+.candy-toast[data-type='error'] [data-icon] {
+  color: var(--candy-pink);
+}
+
+.candy-toast[data-type='success'] [data-icon] {
+  color: #3f9c2a;
+}
+
+.candy-toast-action {
+  background: var(--candy-pink) !important;
+  border-radius: 12px !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+
+.candy-toast-cancel {
+  background: var(--candy-surface) !important;
+  border-radius: 12px !important;
+  color: var(--candy-ink) !important;
+  font-weight: 600 !important;
+}
+
+/* A plain ring, the one loading shape nobody has to decode. */
+.loader-ring {
+  display: block;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 4px solid rgba(0, 18, 52, 0.12);
+  border-top-color: var(--candy-pink);
+  animation: loader-spin 0.75s linear infinite;
+}
+
+@keyframes loader-spin {
   to {
-    opacity: 1;
-    translate: 0 0;
+    rotate: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-ring {
+    animation: none;
+  }
+
+}
+
+/* Dialogs, menus and the org rail share the outlined card language. */
+.candy-dialog {
+  background: #fff;
+  border: 3px solid var(--candy-ink);
+  border-radius: 24px;
+  box-shadow: 0 6px 0 0 rgba(0, 18, 52, 0.2);
+  color: var(--candy-ink);
+}
+
+.candy-dialog h2 {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+}
+
+.candy-dialog input {
+  background: var(--candy-surface);
+  border: 0;
+  border-radius: 14px;
+  height: 50px;
+  padding-inline: 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--candy-ink);
+  width: 100%;
+}
+
+.candy-dialog input::placeholder {
+  color: var(--candy-muted);
+  font-weight: 400;
+}
+
+.candy-dialog input:focus-visible {
+  outline: 3px solid var(--candy-ink);
+  outline-offset: 2px;
+}
+
+/* Organisation chips keep their colour at full strength; the current one
+   gains a ring rather than the others being dimmed into mud. */
+.org-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  transition:
+    scale 180ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 180ms ease;
+}
+
+.org-chip:hover {
+  scale: 1.07;
+}
+
+.org-chip[data-active='true'] {
+  box-shadow:
+    0 0 0 3px var(--candy-ink),
+    0 0 0 6px #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .org-chip {
+    transition: none;
+  }
+
+  .org-chip:hover {
     scale: 1;
   }
 }
 
-@keyframes walk-in {
-  from {
-    opacity: 0;
-    translate: -34px 0;
-  }
-  to {
-    opacity: 1;
-    translate: 0 0;
-  }
+/* Shared dialog buttons so every confirm and cancel looks the same. */
+.dialog-primary,
+.dialog-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding-inline: 22px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  transition:
+    translate 150ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 150ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    background-color 150ms ease;
 }
 
-.enter-rise {
-  animation: rise-in 640ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
-  animation-delay: var(--enter-delay, 0ms);
+.dialog-primary {
+  background: var(--candy-pink);
+  color: #fff;
+  box-shadow: 0 4px 0 0 rgba(0, 18, 52, 0.24);
 }
 
-.enter-drop {
-  animation: drop-in 520ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
-  animation-delay: var(--enter-delay, 0ms);
+.dialog-primary:hover:not(:disabled) {
+  translate: 0 -2px;
+  box-shadow: 0 6px 0 0 rgba(0, 18, 52, 0.24);
 }
 
-.enter-board {
-  animation: board-in 760ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
-  animation-delay: var(--enter-delay, 0ms);
+.dialog-primary:active:not(:disabled) {
+  translate: 0 4px;
+  box-shadow: none;
 }
 
-.enter-walk {
-  animation: walk-in 700ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
-  animation-delay: var(--enter-delay, 0ms);
+.dialog-primary:disabled {
+  opacity: 0.5;
+}
+
+.dialog-ghost {
+  background: var(--candy-surface);
+  color: var(--candy-ink);
+}
+
+.dialog-ghost:hover {
+  background: rgba(0, 18, 52, 0.12);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .enter-rise,
-  .enter-drop,
-  .enter-board,
-  .enter-walk {
-    animation: none;
+  .dialog-primary,
+  .dialog-ghost {
+    transition: none;
+  }
+
+  .dialog-primary:hover:not(:disabled),
+  .dialog-primary:active:not(:disabled) {
+    translate: none;
+  }
+}
+
+/* Canvas chrome: the same outlined, ledge-backed panels as the rest. */
+.canvas-panel {
+  background: #fff;
+  border: 2px solid var(--candy-ink);
+  border-radius: 20px;
+  box-shadow: 0 3px 0 0 rgba(0, 18, 52, 0.16);
+}
+
+.tool-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: var(--candy-ink);
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    translate 150ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.tool-button:hover:not(:disabled) {
+  background-color: var(--candy-surface);
+  translate: 0 -1px;
+}
+
+.tool-button[data-active='true'] {
+  background-color: var(--candy-pink);
+  color: #fff;
+}
+
+.tool-button:disabled {
+  opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-button {
+    transition: none;
+  }
+
+  .tool-button:hover:not(:disabled) {
+    translate: none;
   }
 }

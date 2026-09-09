@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import React from 'react';
 
 import PersonAvatar from '@/components/common/PersonAvatar';
+import ContactActions from '@/components/Home/Contact/Partials/ContactActions';
 
 const Contact: React.FC = (): JSX.Element => {
   return (
@@ -12,6 +12,7 @@ const Contact: React.FC = (): JSX.Element => {
     >
       <div className='mx-auto max-w-[1160px]'>
         <div
+          data-reveal
           className='flex flex-col items-center rounded-[32px] px-8 py-16 text-center sm:px-14 sm:py-20'
           style={{ backgroundColor: 'var(--candy-ink)' }}
         >
@@ -33,21 +34,7 @@ const Contact: React.FC = (): JSX.Element => {
             invite need nothing but the link.
           </p>
 
-          <div className='mt-10 flex flex-col gap-3 sm:flex-row sm:items-center'>
-            <Link
-              href='/register'
-              className='candy-button flex h-14 items-center justify-center rounded-[22px] px-8 text-[17px] font-semibold whitespace-nowrap text-white'
-              style={{ backgroundColor: 'var(--candy-pink)' }}
-            >
-              Start a board for free
-            </Link>
-            <Link
-              href='/login'
-              className='flex h-14 items-center justify-center rounded-[22px] px-6 text-[17px] font-semibold text-white/70 transition-colors hover:text-white'
-            >
-              I already have an account
-            </Link>
-          </div>
+          <ContactActions />
         </div>
       </div>
     </section>

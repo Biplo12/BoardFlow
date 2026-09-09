@@ -1,7 +1,8 @@
-/* eslint-disable unused-imports/no-unused-vars */
 import React from 'react';
 
-import { colorToCss } from '@/lib/utils';
+import { shapeStyle } from '@/lib/canvas-style';
+
+import { HIT_STROKE_PADDING } from '@/constant/canvas';
 
 import { RectangleLayer } from '@/types/TCanvasState';
 
@@ -9,32 +10,44 @@ interface RectangleProps {
   id: string;
   layer: RectangleLayer;
   onPointerDown: (e: React.PointerEvent, id: string) => void;
-  selectionColor?: string;
 }
 
 const Rectangle: React.FC<RectangleProps> = ({
   id,
   layer,
   onPointerDown,
-  selectionColor,
 }): JSX.Element => {
-  const { x, y, width, height, fill } = layer;
+  const { x, y, width, height } = layer;
+  const style = shapeStyle(layer);
 
   return (
-    <rect
-      className='drop-shadow-md'
-      onPointerDown={(e) => onPointerDown(e, id)}
-      style={{
-        transform: `translate(${x}px, ${y}px)`,
-      }}
-      x={0}
-      y={0}
-      width={width}
-      height={height}
-      strokeWidth={1}
-      fill={fill ? colorToCss(fill) : '#000'}
-      stroke={selectionColor || 'transparent'}
-    />
+    <g onPointerDown={(e) => onPointerDown(e, id)} opacity={style.opacity}>
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        rx={style.radius}
+        ry={style.radius}
+        fill={style.fill}
+        stroke={style.stroke}
+        strokeWidth={style.strokeWidth}
+        strokeDasharray={style.strokeDasharray}
+        strokeLinejoin='round'
+      />
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        rx={style.radius}
+        ry={style.radius}
+        fill='none'
+        stroke='transparent'
+        strokeWidth={style.strokeWidth + HIT_STROKE_PADDING}
+        pointerEvents='stroke'
+      />
+    </g>
   );
 };
 export default Rectangle;

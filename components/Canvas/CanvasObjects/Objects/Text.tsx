@@ -1,9 +1,14 @@
-/* eslint-disable unused-imports/no-unused-vars */
 import { Kalam } from 'next/font/google';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
-import { calculateFontSize, cn, colorToCss } from '@/lib/utils';
+import {
+  calculateFontSize,
+  cn,
+  colorToCss,
+  htmlToPlainText,
+  plainTextToHtml,
+} from '@/lib/utils';
 import useUpdateValue from '@/hooks/useUpdateValue';
 
 import { TextLayer } from '@/types/TCanvasState';
@@ -17,21 +22,38 @@ interface TextProps {
   id: string;
   layer: TextLayer;
   onPointerDown: (e: React.PointerEvent, id: string) => void;
-  selectionColor?: string;
 }
 
 const Text: React.FC<TextProps> = ({
   id,
   layer,
   onPointerDown,
-  selectionColor,
 }): JSX.Element => {
-  const { x, y, width, height, fill, value = 'Text' } = layer;
+  const { x, y, width, height, fill, stroke, opacity, value = '' } = layer;
 
-  const { updateValue } = useUpdateValue();
+  const { updateValue, discardIfEmpty } = useUpdateValue();
+  const editable = useRef<HTMLElement>(
+    null
+  ) as React.RefObject<HTMLElement>;
+
+  /* A fresh text box is placed to be typed into, so it takes the caret the
+     moment it appears. */
+  useEffect(() => {
+    if (!editable.current?.textContent) {
+      editable.current?.focus({ preventScroll: true });
+    }
+  }, []);
 
   const handleContentChange = (e: ContentEditableEvent) => {
-    updateValue(e.target.value, id);
+    updateValue(htmlToPlainText(e.target.value), id);
+  };
+
+  /* Paste as plain text so a copied web page cannot push its markup into
+     shared board storage. */
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
   };
 
   return (
@@ -41,20 +63,21 @@ const Text: React.FC<TextProps> = ({
       width={width}
       height={height}
       onPointerDown={(e) => onPointerDown(e, id)}
-      style={{
-        outline: selectionColor ? `1px solid ${selectionColor}` : 'none',
-      }}
+      opacity={(opacity ?? 100) / 100}
     >
       <ContentEditable
-        html={value || ''}
+        innerRef={editable}
+        html={plainTextToHtml(value)}
         onChange={handleContentChange}
+        onBlur={() => discardIfEmpty(id)}
+        onPaste={handlePaste}
         className={cn(
-          'flex h-full w-full items-center justify-center text-center outline-none drop-shadow-md',
+          'flex h-full w-full items-center justify-center text-center outline-none',
           font.className
         )}
         style={{
           fontSize: calculateFontSize(width, height),
-          color: fill ? colorToCss(fill) : '#000',
+          color: colorToCss(stroke ?? fill),
         }}
       />
     </foreignObject>

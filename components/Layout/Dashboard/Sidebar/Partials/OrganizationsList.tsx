@@ -18,7 +18,6 @@ const OrgsList: React.FC = (): JSX.Element | null => {
           key={organization._id}
           id={organization._id}
           name={organization.name}
-          imageUrl={organization.imageUrl}
         />
       ))}
     </ul>

@@ -1,16 +1,8 @@
-import Image from 'next/image';
+import React from 'react';
+
+import BrandLoader from '@/components/common/BrandLoader';
 
 const Loading: React.FC = (): JSX.Element => {
-  return (
-    <div className='flex h-full w-full items-center justify-center'>
-      <Image
-        src='/images/logo/logo-white.png'
-        alt='Logo'
-        width={75}
-        height={75}
-        className='animate-pulse duration-1000 ease-in-out'
-      />
-    </div>
-  );
+  return <BrandLoader className='min-h-screen' />;
 };
 export default Loading;

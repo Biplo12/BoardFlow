@@ -1,8 +1,8 @@
-import Link from 'next/link';
 import React from 'react';
 
 import BrandPattern from '@/components/common/BrandPattern';
 import Peep from '@/components/common/Peep';
+import StartButton from '@/components/common/StartButton';
 import BoardMockup from '@/components/Home/Hero/BoardMockup';
 
 const Hero: React.FC = (): JSX.Element => {
@@ -17,7 +17,7 @@ const Hero: React.FC = (): JSX.Element => {
       <div className='relative mx-auto flex max-w-[1400px] flex-col items-start gap-14 px-4 sm:px-8 lg:flex-row lg:items-center lg:gap-8'>
         <div className='w-full shrink-0 lg:w-[48%]'>
           <h1
-            className='enter-rise candy-display text-[40px] sm:text-[52px] lg:text-[54px] xl:text-[66px]'
+            className='candy-display text-[40px] sm:text-[52px] lg:text-[54px] xl:text-[66px]'
             style={{ color: 'var(--candy-ink)' }}
           >
             One board.
@@ -25,29 +25,15 @@ const Hero: React.FC = (): JSX.Element => {
             <span style={{ color: 'var(--candy-pink)' }}>Everyone</span> on it.
           </h1>
           <p
-            className='enter-rise mt-6 max-w-[440px] text-[17px] font-medium sm:text-[19px]'
-            style={
-              {
-                color: 'var(--candy-muted)',
-                '--enter-delay': '110ms',
-              } as React.CSSProperties
-            }
+            className='mt-6 max-w-[440px] text-[17px] font-medium sm:text-[19px]'
+            style={{ color: 'var(--candy-muted)' }}
           >
             Notes, sketches, shapes and images on a canvas that never runs out,
             with your team&apos;s cursors moving next to yours.
           </p>
 
-          <div
-            className='enter-rise mt-9 flex flex-col gap-3 sm:flex-row'
-            style={{ '--enter-delay': '210ms' } as React.CSSProperties}
-          >
-            <Link
-              href='/register'
-              className='candy-button flex h-14 items-center justify-center rounded-[22px] px-8 text-[17px] font-semibold whitespace-nowrap text-white'
-              style={{ backgroundColor: 'var(--candy-pink)' }}
-            >
-              Start a board for free
-            </Link>
+          <div className='mt-9 flex flex-col gap-3 sm:flex-row'>
+            <StartButton />
             <a
               href='#how'
               className='candy-button flex h-14 items-center justify-center rounded-[22px] px-8 text-[17px] font-semibold whitespace-nowrap'
@@ -62,21 +48,13 @@ const Hero: React.FC = (): JSX.Element => {
         </div>
 
         <div className='relative w-full lg:w-[52%]'>
-          <div
-            className='enter-board -mr-[36%] sm:-mr-[26%] lg:-mr-[12%]'
-            style={{ '--enter-delay': '300ms' } as React.CSSProperties}
-          >
+          <div className='-mr-[36%] sm:-mr-[26%] lg:-mr-[12%]'>
             <BoardMockup />
           </div>
-          <span
-            className='pointer-events-none absolute -bottom-5 left-0 hidden -translate-x-[18%] md:block lg:-translate-x-[38%]'
-            style={{ '--enter-delay': '430ms' } as React.CSSProperties}
-          >
-            <Peep
-              figure='pointing'
-              className='enter-walk h-[250px] lg:h-[290px] xl:h-[330px]'
-            />
-          </span>
+          <Peep
+            figure='pointing'
+            className='pointer-events-none absolute -bottom-5 left-0 hidden h-[250px] -translate-x-[18%] md:block lg:h-[290px] lg:-translate-x-[38%] xl:h-[330px]'
+          />
         </div>
       </div>
     </section>

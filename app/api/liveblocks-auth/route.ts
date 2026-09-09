@@ -42,6 +42,7 @@ export async function POST(req: Request) {
   }
 
   const userInfo = {
+    userId: user._id,
     name: user.name ?? user.email ?? 'Teammate',
     picture: user.image ?? '',
   };

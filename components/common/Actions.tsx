@@ -7,7 +7,6 @@ import { toast } from 'sonner';
 import { useApiMutation } from '@/hooks/useApiMutation';
 
 import ConfirmDialog from '@/components/Dialogs/ConfirmDialog';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -71,18 +70,27 @@ export const Actions = ({
       <DropdownMenuContent
         onClick={(e) => e.stopPropagation()}
         side={side}
-        sideOffset={sideOffset}
-        className='w-60'
+        sideOffset={sideOffset ?? 8}
+        className='w-56 rounded-[18px] border-2 p-2'
+        style={{
+          borderColor: 'var(--candy-ink)',
+          boxShadow: '0 4px 0 0 rgba(0,18,52,0.18)',
+        }}
       >
-        <DropdownMenuItem onClick={onCopyLink} className='cursor-pointer p-3'>
-          <Link2 className='mr-2 h-4 w-4' />
+        <DropdownMenuItem
+          onClick={onCopyLink}
+          className='cursor-pointer gap-2.5 rounded-[12px] px-3 py-2.5 text-[15px] font-semibold'
+          style={{ color: 'var(--candy-ink)' }}
+        >
+          <Link2 className='h-[18px] w-[18px]' />
           Copy board link
         </DropdownMenuItem>
         <DropdownMenuItem
-          className='cursor-pointer p-3'
+          className='cursor-pointer gap-2.5 rounded-[12px] px-3 py-2.5 text-[15px] font-semibold'
+          style={{ color: 'var(--candy-ink)' }}
           onClick={handleOpenRenameDialog}
         >
-          <Pencil className='mr-2 h-4 w-4' />
+          <Pencil className='h-[18px] w-[18px]' />
           Rename
         </DropdownMenuItem>
         <ConfirmDialog
@@ -91,13 +99,13 @@ export const Actions = ({
           disabled={pending}
           onConfirm={handleDeleteBoard}
         >
-          <Button
-            variant='ghost'
-            className='w-full cursor-pointer justify-start p-3 text-sm font-normal'
+          <button
+            className='flex w-full cursor-pointer items-center gap-2.5 rounded-[12px] px-3 py-2.5 text-[15px] font-semibold transition-colors hover:bg-[rgba(255,61,127,0.1)]'
+            style={{ color: 'var(--candy-pink)' }}
           >
-            <Trash2 className='mr-2 h-4 w-4' />
+            <Trash2 className='h-[18px] w-[18px]' />
             Delete
-          </Button>
+          </button>
         </ConfirmDialog>
       </DropdownMenuContent>
     </DropdownMenu>

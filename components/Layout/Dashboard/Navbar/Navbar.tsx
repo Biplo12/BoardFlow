@@ -13,7 +13,7 @@ const Navbar: React.FC = (): JSX.Element => {
   const { organization } = useOrganization();
 
   return (
-    <nav className='flex items-center gap-4 p-5'>
+    <nav className='flex items-center gap-4 px-5 pt-6 pb-2'>
       <SearchInput />
       <div className='block flex-1 lg:hidden'>
         <OrgSwitcher />

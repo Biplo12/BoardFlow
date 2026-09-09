@@ -1,4 +1,3 @@
-/* eslint-disable unused-imports/no-unused-vars */
 export type Color = {
   r: number;
   g: number;
@@ -8,6 +7,7 @@ export type Color = {
 export type Camera = {
   x: number;
   y: number;
+  scale: number;
 };
 
 export enum LayerType {
@@ -17,67 +17,73 @@ export enum LayerType {
   Text,
   Note,
   Image,
+  Diamond,
+  Arrow,
+  Line,
 }
 
-export type RectangleLayer = {
+/* Every shape now carries its own outline, fill and opacity so the style panel
+   has something to drive, the way a drawing tool is expected to work. */
+export type StrokeStyle = 'solid' | 'dashed' | 'dotted';
+export type EdgeStyle = 'sharp' | 'round';
+
+export type LayerStyle = {
+  fill: Color;
+  stroke?: Color;
+  strokeWidth?: number;
+  strokeStyle?: StrokeStyle;
+  edges?: EdgeStyle;
+  opacity?: number;
+  filled?: boolean;
+};
+
+type LayerBase = LayerStyle & {
+  x: number;
+  y: number;
+  height: number;
+  width: number;
+  value?: string;
+};
+
+export type RectangleLayer = LayerBase & {
   type: LayerType.Rectangle;
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-  fill: Color;
-  value?: string;
 };
 
-export type EllipseLayer = {
+export type DiamondLayer = LayerBase & {
+  type: LayerType.Diamond;
+};
+
+export type EllipseLayer = LayerBase & {
   type: LayerType.Ellipse;
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-  fill: Color;
-  value?: string;
 };
 
-export type PathLayer = {
+export type PathLayer = LayerBase & {
   type: LayerType.Path;
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-  fill: Color;
   points: number[][];
-  value?: string;
 };
 
-export type TextLayer = {
+/* Arrows and lines are two points in the layer's own box, kept relative so a
+   resize scales them with everything else. */
+export type ArrowLayer = LayerBase & {
+  type: LayerType.Arrow;
+  points: number[][];
+};
+
+export type LineLayer = LayerBase & {
+  type: LayerType.Line;
+  points: number[][];
+};
+
+export type TextLayer = LayerBase & {
   type: LayerType.Text;
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-  fill: Color;
-  value?: string;
 };
 
-export type NoteLayer = {
+export type NoteLayer = LayerBase & {
   type: LayerType.Note;
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-  fill: Color;
-  value?: string;
 };
 
-export type ImageLayer = {
+export type ImageLayer = LayerBase & {
   type: LayerType.Image;
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-  fill: Color;
-  value?: string;
 };
 
 export type Point = {
@@ -98,6 +104,7 @@ export enum Side {
   Left = 4,
   Right = 8,
 }
+
 export type TCanvasState =
   | {
       mode: CanvasMode.None;
@@ -119,14 +126,32 @@ export type TCanvasState =
       layerType:
         | LayerType.Ellipse
         | LayerType.Rectangle
+        | LayerType.Diamond
+        | LayerType.Arrow
+        | LayerType.Line
         | LayerType.Text
         | LayerType.Note
         | LayerType.Image
         | undefined;
+      origin?: Point;
+      current?: Point;
     }
   | {
       mode: CanvasMode.Pencil;
       layerType: undefined;
+    }
+  | {
+      mode: CanvasMode.Erasing;
+      layerType: undefined;
+    }
+  | {
+      mode: CanvasMode.Hand;
+      layerType: undefined;
+    }
+  | {
+      mode: CanvasMode.Panning;
+      layerType: undefined;
+      returnTo: CanvasMode.None | CanvasMode.Hand;
     }
   | {
       mode: CanvasMode.Pressing;
@@ -148,12 +173,18 @@ export enum CanvasMode {
   Inserting,
   Resizing,
   Pencil,
+  Erasing,
+  Hand,
+  Panning,
 }
 
 export type Layer =
   | RectangleLayer
+  | DiamondLayer
   | EllipseLayer
   | PathLayer
+  | ArrowLayer
+  | LineLayer
   | TextLayer
   | NoteLayer
   | ImageLayer;

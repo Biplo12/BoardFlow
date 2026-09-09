@@ -24,15 +24,11 @@ const Footer: React.FC = (): JSX.Element => {
       className='relative w-full overflow-hidden px-4 pt-20 sm:px-8'
       style={{ backgroundColor: 'var(--candy-ink)' }}
     >
-      <span
-        aria-hidden
-        className='candy-display pointer-events-none absolute inset-x-0 -bottom-[1.2vw] block text-center text-[15.5vw] leading-[0.74] whitespace-nowrap text-white/[0.07] select-none'
-      >
-        BoardFlow
-      </span>
-
-      <div className='relative mx-auto max-w-[1160px] pb-[11vw]'>
-        <div className='flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between'>
+      <div className='relative mx-auto max-w-[1160px] pb-12'>
+        <div
+          data-reveal
+          className='flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between'
+        >
           <div>
             <Link href='/' className='group flex items-center gap-3'>
               <BrandMark className='h-10 w-10 transition-transform duration-300 group-hover:-rotate-6' />
@@ -43,7 +39,7 @@ const Footer: React.FC = (): JSX.Element => {
             <p className='mt-5 max-w-[300px] text-[17px] font-medium text-white/55'>
               A whiteboard your whole team can draw on at the same time.
             </p>
-            <div className='swatch-row mt-7 flex items-end gap-1.5'>
+            <div className='swatch-row mt-11 flex items-end gap-1.5'>
               {SWATCHES.map((color) => (
                 <span
                   key={color}
@@ -117,6 +113,7 @@ const Footer: React.FC = (): JSX.Element => {
         </div>
 
         <div
+          data-reveal
           className='mt-16 flex flex-col gap-3 pt-6 sm:flex-row sm:items-center sm:justify-between'
           style={{
             backgroundImage:

@@ -1,49 +1,46 @@
 import React from 'react';
 
-import { randomBorderColor } from '@/lib/utils';
-
 import UserAvatar from '@/components/common/UserAvatar';
 
 import { useOthers, useSelf } from '@/liveblocks.config';
 
-const MAX_PARTICIPANTS = 2;
+const MAX_PARTICIPANTS = 3;
 
 const CanvasParticipants: React.FC = (): JSX.Element => {
   const users = useOthers();
   const self = useSelf();
 
-  const isMaxParticipants = users.length >= MAX_PARTICIPANTS;
+  const overflow = users.length - MAX_PARTICIPANTS;
 
   return (
-    <div className='absolute right-2 top-2 flex h-12 items-center rounded-md bg-white p-3 shadow-md'>
-      <div className='flex gap-2'>
-        {users
-          .slice(0, MAX_PARTICIPANTS)
-          .map(({ info: user, connectionId }) => (
-            <UserAvatar
-              key={connectionId}
-              src={user.picture}
-              name={user.name}
-              fallback={user.name[0] || 'T'}
-              borderColor={randomBorderColor(connectionId)}
-            />
-          ))}
-
+    <div className='absolute top-3 right-3 flex items-center'>
+      <div className='flex -space-x-4'>
         {self && (
           <UserAvatar
-            src={self.info.picture}
             name={`${self.info.name} (You)`}
-            fallback={self.info.name[0] || 'T'}
-            borderColor={randomBorderColor(self.connectionId)}
+            seed={self.info.userId}
           />
         )}
 
-        {isMaxParticipants && (
+        {users.slice(0, MAX_PARTICIPANTS).map((other) => (
           <UserAvatar
-            src=''
-            name={`+${users.length - MAX_PARTICIPANTS} more`}
-            fallback={`+${users.length - MAX_PARTICIPANTS}`}
+            key={other.connectionId}
+            name={other.info.name}
+            seed={other.info.userId}
           />
+        ))}
+
+        {overflow > 0 && (
+          <span
+            className='flex h-12 w-12 items-center justify-center rounded-[32%] border-[3px] text-[14px] font-bold'
+            style={{
+              backgroundColor: 'var(--candy-surface)',
+              borderColor: '#111111',
+              color: 'var(--candy-ink)',
+            }}
+          >
+            +{overflow}
+          </span>
         )}
       </div>
     </div>

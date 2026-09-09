@@ -23,6 +23,14 @@ export const colors = [
   { r: 255, g: 255, b: 255 },
 ];
 
+/* Until the user picks a swatch, each kind of object gets a colour that is
+   actually visible against the board rather than the white it used to take. */
+export const DEFAULT_FILLS = {
+  note: { r: 255, g: 249, b: 177 },
+  shape: { r: 39, g: 142, b: 237 },
+  ink: { r: 17, g: 17, b: 17 },
+};
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -36,13 +44,23 @@ export function pointerEventToCanvasPoint(
   camera: Camera
 ) {
   return {
-    x: Math.round(e.clientX) - camera.x,
-    y: Math.round(e.clientY) - camera.y,
+    x: (e.clientX - camera.x) / camera.scale,
+    y: (e.clientY - camera.y) / camera.scale,
   };
 }
 
 export function colorToCss(color: Color) {
   return `#${color.r.toString(16).padStart(2, '0')}${color.g.toString(16).padStart(2, '0')}${color.b.toString(16).padStart(2, '0')}`;
+}
+
+export function cssToColor(css: string): Color {
+  const hex = css.replace('#', '');
+
+  return {
+    r: parseInt(hex.slice(0, 2), 16) || 0,
+    g: parseInt(hex.slice(2, 4), 16) || 0,
+    b: parseInt(hex.slice(4, 6), 16) || 0,
+  };
 }
 
 export function findIntersectingLayersWithRectangle(
@@ -155,4 +173,107 @@ export function getSvgPathFromStroke(stroke: number[][]) {
 
   d.push('Z');
   return d.join(' ');
+}
+
+const PEEP_FACES = [
+  'ada',
+  'bo',
+  'cira',
+  'dev',
+  'emi',
+  'finn',
+  'gia',
+  'huck',
+  'iris',
+  'jules',
+  'kit',
+  'lou',
+  'mira',
+  'nils',
+  'ola',
+  'pax',
+];
+
+const PEEP_TINTS = [
+  '#ffd8e6',
+  '#c9e9ff',
+  '#c3e776',
+  '#edf072',
+  '#e3d4ff',
+  '#ffe0c2',
+];
+
+const ORG_TINTS = [
+  { background: '#ff3d7f', ink: '#ffffff' },
+  { background: '#9466e8', ink: '#ffffff' },
+  { background: '#0f8fd6', ink: '#ffffff' },
+  { background: '#c3e776', ink: '#111111' },
+  { background: '#ffd23f', ink: '#111111' },
+  { background: '#c9e9ff', ink: '#111111' },
+];
+
+/* Same seed, same face for ever: people keep the head they were given
+   without anything being stored against their account. */
+export function peepFace(seed: string | number) {
+  const key = String(seed);
+  let hash = 2166136261;
+
+  for (let index = 0; index < key.length; index++) {
+    hash ^= key.charCodeAt(index);
+    hash = Math.imul(hash, 16777619) >>> 0;
+  }
+
+  return {
+    face: PEEP_FACES[hash % PEEP_FACES.length],
+    tint: PEEP_TINTS[(hash >>> 9) % PEEP_TINTS.length],
+  };
+}
+
+export function orgTint(seed: string) {
+  let hash = 2166136261;
+
+  for (let index = 0; index < seed.length; index++) {
+    hash ^= seed.charCodeAt(index);
+    hash = Math.imul(hash, 16777619) >>> 0;
+  }
+
+  return ORG_TINTS[hash % ORG_TINTS.length];
+}
+
+const ENTITIES: Record<string, string> = {
+  '&amp;': '&',
+  '&lt;': '<',
+  '&gt;': '>',
+  '&quot;': '"',
+  '&#39;': "'",
+  '&nbsp;': ' ',
+};
+
+/* Board text is plain text. It is stored that way and escaped again on the way
+   into the contenteditable, so markup pasted by one collaborator can never be
+   parsed as HTML for everybody else. */
+export function htmlToPlainText(html: string) {
+  /* A contenteditable wraps every line after the first in its own block, so
+     the opening tag is the line break, not just the closing one. */
+  return html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<(div|p|li|h[1-6])(\s[^>]*)?>/gi, '\n')
+    .replace(/<\/(div|p|li|h[1-6])>/gi, '')
+    .replace(/<[^>]*>/g, '')
+    .replace(
+      /&(amp|lt|gt|quot|#39|nbsp);/gi,
+      (match) => ENTITIES[match.toLowerCase()] ?? match
+    )
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\n+$/, '');
+}
+
+export function plainTextToHtml(text: string) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/\n/g, '<br>');
 }

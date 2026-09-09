@@ -1,11 +1,12 @@
-/* eslint-disable jsx-a11y/alt-text */
-/* eslint-disable unused-imports/no-unused-vars */
 import React, { memo } from 'react';
 
 import { colorToCss } from '@/lib/utils';
 
+import Arrow from '@/components/Canvas/CanvasObjects/Objects/Arrow';
+import Diamond from '@/components/Canvas/CanvasObjects/Objects/Diamond';
 import Ellipse from '@/components/Canvas/CanvasObjects/Objects/Ellipse';
-import ImageObjectProps from '@/components/Canvas/CanvasObjects/Objects/ImageObject';
+import ImageObject from '@/components/Canvas/CanvasObjects/Objects/ImageObject';
+import Line from '@/components/Canvas/CanvasObjects/Objects/Line';
 import Note from '@/components/Canvas/CanvasObjects/Objects/Note';
 import Path from '@/components/Canvas/CanvasObjects/Objects/Path';
 import Rectangle from '@/components/Canvas/CanvasObjects/Objects/Rectangle';
@@ -18,11 +19,10 @@ import { LayerType } from '@/types/TCanvasState';
 interface LayerPreviewProps {
   layerId: string;
   onLayerPointerDown: (e: React.PointerEvent, layerId: string) => void;
-  selectionColor?: string;
 }
 
 const LayerPreview: React.FC<LayerPreviewProps> = memo(
-  ({ layerId, onLayerPointerDown, selectionColor }) => {
+  ({ layerId, onLayerPointerDown }) => {
     const layer = useStorage((root) => root.layers[layerId]);
 
     if (!layer) {
@@ -36,8 +36,23 @@ const LayerPreview: React.FC<LayerPreviewProps> = memo(
             id={layerId}
             layer={layer}
             onPointerDown={onLayerPointerDown}
-            selectionColor={selectionColor}
           />
+        );
+      case LayerType.Diamond:
+        return (
+          <Diamond
+            id={layerId}
+            layer={layer}
+            onPointerDown={onLayerPointerDown}
+          />
+        );
+      case LayerType.Arrow:
+        return (
+          <Arrow id={layerId} layer={layer} onPointerDown={onLayerPointerDown} />
+        );
+      case LayerType.Line:
+        return (
+          <Line id={layerId} layer={layer} onPointerDown={onLayerPointerDown} />
         );
       case LayerType.Ellipse:
         return (
@@ -45,50 +60,37 @@ const LayerPreview: React.FC<LayerPreviewProps> = memo(
             id={layerId}
             layer={layer}
             onPointerDown={onLayerPointerDown}
-            selectionColor={selectionColor}
           />
         );
       case LayerType.Text:
         return (
-          <Text
-            id={layerId}
-            layer={layer}
-            onPointerDown={onLayerPointerDown}
-            selectionColor={selectionColor}
-          />
+          <Text id={layerId} layer={layer} onPointerDown={onLayerPointerDown} />
         );
       case LayerType.Note:
         return (
-          <Note
-            id={layerId}
-            layer={layer}
-            onPointerDown={onLayerPointerDown}
-            selectionColor={selectionColor}
-          />
+          <Note id={layerId} layer={layer} onPointerDown={onLayerPointerDown} />
         );
       case LayerType.Path:
         return (
           <Path
-            key={layerId}
             points={layer.points}
             onPointerDown={(e) => onLayerPointerDown(e, layerId)}
             x={layer.x}
             y={layer.y}
-            fill={layer.fill ? colorToCss(layer.fill) : '#000'}
-            stroke={selectionColor}
+            fill={colorToCss(layer.stroke ?? layer.fill)}
+            strokeWidth={layer.strokeWidth}
+            opacity={(layer.opacity ?? 100) / 100}
           />
         );
       case LayerType.Image:
         return (
-          <ImageObjectProps
+          <ImageObject
             id={layerId}
             layer={layer}
             onPointerDown={onLayerPointerDown}
-            selectionColor={selectionColor}
           />
         );
       default:
-        console.warn('Unknown layer type');
         return null;
     }
   }

@@ -1,29 +1,26 @@
-import { Poppins } from 'next/font/google';
-import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
 import { cn } from '@/lib/utils';
 
-const font = Poppins({
-  subsets: ['latin'],
-  weight: ['600'],
-});
+import BrandMark from '@/components/common/BrandMark';
 
 interface LogoProps {
   href?: string;
+  className?: string;
 }
 
-const Logo: React.FC<LogoProps> = ({ href }): JSX.Element => {
+const Logo: React.FC<LogoProps> = ({ href, className }): JSX.Element => {
   return (
-    <Link href={href || '/'} className='flex items-center gap-1'>
-      <Image
-        src='/images/logo/logo-white-no-bg.png'
-        alt='Logo'
-        width={30}
-        height={30}
-      />
-      <span className={cn('text-2xl font-semibold', font.className)}>
+    <Link
+      href={href || '/dashboard'}
+      className={cn('group flex items-center gap-2.5', className)}
+    >
+      <BrandMark className='h-9 w-9 transition-transform duration-300 group-hover:-rotate-6' />
+      <span
+        className='text-[21px] font-black tracking-[-0.03em]'
+        style={{ color: 'var(--candy-ink)' }}
+      >
         BoardFlow
       </span>
     </Link>

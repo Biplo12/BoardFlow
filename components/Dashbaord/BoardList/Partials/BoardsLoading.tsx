@@ -1,11 +1,10 @@
 import React from 'react';
 
 import NewBoardButton from '@/components/Dashbaord/BoardList/Partials/NewBoardButton';
-import { Skeleton } from '@/components/ui/skeleton';
 
 import { Id } from '@/convex/_generated/dataModel';
 
-const SKELETON_COUNT = 5;
+const PLACEHOLDER_COUNT = 7;
 
 interface BoardsLoadingProps {
   query: {
@@ -15,24 +14,28 @@ interface BoardsLoadingProps {
   orgId: Id<'organizations'>;
 }
 
+/* The query usually resolves in a blink, so the whole section just greys out
+   rather than flashing a shimmering skeleton. */
 const BoardsLoading: React.FC<BoardsLoadingProps> = ({
   query,
   orgId,
 }): JSX.Element => {
   return (
-    <div className='flex h-full w-full flex-col gap-4 p-4'>
-      <h2 className='text-3xl'>
+    <div className='flex h-full w-full flex-col gap-6 p-4 opacity-45'>
+      <h2
+        className='candy-display text-[32px] sm:text-[40px]'
+        style={{ color: 'var(--candy-ink)' }}
+      >
         {query.favorites ? 'Favorite boards' : 'Team boards'}
       </h2>
-      <div className='mt-8 grid grid-cols-1 gap-5 pb-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'>
+      <div className='grid grid-cols-1 gap-5 pb-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'>
         <NewBoardButton orgId={orgId} disabled />
-        {[...Array(SKELETON_COUNT)].map((_, index) => (
+        {[...Array(PLACEHOLDER_COUNT)].map((_, index) => (
           <div
-            className='aspect-[100/127] overflow-hidden rounded-lg'
             key={index}
-          >
-            <Skeleton className='h-full w-full' />
-          </div>
+            className='aspect-[100/127] rounded-[18px]'
+            style={{ backgroundColor: 'rgba(0,18,52,0.08)' }}
+          />
         ))}
       </div>
     </div>
