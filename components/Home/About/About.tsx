@@ -44,6 +44,12 @@ const TOOLS = [
 
 const ACTIVE_TOOL = 2;
 
+/* The style panel's own controls: the five stroke colours, the three widths
+   and the three dash styles it actually offers. */
+const STROKES = ['#1e1e1e', '#e03131', '#2f9e44', '#1971c2', '#f08c00'];
+const WIDTHS = [2, 4, 8];
+const DASHES = [undefined, '12 8', '0 8'];
+
 const CURSORS = [
   { name: 'Priya', color: '#ffd23f', at: 'left-[8%] top-[10%]', drift: '0s' },
   { name: 'Tom', color: '#c3e776', at: 'left-[46%] top-[42%]', drift: '-1.3s' },
@@ -172,15 +178,12 @@ const About: React.FC = (): JSX.Element => {
               draw comes out the same.
             </p>
 
-            <div className='mt-auto flex justify-center pt-12'>
-              <div
-                className='board-word canvas-panel flex-wrap items-center justify-center gap-1.5 p-2.5'
-                style={{ '--tilt': '-1.5deg' } as React.CSSProperties}
-              >
+            <div className='my-auto flex flex-col items-center gap-5 py-10'>
+              <div className='canvas-panel flex flex-wrap items-center justify-center gap-1 p-2.5'>
                 {TOOLS.map(({ Icon, shortcut }, index) => (
                   <span key={index} className='relative'>
                     <span
-                      className='flex h-11 w-11 items-center justify-center rounded-[13px]'
+                      className='flex h-12 w-12 items-center justify-center rounded-[14px]'
                       style={
                         index === ACTIVE_TOOL
                           ? {
@@ -190,7 +193,7 @@ const About: React.FC = (): JSX.Element => {
                           : { color: 'var(--candy-ink)' }
                       }
                     >
-                      <Icon className='h-[22px] w-[22px]' />
+                      <Icon className='h-[23px] w-[23px]' />
                     </span>
                     {shortcut && (
                       <span
@@ -207,6 +210,70 @@ const About: React.FC = (): JSX.Element => {
                     )}
                   </span>
                 ))}
+              </div>
+
+              <div className='canvas-panel flex flex-wrap items-center justify-center gap-3 px-4 py-3'>
+                <span className='flex items-center gap-2'>
+                  {STROKES.map((color, index) => (
+                    <span
+                      key={color}
+                      className='h-6 w-6 rounded-[8px] border border-black/10'
+                      style={{
+                        backgroundColor: color,
+                        outline:
+                          index === 0
+                            ? '2px solid var(--candy-ink)'
+                            : undefined,
+                        outlineOffset: '2px',
+                      }}
+                    />
+                  ))}
+                </span>
+
+                <span
+                  className='h-6 w-px'
+                  style={{ backgroundColor: 'rgba(0,18,52,0.16)' }}
+                />
+
+                <span className='flex items-center gap-2.5'>
+                  {WIDTHS.map((width) => (
+                    <span
+                      key={width}
+                      className='w-6 rounded-full'
+                      style={{
+                        height: width,
+                        backgroundColor: 'var(--candy-ink)',
+                      }}
+                    />
+                  ))}
+                </span>
+
+                <span
+                  className='h-6 w-px'
+                  style={{ backgroundColor: 'rgba(0,18,52,0.16)' }}
+                />
+
+                <span className='flex items-center gap-2.5'>
+                  {DASHES.map((dash, index) => (
+                    <svg
+                      key={index}
+                      viewBox='0 0 28 8'
+                      className='h-2 w-7'
+                      aria-hidden
+                    >
+                      <line
+                        x1='2'
+                        y1='4'
+                        x2='26'
+                        y2='4'
+                        stroke='var(--candy-ink)'
+                        strokeWidth='3'
+                        strokeLinecap='round'
+                        strokeDasharray={dash}
+                      />
+                    </svg>
+                  ))}
+                </span>
               </div>
             </div>
           </div>
