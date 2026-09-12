@@ -1,12 +1,22 @@
-import { MousePointer2 } from 'lucide-react';
-import { Kalam } from 'next/font/google';
+import {
+  Circle,
+  Diamond as DiamondIcon,
+  Eraser,
+  Hand,
+  Image as ImageIcon,
+  Minus,
+  MousePointer2,
+  MoveRight,
+  Pencil,
+  Square,
+  StickyNote,
+  Type,
+} from 'lucide-react';
 import React from 'react';
 
 import { cn } from '@/lib/utils';
 
 import Peep from '@/components/common/Peep';
-
-const handwriting = Kalam({ subsets: ['latin'], weight: ['400'] });
 
 const BILL = [
   { label: 'People on a board', value: 'No cap' },
@@ -14,6 +24,25 @@ const BILL = [
   { label: 'Every tool', value: 'Included' },
   { label: 'Card on file', value: 'None' },
 ];
+
+/* The toolbar the product actually ships, in its real order with its real
+   keys, shown at a size you would never see it on the canvas. */
+const TOOLS = [
+  { Icon: Hand, shortcut: '1' },
+  { Icon: MousePointer2, shortcut: '2' },
+  { Icon: Square, shortcut: '3' },
+  { Icon: DiamondIcon, shortcut: '4' },
+  { Icon: Circle, shortcut: '5' },
+  { Icon: MoveRight, shortcut: '6' },
+  { Icon: Minus, shortcut: '7' },
+  { Icon: Pencil, shortcut: '8' },
+  { Icon: Type, shortcut: '9' },
+  { Icon: StickyNote, shortcut: '0' },
+  { Icon: ImageIcon, shortcut: '' },
+  { Icon: Eraser, shortcut: 'E' },
+];
+
+const ACTIVE_TOOL = 2;
 
 const CURSORS = [
   { name: 'Priya', color: '#ffd23f', at: 'left-[8%] top-[10%]', drift: '0s' },
@@ -125,111 +154,60 @@ const About: React.FC = (): JSX.Element => {
 
           <div
             data-reveal
-            className='hover-lift group relative flex flex-col justify-between overflow-hidden rounded-[26px] p-8 lg:col-span-2'
+            className='hover-lift group relative flex min-h-[360px] flex-col overflow-hidden rounded-[26px] p-8 lg:col-span-2'
             style={{ backgroundColor: 'var(--candy-lime)' }}
           >
-            <div>
-              <h3
-                className='text-[24px] font-black tracking-[-0.025em]'
-                style={{ color: 'var(--candy-ink)' }}
-              >
-                Put anything on the canvas
-              </h3>
-              <p
-                className='mt-3 max-w-[420px] text-[16px] font-medium'
-                style={{ color: 'var(--candy-ink)', opacity: 0.72 }}
-              >
-                Drop it anywhere, then drag, resize and stack it however the
-                conversation goes.
-              </p>
-            </div>
-
-            <div
-              className='mt-9 flex flex-wrap items-center gap-x-5 gap-y-5 text-[28px] leading-none font-black tracking-[-0.02em] sm:text-[34px]'
+            <h3
+              className='text-[24px] font-black tracking-[-0.025em]'
               style={{ color: 'var(--candy-ink)' }}
             >
-              <span
-                className={cn(
-                  'board-word rounded-[6px] px-4 py-2.5 text-[26px] shadow-sm sm:text-[30px]',
-                  handwriting.className
-                )}
-                style={
-                  {
-                    backgroundColor: 'var(--candy-butter)',
-                    '--tilt': '-3.5deg',
-                  } as React.CSSProperties
-                }
-              >
-                Notes
-              </span>
+              Twelve tools, no menus
+            </h3>
+            <p
+              className='mt-3 max-w-[460px] text-[16px] font-medium'
+              style={{ color: 'var(--candy-ink)', opacity: 0.72 }}
+            >
+              The whole set sits on one strip and every one of them answers to
+              a key. Pick a colour and a weight once, and the next thing you
+              draw comes out the same.
+            </p>
 
-              <span
-                className='board-word'
-                style={{ '--tilt': '0deg' } as React.CSSProperties}
+            <div className='mt-auto flex justify-center pt-12'>
+              <div
+                className='board-word canvas-panel flex-wrap items-center justify-center gap-1.5 p-2.5'
+                style={{ '--tilt': '-1.5deg' } as React.CSSProperties}
               >
-                Text
-              </span>
-
-              <span
-                className='board-word rounded-[12px] border-[4px] px-4 py-2'
-                style={
-                  { borderColor: '#0f8fd6', '--tilt': '-2deg' } as React.CSSProperties
-                }
-              >
-                Boxes
-              </span>
-
-              <span
-                className='board-word rounded-full border-[4px] px-6 py-2.5'
-                style={
-                  { borderColor: '#9466e8', '--tilt': '2.5deg' } as React.CSSProperties
-                }
-              >
-                Ellipses
-              </span>
-
-              <span
-                className='board-word relative overflow-hidden rounded-[10px] border-[4px] px-5 pt-2.5 pb-7'
-                style={
-                  {
-                    backgroundColor: '#d8eeff',
-                    borderColor: 'var(--candy-ink)',
-                    '--tilt': '-1.5deg',
-                  } as React.CSSProperties
-                }
-              >
-                <svg
-                  className='absolute inset-x-0 bottom-0 h-[22px] w-full'
-                  viewBox='0 0 120 26'
-                  preserveAspectRatio='none'
-                  aria-hidden
-                >
-                  <path d='M0 26l30-19 22 12 18-9 50 16z' fill='#7cc0e8' />
-                </svg>
-                <i className='absolute top-1.5 right-2.5 block h-3 w-3 rounded-full bg-[#ffd23f]' />
-                <span className='relative'>Images</span>
-              </span>
-
-              <span
-                className='board-word relative pb-6'
-                style={{ '--tilt': '1.5deg' } as React.CSSProperties}
-              >
-                Lines
-                <svg
-                  className='absolute bottom-0 left-0 h-[18px] w-full'
-                  viewBox='-3 -2 126 16'
-                  preserveAspectRatio='none'
-                  fill='none'
-                  aria-hidden
-                >
-                  <path
-                    d='M3 6c14-7 26 7 40 0s26-7 40 0 24 5 34 1'
-                    stroke='var(--candy-ink)'
-                    strokeWidth='4'
-                    strokeLinecap='round'
-                  />
-                </svg>
-              </span>
+                {TOOLS.map(({ Icon, shortcut }, index) => (
+                  <span key={index} className='relative'>
+                    <span
+                      className='flex h-11 w-11 items-center justify-center rounded-[13px]'
+                      style={
+                        index === ACTIVE_TOOL
+                          ? {
+                              backgroundColor: 'var(--candy-pink)',
+                              color: '#fff',
+                            }
+                          : { color: 'var(--candy-ink)' }
+                      }
+                    >
+                      <Icon className='h-[22px] w-[22px]' />
+                    </span>
+                    {shortcut && (
+                      <span
+                        className='pointer-events-none absolute right-1 bottom-0.5 text-[11px] leading-none'
+                        style={{
+                          color:
+                            index === ACTIVE_TOOL
+                              ? 'rgba(255,255,255,0.75)'
+                              : 'var(--candy-muted)',
+                        }}
+                      >
+                        {shortcut}
+                      </span>
+                    )}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
 
