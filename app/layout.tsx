@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 
 import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { siteConfig } from '@/constant/config';
 import { ConvexClientProvider } from '@/providers/convex-client-provider';
@@ -33,8 +34,10 @@ export default function RootLayout({
         <ReduxProvider>
           <ConvexAuthNextjsServerProvider>
             <ConvexClientProvider>
-              <Toaster />
-              {children}
+              <TooltipProvider delayDuration={220} skipDelayDuration={400}>
+                <Toaster />
+                {children}
+              </TooltipProvider>
             </ConvexClientProvider>
           </ConvexAuthNextjsServerProvider>
         </ReduxProvider>

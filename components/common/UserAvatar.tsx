@@ -20,7 +20,12 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
     <Hint label={name} side='bottom' sideOffset={18}>
       <PersonAvatar
         seed={seed ?? name}
-        className={cn('h-12 w-12 border-[3px] border-[#111111]', className)}
+        /* The heads overlap, so the one under the pointer lifts and comes
+           forward instead of staying buried. */
+        className={cn(
+          'relative h-12 w-12 border-[3px] border-[#111111] transition-transform duration-150 hover:z-10 hover:-translate-y-1 hover:scale-[1.06]',
+          className
+        )}
       />
     </Hint>
   );

@@ -875,3 +875,66 @@ body,
     translate: none;
   }
 }
+
+/* Tooltips wear the same outlined language as the panels they belong to. The
+   entrance animates `translate` rather than `transform`, which the popper is
+   already using to place the box. */
+.tooltip-candy {
+  z-index: 60;
+  max-width: 260px;
+  padding: 6px 11px;
+  border: 2px solid var(--candy-ink);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 3px 0 0 rgba(0, 18, 52, 0.16);
+  color: var(--candy-ink);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+  animation: tooltip-in 130ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.tooltip-candy[data-state='closed'] {
+  animation: tooltip-out 90ms ease-in both;
+}
+
+.tooltip-candy[data-side='top'] {
+  --tooltip-from: 4px;
+}
+
+.tooltip-candy[data-side='bottom'] {
+  --tooltip-from: -4px;
+}
+
+.tooltip-candy[data-side='left'],
+.tooltip-candy[data-side='right'] {
+  --tooltip-from: 0px;
+}
+
+@keyframes tooltip-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--tooltip-from, -4px);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes tooltip-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tooltip-candy,
+  .tooltip-candy[data-state='closed'] {
+    animation: none;
+  }
+}
