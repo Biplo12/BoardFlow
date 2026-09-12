@@ -1,3 +1,5 @@
+import { PEN_NIB_SCALE } from '@/constant/canvas';
+
 import { Layer, LayerType, Point } from '@/types/TCanvasState';
 
 const BASE_TOLERANCE = 8;
@@ -96,7 +98,9 @@ export function hitsLayer(
   point: Point,
   tolerance: number = BASE_TOLERANCE
 ): boolean {
-  const reach = tolerance + (layer.strokeWidth ?? 2) / 2;
+  const width = layer.strokeWidth ?? 2;
+  const ink = layer.type === LayerType.Path ? width * PEN_NIB_SCALE : width;
+  const reach = tolerance + ink / 2;
 
   if (
     point.x < layer.x - reach ||
@@ -141,6 +145,46 @@ export function hitsLayer(
     default:
       return true;
   }
+}
+
+export const ERASER_RADIUS = 10;
+
+/* An eraser stroke is a swept path, not a point: sampling it at the width of
+   the nib means a fast flick cannot jump straight over a shape. */
+export function hitsAlongSegment(
+  layerIds: readonly string[],
+  layers: ReadonlyMap<string, Layer>,
+  from: Point,
+  to: Point,
+  tolerance: number = ERASER_RADIUS
+): string[] {
+  const span = Math.hypot(to.x - from.x, to.y - from.y);
+  const steps = Math.min(
+    128,
+    Math.max(1, Math.ceil(span / Math.max(1, tolerance)))
+  );
+
+  const found = new Set<string>();
+
+  for (let step = 0; step <= steps; step++) {
+    const t = step / steps;
+    const point = {
+      x: from.x + (to.x - from.x) * t,
+      y: from.y + (to.y - from.y) * t,
+    };
+
+    for (const id of layerIds) {
+      if (found.has(id)) continue;
+
+      const layer = layers.get(id);
+
+      if (layer && hitsLayer(layer, point, tolerance)) {
+        found.add(id);
+      }
+    }
+  }
+
+  return [...found];
 }
 
 /* Topmost first: the last id in the paint order is the one on top. */

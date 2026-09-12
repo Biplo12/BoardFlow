@@ -6,7 +6,16 @@ import { useSelf, useStorage } from '@/liveblocks.config';
 
 import { Layer, XYWH } from '@/types/TCanvasState';
 
-const boundingBox = (layers: Layer[]): XYWH | null => {
+const isMeasurable = (layer: Layer) =>
+  Number.isFinite(layer.x) &&
+  Number.isFinite(layer.y) &&
+  Number.isFinite(layer.width) &&
+  Number.isFinite(layer.height);
+
+/* A layer with a broken number would poison the box and reach the DOM as a
+   NaN attribute, so it is left out of the measurement entirely. */
+const boundingBox = (all: Layer[]): XYWH | null => {
+  const layers = all.filter(isMeasurable);
   const first = layers[0];
 
   if (!first) {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  arrowHead,
   layerBoxFromDrag,
   segmentPoints,
   snapSegment,
@@ -8,7 +9,7 @@ import {
 } from '@/lib/canvas-geometry';
 import {
   calculateFontSize,
-  findIntersectingLayersWithRectangle,
+  findLayersInsideRectangle,
   getContrastingTextColor,
   penPointsToPathLayer,
   pointerEventToCanvasPoint,
@@ -157,8 +158,30 @@ describe('marquee selection', () => {
   ]);
   const ids = ['a', 'b', 'c'];
 
+  it('takes only what it surrounds completely', () => {
+    const hit = findLayersInsideRectangle(
+      ids,
+      layers,
+      { x: -10, y: -10 },
+      { x: 60, y: 60 }
+    );
+
+    expect(hit).toEqual(['a']);
+  });
+
+  it('leaves a layer it merely overlaps', () => {
+    const hit = findLayersInsideRectangle(
+      ids,
+      layers,
+      { x: -10, y: -10 },
+      { x: 40, y: 40 }
+    );
+
+    expect(hit).toEqual([]);
+  });
+
   it('catches what the rectangle covers', () => {
-    const hit = findIntersectingLayersWithRectangle(
+    const hit = findLayersInsideRectangle(
       ids,
       layers,
       { x: -10, y: -10 },
@@ -189,14 +212,14 @@ describe('marquee selection', () => {
     ] as const;
 
     const answers = corners.map(([a, b]) =>
-      findIntersectingLayersWithRectangle(ids, layers, a, b).sort().join(',')
+      findLayersInsideRectangle(ids, layers, a, b).sort().join(',')
     );
 
     expect(new Set(answers).size).toBe(1);
   });
 
   it('does not catch a layer it merely passes near', () => {
-    const hit = findIntersectingLayersWithRectangle(
+    const hit = findLayersInsideRectangle(
       ids,
       layers,
       { x: 400, y: 400 },
@@ -299,5 +322,52 @@ describe('holding shift', () => {
 
   it('does nothing to a segment of no length', () => {
     expect(snapSegment({ x: 5, y: 5 }, { x: 5, y: 5 })).toEqual({ x: 5, y: 5 });
+  });
+});
+
+describe('the head of an arrow', () => {
+  const start = { x: 0, y: 0 };
+  const end = { x: 200, y: 0 };
+
+  it('puts both barbs behind the tip', () => {
+    const [left, right] = arrowHead(start, end, 4);
+
+    expect(left.x).toBeLessThan(end.x);
+    expect(right.x).toBeLessThan(end.x);
+  });
+
+  it('spreads them evenly either side of the shaft', () => {
+    const [left, right] = arrowHead(start, end, 4);
+
+    expect(left.x).toBeCloseTo(right.x);
+    expect(left.y).toBeCloseTo(-right.y);
+  });
+
+  it('turns with the arrow', () => {
+    const [left] = arrowHead(start, { x: 0, y: 200 }, 4);
+
+    expect(left.y).toBeLessThan(200);
+    expect(Math.abs(left.x)).toBeGreaterThan(0);
+  });
+
+  it('grows with the stroke width', () => {
+    const thin = arrowHead(start, end, 2)[0];
+    const thick = arrowHead(start, end, 8)[0];
+
+    expect(end.x - thick.x).toBeGreaterThan(end.x - thin.x);
+  });
+
+  it('never outgrows half of a short arrow', () => {
+    const near = { x: 20, y: 0 };
+    const [left] = arrowHead(start, near, 8);
+
+    expect(near.x - left.x).toBeLessThanOrEqual(10.001);
+  });
+
+  it('stays finite when the arrow has no length', () => {
+    const [left, right] = arrowHead(start, start, 4);
+
+    expect(Number.isFinite(left.x)).toBe(true);
+    expect(Number.isFinite(right.y)).toBe(true);
   });
 });

@@ -18,11 +18,14 @@ import { LayerType } from '@/types/TCanvasState';
 
 interface LayerPreviewProps {
   layerId: string;
+  isEditing: boolean;
   onLayerPointerDown: (e: React.PointerEvent, layerId: string) => void;
+  onEdit: (layerId: string) => void;
+  onStopEditing: () => void;
 }
 
 const LayerPreview: React.FC<LayerPreviewProps> = memo(
-  ({ layerId, onLayerPointerDown }) => {
+  ({ layerId, isEditing, onLayerPointerDown, onEdit, onStopEditing }) => {
     const layer = useStorage((root) => root.layers[layerId]);
 
     if (!layer) {
@@ -64,11 +67,25 @@ const LayerPreview: React.FC<LayerPreviewProps> = memo(
         );
       case LayerType.Text:
         return (
-          <Text id={layerId} layer={layer} onPointerDown={onLayerPointerDown} />
+          <Text
+            id={layerId}
+            layer={layer}
+            isEditing={isEditing}
+            onPointerDown={onLayerPointerDown}
+            onEdit={onEdit}
+            onStopEditing={onStopEditing}
+          />
         );
       case LayerType.Note:
         return (
-          <Note id={layerId} layer={layer} onPointerDown={onLayerPointerDown} />
+          <Note
+            id={layerId}
+            layer={layer}
+            isEditing={isEditing}
+            onPointerDown={onLayerPointerDown}
+            onEdit={onEdit}
+            onStopEditing={onStopEditing}
+          />
         );
       case LayerType.Path:
         return (

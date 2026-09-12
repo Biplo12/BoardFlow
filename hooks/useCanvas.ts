@@ -13,14 +13,14 @@ import {
   snapSegment,
   squarePoint,
 } from '@/lib/canvas-geometry';
-import { topmostHit } from '@/lib/canvas-hit';
+import { ERASER_RADIUS, hitsAlongSegment } from '@/lib/canvas-hit';
 import { claimPointer, surfaceOf } from '@/lib/canvas-pointer';
 import { ScalableLayer, scaleLayer } from '@/lib/canvas-resize';
 import {
   colorToCss,
   cssToColor,
   DEFAULT_FILLS,
-  findIntersectingLayersWithRectangle,
+  findLayersTouchingRectangle,
   penPointsToPathLayer,
   pointerEventToCanvasPoint,
   randomBorderColor,
@@ -32,7 +32,11 @@ import useDisableScroll from '@/hooks/useDisableScroll';
 import useDuplicateLayers from '@/hooks/useDuplicateLayers';
 import useShortcuts from '@/hooks/useShortcuts';
 
-import { CanvasStyle,DEFAULT_STYLE } from '@/constant/canvas';
+import {
+  CanvasStyle,
+  DEFAULT_SHAPE_SIZE,
+  DEFAULT_STYLE,
+} from '@/constant/canvas';
 import {
   useHistory,
   useMutation,
@@ -43,6 +47,7 @@ import {
 
 import {
   CanvasMode,
+  Layer,
   LayerStyle,
   LayerType,
   Point,
@@ -53,6 +58,43 @@ import {
 
 const MAX_LAYERS = 100;
 const SELECTION_NET_THRESHOLD = 5;
+const ERASER_TRAIL_POINTS = 48;
+
+const TOOL_MODES = [
+  CanvasMode.Inserting,
+  CanvasMode.Pencil,
+  CanvasMode.Erasing,
+  CanvasMode.Hand,
+];
+
+/* The tool a gesture belongs to, with the half finished gesture stripped off:
+   panning away and back must not restore a stale drag. */
+const toolOf = (state: TCanvasState): TCanvasState => {
+  if (state.mode === CanvasMode.Inserting) {
+    return { mode: CanvasMode.Inserting, layerType: state.layerType };
+  }
+
+  if (
+    state.mode === CanvasMode.Pencil ||
+    state.mode === CanvasMode.Erasing ||
+    state.mode === CanvasMode.Hand
+  ) {
+    return state;
+  }
+
+  return { mode: CanvasMode.None, layerType: undefined };
+};
+
+const INK_LAYERS = [
+  LayerType.Text,
+  LayerType.Arrow,
+  LayerType.Line,
+  LayerType.Path,
+];
+
+type EraserStroke = { trail: number[][]; marked: string[] };
+
+const NO_ERASER: EraserStroke = { trail: [], marked: [] };
 
 const DRAG_MODES = [
   CanvasMode.Pressing,
@@ -72,7 +114,7 @@ const useCanvas = ({
   useDisableScroll();
 
   const deleteLayer = useDeleteLayer();
-  const duplicateLayers = useDuplicateLayers();
+  const { duplicateLayers, duplicateInPlace } = useDuplicateLayers();
 
   const [toolStyle, setToolStyle] = useState<CanvasStyle>(DEFAULT_STYLE);
 
@@ -85,9 +127,14 @@ const useCanvas = ({
 
     if (!layer) return null;
 
+    /* A line, a letter or a pen stroke is only its colour. Reading its fill
+       back as a background would hand that colour to the next shape drawn. */
+    const isInk = INK_LAYERS.includes(layer.type);
+
     return {
       stroke: colorToCss(layer.stroke ?? layer.fill),
-      background: layer.filled === false ? null : colorToCss(layer.fill),
+      background:
+        isInk || layer.filled === false ? null : colorToCss(layer.fill),
       strokeWidth: layer.strokeWidth ?? DEFAULT_STYLE.strokeWidth,
       strokeStyle: layer.strokeStyle ?? DEFAULT_STYLE.strokeStyle,
       edges: layer.edges ?? DEFAULT_STYLE.edges,
@@ -117,11 +164,7 @@ const useCanvas = ({
 
         /* Ink has no background to fill: a line or a letter is only its
            colour, so the swatch would otherwise erase it. */
-        const isInk =
-          type === LayerType.Text ||
-          type === LayerType.Arrow ||
-          type === LayerType.Line ||
-          type === LayerType.Path;
+        const isInk = INK_LAYERS.includes(type);
 
         if (patch.background !== undefined && !isInk) {
           if (type === LayerType.Note) {
@@ -180,9 +223,60 @@ const useCanvas = ({
      drag started, otherwise the scaling compounds on itself. */
   const initialLayers = useRef<Record<string, ScalableLayer>>({});
 
+  /* The eraser marks as it sweeps and only deletes when the button comes up,
+     so a stroke can be seen before it is committed. */
+  const [eraser, setEraser] = useState<EraserStroke>(NO_ERASER);
+  const eraserAnchor = useRef<Point | null>(null);
+
+  /* What was already selected when a shift-marquee started. */
+  const marqueeBase = useRef<string[]>([]);
+
+  /* True from pointer-down to pointer-up. Undo in the middle of a drag would
+     take the half finished move off the stack and leave storage ahead of it. */
+  const isGesturing = useRef(false);
+
+  /* The one layer whose text is open for editing. */
+  const [editingId, setEditingId] = useState<string | null>(null);
+
   const layerIds = useStorage((s) => s.layerIds);
 
   const history = useHistory();
+
+  /* Every tool switch goes through here. A gesture that was still running has
+     to be cleaned up, or its leftovers outlive it: a half drawn stroke that
+     every other person in the room keeps seeing, layers left ghosted under
+     the eraser, a pan anchor, a paused history. */
+  const changeMode = useMutation(
+    ({ self, setMyPresence }, next: TCanvasState) => {
+      if (
+        canvasState.mode === CanvasMode.Pencil &&
+        self.presence.pencilDraft != null
+      ) {
+        setMyPresence({ pencilDraft: null });
+      }
+
+      if (eraserAnchor.current || eraser.marked.length) {
+        eraserAnchor.current = null;
+        setEraser(NO_ERASER);
+      }
+
+      setMyPresence({ draft: null });
+
+      panAnchor.current = null;
+      marqueeBase.current = [];
+      setEditingId(null);
+      history.resume();
+
+      /* Picking a tool drops the selection, so the next shape is drawn in the
+         tool's own style instead of inheriting the last selected shape's. */
+      if (TOOL_MODES.includes(next.mode) && self.presence.selection.length) {
+        setMyPresence({ selection: [] }, { addToHistory: true });
+      }
+
+      setCanvasState(next);
+    },
+    [canvasState.mode, eraser.marked.length, history, setCanvasState]
+  );
 
   const { resizeBox } = useBounds();
 
@@ -209,7 +303,16 @@ const useCanvas = ({
       const isSegment =
         layerType === LayerType.Arrow || layerType === LayerType.Line;
 
-      const { box } = layerBoxFromDrag(origin, current);
+      /* A click with no drag has to become a real segment, not a zero length
+         one hidden inside a default box. */
+      const end =
+        isSegment && !layerBoxFromDrag(origin, current).dragged
+          ? { x: origin.x + DEFAULT_SHAPE_SIZE, y: origin.y }
+          : current;
+
+      const { box } = isSegment
+        ? layerBoxFromDrag(origin, end ?? origin, DEFAULT_SHAPE_SIZE)
+        : layerBoxFromDrag(origin, current);
 
       /* A note is its paper and text is its ink, so neither can take the
          "no background" that leaves a shape as an outline. */
@@ -235,7 +338,7 @@ const useCanvas = ({
         ? new LiveObject({
             ...shared,
             type: layerType,
-            points: segmentPoints(origin, current, box),
+            points: segmentPoints(origin, end, box),
           })
         : new LiveObject({ ...shared, type: layerType });
 
@@ -243,27 +346,56 @@ const useCanvas = ({
       allLayers.set(layerId, layer as never);
 
       setMyPresence({ selection: [layerId] }, { addToHistory: true });
+      setEditingId(
+        layerType === LayerType.Text || layerType === LayerType.Note
+          ? layerId
+          : null
+      );
       setCanvasState({ mode: CanvasMode.None, layerType: undefined });
     },
     [style]
   );
 
-  const eraseAt = useMutation(
-    ({ storage, setMyPresence }, point: Point) => {
-      const liveLayers = storage.get('layers');
-      const liveLayerIds = storage.get('layerIds');
-      const layers = new Map(Object.entries(liveLayers.toJSON()));
+  const sweepEraser = useMutation(
+    ({ storage }, from: Point, to: Point, tolerance: number) => {
+      const layers = new Map(
+        Object.entries(storage.get('layers').toJSON())
+      ) as ReadonlyMap<string, Layer>;
 
-      const id = topmostHit(layerIds, layers, point);
+      const hits = hitsAlongSegment(layerIds, layers, from, to, tolerance);
 
-      if (!id) return;
+      setEraser((current) => {
+        const marked = hits.length
+          ? [...new Set([...current.marked, ...hits])]
+          : current.marked;
 
-      liveLayers.delete(id);
-      const at = liveLayerIds.indexOf(id);
-      if (at !== -1) liveLayerIds.delete(at);
-      setMyPresence({ selection: [] }, { addToHistory: true });
+        return {
+          marked,
+          trail: [...current.trail, [to.x, to.y]].slice(-ERASER_TRAIL_POINTS),
+        };
+      });
     },
     [layerIds]
+  );
+
+  const commitErase = useMutation(
+    ({ storage, setMyPresence }, marked: string[]) => {
+      if (!marked.length) return;
+
+      const liveLayers = storage.get('layers');
+      const liveLayerIds = storage.get('layerIds');
+
+      for (const id of marked) {
+        liveLayers.delete(id);
+
+        const index = liveLayerIds.indexOf(id);
+
+        if (index !== -1) liveLayerIds.delete(index);
+      }
+
+      setMyPresence({ selection: [] }, { addToHistory: true });
+    },
+    []
   );
 
   const resizeSelectedLayer = useMutation(
@@ -319,21 +451,27 @@ const useCanvas = ({
       }
 
       const layers = new Map(Object.entries(storage.get('layers').toJSON()));
+
       setCanvasState({
         mode: CanvasMode.SelectingNet,
         origin,
         current,
-        layerType: canvasState.layerType as any,
+        layerType: undefined,
       });
 
-      const ids = findIntersectingLayersWithRectangle(
+      const ids = findLayersTouchingRectangle(
         layerIds,
         layers,
         origin,
         current
       );
 
-      setMyPresence({ selection: ids });
+      /* Shift adds to what was already picked instead of starting over. */
+      const kept = marqueeBase.current;
+
+      setMyPresence({
+        selection: kept.length ? [...new Set([...kept, ...ids])] : ids,
+      });
     },
     [layerIds]
   );
@@ -342,10 +480,12 @@ const useCanvas = ({
     ({ setMyPresence }, point: Point, pressure: number) => {
       setMyPresence({
         pencilDraft: [[point.x, point.y, pressure]],
-        penColor: lastUsedColor,
+        penColor: style.stroke,
+        penWidth: style.strokeWidth,
+        penOpacity: style.opacity,
       });
     },
-    [lastUsedColor]
+    [style]
   );
 
   const continueDrawing = useMutation(
@@ -448,17 +588,53 @@ const useCanvas = ({
   );
 
   const onPointerMove = useMutation(
-    ({ setMyPresence }, e: React.PointerEvent) => {
+    ({ self, setMyPresence }, e: React.PointerEvent) => {
       const current = pointerEventToCanvasPoint(e, camera);
 
-      /* A gesture whose pointer-up went missing would otherwise follow the
-         cursor for ever. */
-      if (e.buttons === 0 && DRAG_MODES.includes(canvasState.mode)) {
-        panAnchor.current = null;
-        setCanvasState({ mode: CanvasMode.None, layerType: undefined });
-        history.resume();
-        setMyPresence({ cursor: current });
-        return;
+      /* Nothing is held, so no gesture can still be in progress. Whatever the
+         last one left behind is cleared here, because a pointer-up that never
+         arrived would otherwise strand the board: a shape following the
+         cursor, or the ghost of a shape that was never committed sitting on
+         top of everything. */
+      if (e.buttons === 0) {
+        isGesturing.current = false;
+
+        if (canvasState.mode === CanvasMode.Erasing && eraserAnchor.current) {
+          /* A release nobody saw is not a reliable instruction to delete. */
+          eraserAnchor.current = null;
+          setEraser(NO_ERASER);
+          setMyPresence({ cursor: current });
+          return;
+        }
+
+        if (
+          canvasState.mode === CanvasMode.Inserting &&
+          canvasState.origin != null
+        ) {
+          setCanvasState({
+            mode: CanvasMode.Inserting,
+            layerType: canvasState.layerType,
+          });
+          setMyPresence({ cursor: current });
+          return;
+        }
+
+        if (
+          canvasState.mode === CanvasMode.Pencil &&
+          self.presence.pencilDraft != null
+        ) {
+          insertPath();
+          setMyPresence({ cursor: current });
+          return;
+        }
+
+        if (DRAG_MODES.includes(canvasState.mode)) {
+          panAnchor.current = null;
+          setCanvasState({ mode: CanvasMode.None, layerType: undefined });
+          history.resume();
+          setMyPresence({ cursor: current });
+          return;
+        }
       }
 
       if (canvasState.mode === CanvasMode.Panning) {
@@ -472,7 +648,10 @@ const useCanvas = ({
         canvasState.mode === CanvasMode.Erasing &&
         e.buttons === 1
       ) {
-        eraseAt(current);
+        const from = eraserAnchor.current ?? current;
+
+        eraserAnchor.current = current;
+        sweepEraser(from, current, ERASER_RADIUS / camera.scale);
       } else if (
         canvasState.mode === CanvasMode.Inserting &&
         canvasState.origin != null
@@ -481,16 +660,29 @@ const useCanvas = ({
           canvasState.layerType === LayerType.Arrow ||
           canvasState.layerType === LayerType.Line;
 
+        const shaped = e.shiftKey
+          ? isSegment
+            ? snapSegment(canvasState.origin, current)
+            : squarePoint(canvasState.origin, current)
+          : current;
+
         setCanvasState({
           mode: CanvasMode.Inserting,
           layerType: canvasState.layerType,
           origin: canvasState.origin,
-          current: e.shiftKey
-            ? isSegment
-              ? snapSegment(canvasState.origin, current)
-              : squarePoint(canvasState.origin, current)
-            : current,
+          current: shaped,
         });
+
+        if (canvasState.layerType != null) {
+          setMyPresence({
+            draft: {
+              layerType: canvasState.layerType,
+              origin: canvasState.origin,
+              current: shaped,
+              style,
+            },
+          });
+        }
       } else if (canvasState.mode === CanvasMode.Pressing) {
         startMultiSelect(current, canvasState.origin);
       } else if (
@@ -508,7 +700,16 @@ const useCanvas = ({
 
       setMyPresence({ cursor: current });
     },
-    [canvasState, camera, history, resizeSelectedLayer, translateSelectedLayers]
+    [
+      canvasState,
+      camera,
+      history,
+      insertPath,
+      resizeSelectedLayer,
+      style,
+      sweepEraser,
+      translateSelectedLayers,
+    ]
   );
 
   const onPointerLeave = useMutation(({ setMyPresence }) => {
@@ -522,10 +723,14 @@ const useCanvas = ({
   }, []);
 
   const onPointerUp = useMutation(
-    ({}, e: React.PointerEvent) => {
+    ({ setMyPresence }, e: React.PointerEvent) => {
       if (e.currentTarget.hasPointerCapture?.(e.pointerId)) {
         e.currentTarget.releasePointerCapture(e.pointerId);
       }
+
+      isGesturing.current = false;
+      marqueeBase.current = [];
+      setMyPresence({ draft: null });
 
       const point = pointerEventToCanvasPoint(e, camera);
 
@@ -533,15 +738,19 @@ const useCanvas = ({
         canvasState.mode === CanvasMode.None ||
         canvasState.mode === CanvasMode.Pressing
       ) {
-        unSelectLayers();
+        if (!e.shiftKey) unSelectLayers();
         setCanvasState({
           mode: CanvasMode.None,
           layerType: canvasState.layerType,
         });
       } else if (canvasState.mode === CanvasMode.Panning) {
         panAnchor.current = null;
-        setCanvasState({ mode: canvasState.returnTo, layerType: undefined });
+        setCanvasState(canvasState.returnTo);
       } else if (canvasState.mode === CanvasMode.Erasing) {
+        commitErase(eraser.marked);
+        eraserAnchor.current = null;
+        setEraser(NO_ERASER);
+        history.resume();
         return;
       } else if (canvasState.mode === CanvasMode.Pencil) {
         insertPath();
@@ -564,12 +773,23 @@ const useCanvas = ({
 
       history.resume();
     },
-    [canvasState, camera, insertLayer, history, unSelectLayers, panBy]
+    [
+      canvasState,
+      camera,
+      commitErase,
+      eraser,
+      history,
+      insertLayer,
+      panBy,
+      unSelectLayers,
+    ]
   );
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
       claimPointer(e, e.currentTarget);
+      isGesturing.current = true;
+      setEditingId(null);
 
       const point = pointerEventToCanvasPoint(e, camera);
 
@@ -584,9 +804,9 @@ const useCanvas = ({
           mode: CanvasMode.Panning,
           layerType: undefined,
           returnTo:
-            canvasState.mode === CanvasMode.Hand
-              ? CanvasMode.Hand
-              : CanvasMode.None,
+            canvasState.mode === CanvasMode.Panning
+              ? canvasState.returnTo
+              : toolOf(canvasState),
         });
         return;
       }
@@ -596,7 +816,9 @@ const useCanvas = ({
       }
 
       if (canvasState.mode === CanvasMode.Erasing) {
-        eraseAt(point);
+        eraserAnchor.current = point;
+        setEraser({ trail: [[point.x, point.y]], marked: [] });
+        sweepEraser(point, point, ERASER_RADIUS / camera.scale);
         return;
       }
 
@@ -615,13 +837,16 @@ const useCanvas = ({
         return;
       }
 
+      /* Shift keeps what was already picked, so a marquee can add to it. */
+      marqueeBase.current = e.shiftKey ? [...(selection ?? [])] : [];
+
       setCanvasState({
         origin: point,
         mode: CanvasMode.Pressing,
-        layerType: canvasState.layerType,
+        layerType: undefined,
       });
     },
-    [camera, canvasState, eraseAt, setCanvasState, startDrawing]
+    [camera, canvasState, selection, setCanvasState, startDrawing, sweepEraser]
   );
 
   const onLayerPointerDown = useMutation(
@@ -643,9 +868,12 @@ const useCanvas = ({
       history.pause();
       e.stopPropagation();
       claimPointer(e, surfaceOf(e.currentTarget as Element));
+      isGesturing.current = true;
 
       const point = pointerEventToCanvasPoint(e, camera);
       const selection = self.presence.selection;
+
+      setEditingId((current) => (current === layerId ? current : null));
 
       /* Alt turns a drag into a copy: the original stays put and the new one
          comes along with the pointer. */
@@ -654,7 +882,7 @@ const useCanvas = ({
           setMyPresence({ selection: [layerId] }, { addToHistory: true });
         }
 
-        duplicateLayers(0);
+        duplicateInPlace();
         setCanvasState({
           mode: CanvasMode.Translating,
           current: point,
@@ -682,7 +910,7 @@ const useCanvas = ({
         layerType: canvasState.layerType,
       });
     },
-    [setCanvasState, camera, history, canvasState.mode, duplicateLayers]
+    [setCanvasState, camera, history, canvasState.mode, duplicateInPlace]
   );
 
   const selectAll = useMutation(
@@ -710,6 +938,11 @@ const useCanvas = ({
   const onPointerCancel = useMutation(
     ({ setMyPresence }) => {
       panAnchor.current = null;
+      eraserAnchor.current = null;
+      isGesturing.current = false;
+      marqueeBase.current = [];
+      setMyPresence({ draft: null });
+      setEraser(NO_ERASER);
       setMyPresence({ pencilDraft: null });
 
       if (canvasState.mode === CanvasMode.Inserting) {
@@ -766,6 +999,7 @@ const useCanvas = ({
       }
 
       initialLayers.current = snapshot;
+      isGesturing.current = true;
 
       history.pause();
       setCanvasState({
@@ -787,11 +1021,19 @@ const useCanvas = ({
     zoomIn,
     zoomOut,
     resetZoom,
-    setCanvasState,
+    setCanvasState: changeMode,
+    isGesturing,
     spaceHeld,
   });
 
+  const pauseHistory = useCallback(() => history.pause(), [history]);
+  const resumeHistory = useCallback(() => history.resume(), [history]);
+
   return {
+    eraser,
+    editingId,
+    setEditingId,
+    setCanvasState: changeMode,
     onPointerMove,
     onPointerCancel,
     onPointerLeave,
@@ -811,6 +1053,8 @@ const useCanvas = ({
     zoomIn,
     zoomOut,
     resetZoom,
+    pauseHistory,
+    resumeHistory,
   };
 };
 

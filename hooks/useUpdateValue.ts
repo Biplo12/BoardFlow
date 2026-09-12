@@ -12,7 +12,7 @@ const useUpdateValue = () => {
   /* Text that was never typed leaves nothing on the board to click on, so it
      goes away again the moment it loses focus. */
   const discardIfEmpty = useMutation(
-    ({ storage, setMyPresence }, id: string) => {
+    ({ storage, self, setMyPresence }, id: string) => {
       const liveLayers = storage.get('layers');
       const layer = liveLayers.get(id);
 
@@ -25,7 +25,11 @@ const useUpdateValue = () => {
 
       if (index !== -1) liveLayerIds.delete(index);
 
-      setMyPresence({ selection: [] });
+      const selection = self.presence.selection;
+
+      if (selection.includes(id)) {
+        setMyPresence({ selection: selection.filter((other) => other !== id) });
+      }
     },
     []
   );

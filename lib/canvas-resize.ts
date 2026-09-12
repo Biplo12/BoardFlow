@@ -1,3 +1,5 @@
+import { MIN_LAYER_SIZE } from '@/lib/canvas-geometry';
+
 import { Point, Side, XYWH } from '@/types/TCanvasState';
 
 export type ResizeResult = {
@@ -21,26 +23,26 @@ export function resizeBox(
   if ((corner & Side.Left) === Side.Left) {
     const anchor = bounds.x + bounds.width;
     box.x = Math.min(point.x, anchor);
-    box.width = Math.abs(anchor - point.x);
+    box.width = Math.max(MIN_LAYER_SIZE, Math.abs(anchor - point.x));
     flipX = point.x > anchor;
   }
 
   if ((corner & Side.Right) === Side.Right) {
     box.x = Math.min(point.x, bounds.x);
-    box.width = Math.abs(point.x - bounds.x);
+    box.width = Math.max(MIN_LAYER_SIZE, Math.abs(point.x - bounds.x));
     flipX = point.x < bounds.x;
   }
 
   if ((corner & Side.Top) === Side.Top) {
     const anchor = bounds.y + bounds.height;
     box.y = Math.min(point.y, anchor);
-    box.height = Math.abs(anchor - point.y);
+    box.height = Math.max(MIN_LAYER_SIZE, Math.abs(anchor - point.y));
     flipY = point.y > anchor;
   }
 
   if ((corner & Side.Bottom) === Side.Bottom) {
     box.y = Math.min(point.y, bounds.y);
-    box.height = Math.abs(point.y - bounds.y);
+    box.height = Math.max(MIN_LAYER_SIZE, Math.abs(point.y - bounds.y));
     flipY = point.y < bounds.y;
   }
 

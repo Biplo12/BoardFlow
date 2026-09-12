@@ -151,7 +151,7 @@ export type TCanvasState =
   | {
       mode: CanvasMode.Panning;
       layerType: undefined;
-      returnTo: CanvasMode.None | CanvasMode.Hand;
+      returnTo: TCanvasState;
     }
   | {
       mode: CanvasMode.Pressing;

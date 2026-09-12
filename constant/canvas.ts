@@ -38,6 +38,10 @@ export const MIN_DRAG_TO_SIZE = 6;
 /* An outline is a few pixels wide; the grab area around it is not. */
 export const HIT_STROKE_PADDING = 12;
 
+/* The pen lays down a nib several times the nominal stroke width, so hit
+   testing a freehand path has to measure the ink, not the setting. */
+export const PEN_NIB_SCALE = 4;
+
 export const DEFAULT_SHAPE_SIZE = 120;
 
 export type CanvasStyle = {

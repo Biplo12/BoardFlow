@@ -87,9 +87,10 @@ const useCamera = () => {
     zoomAt(camera.scale / STEP, window.innerWidth / 2, window.innerHeight / 2);
   }, [camera.scale, zoomAt]);
 
+  /* Back to 100%, still looking at the same place. */
   const resetZoom = useCallback(() => {
-    setCamera({ x: 0, y: 0, scale: 1 });
-  }, []);
+    zoomAt(1, window.innerWidth / 2, window.innerHeight / 2);
+  }, [zoomAt]);
 
   const panBy = useCallback((dx: number, dy: number) => {
     setCamera((current) => ({

@@ -35,6 +35,7 @@ const Ellipse: React.FC<EllipseProps> = ({
         stroke={style.stroke}
         strokeWidth={style.strokeWidth}
         strokeDasharray={style.strokeDasharray}
+        strokeLinecap='round'
       />
       <ellipse
         {...geometry}

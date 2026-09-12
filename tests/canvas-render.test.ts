@@ -202,7 +202,7 @@ describe('shape geometry', () => {
     expect(markup).toContain('y2="100"');
   });
 
-  it('gives an arrow a head at the far end', () => {
+  it('gives an arrow two barbs off the far end', () => {
     const markup = render(Arrow, {
       id: 'x',
       layer: layer(LayerType.Arrow, {
@@ -214,8 +214,10 @@ describe('shape geometry', () => {
       onPointerDown: noop,
     });
 
-    expect(markup).toContain('<polygon');
-    expect(markup).toContain('130,100');
+    const barbs = markup.match(/x1="130" y1="100"/g) ?? [];
+
+    expect(barbs).toHaveLength(2);
+    expect(markup).toContain('x1="10" y1="20" x2="130" y2="100"');
   });
 
   it('draws nothing for a segment with one end', () => {

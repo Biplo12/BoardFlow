@@ -63,18 +63,20 @@ export function cssToColor(css: string): Color {
   };
 }
 
-export function findIntersectingLayersWithRectangle(
+/* Two readings of a marquee. Excalidraw and Figma take only what the box
+   fully surrounds; Illustrator takes anything it touches. Enclosing is the
+   stricter one and reads badly for a long diagonal line, whose box is mostly
+   empty, so the canvas uses touching. */
+export function findLayersTouchingRectangle(
   layerIds: readonly string[],
   layers: ReadonlyMap<string, Layer>,
   a: Point,
   b: Point
 ) {
-  const rect = {
-    x: Math.min(a?.x, b.x),
-    y: Math.min(a?.y, b.y),
-    width: Math.abs(a?.x - b.x),
-    height: Math.abs(a?.y - b.y),
-  };
+  const left = Math.min(a.x, b.x);
+  const right = Math.max(a.x, b.x);
+  const top = Math.min(a.y, b.y);
+  const bottom = Math.max(a.y, b.y);
 
   const ids = [];
 
@@ -88,10 +90,45 @@ export function findIntersectingLayersWithRectangle(
     const { x, y, height, width } = layer;
 
     if (
-      rect.x + rect.width > x &&
-      rect.x < x + width &&
-      rect.y + rect.height > y &&
-      rect.y < y + height
+      right > x &&
+      left < x + width &&
+      bottom > y &&
+      top < y + height
+    ) {
+      ids.push(layerId);
+    }
+  }
+
+  return ids;
+}
+
+export function findLayersInsideRectangle(
+  layerIds: readonly string[],
+  layers: ReadonlyMap<string, Layer>,
+  a: Point,
+  b: Point
+) {
+  const left = Math.min(a.x, b.x);
+  const right = Math.max(a.x, b.x);
+  const top = Math.min(a.y, b.y);
+  const bottom = Math.max(a.y, b.y);
+
+  const ids = [];
+
+  for (const layerId of layerIds) {
+    const layer = layers.get(layerId);
+
+    if (layer == null) {
+      continue;
+    }
+
+    const { x, y, height, width } = layer;
+
+    if (
+      left <= x &&
+      top <= y &&
+      right >= x + width &&
+      bottom >= y + height
     ) {
       ids.push(layerId);
     }

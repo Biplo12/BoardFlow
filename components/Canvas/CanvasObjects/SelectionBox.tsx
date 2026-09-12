@@ -9,12 +9,13 @@ import { Side, XYWH } from '@/types/TCanvasState';
 interface SelectionBoxProps {
   onResizeHandlePointerDown: (corner: Side, initialBounds: XYWH) => void;
   scale?: number;
+  spaceHeld: React.MutableRefObject<boolean>;
 }
 
 const BASE_HANDLE_WIDTH = 8;
 
 const SelectionBox: React.FC<SelectionBoxProps> = memo(
-  ({ onResizeHandlePointerDown, scale = 1 }) => {
+  ({ onResizeHandlePointerDown, scale = 1, spaceHeld }) => {
     /* The whole surface is scaled, so handles and outlines are divided back
        out to keep the same size on screen at any zoom. */
     const HANDLE_WIDTH = BASE_HANDLE_WIDTH / scale;
@@ -102,6 +103,10 @@ const SelectionBox: React.FC<SelectionBoxProps> = memo(
               transform: `translate(${handle.x}px, ${handle.y}px)`,
             }}
             onPointerDown={(e) => {
+              /* A handle is for the left button only. Space-pan, the hand
+                 tool and middle-drag have to reach the surface underneath. */
+              if (e.button !== 0 || spaceHeld.current) return;
+
               e.stopPropagation();
               claimPointer(e, surfaceOf(e.currentTarget));
               onResizeHandlePointerDown(handle.side, bounds);

@@ -2,6 +2,7 @@ import { Kalam } from 'next/font/google';
 import React, { useEffect, useRef } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
+import { shapeStyle } from '@/lib/canvas-style';
 import {
   calculateFontSize,
   cn,
@@ -12,37 +13,47 @@ import {
 } from '@/lib/utils';
 import useUpdateValue from '@/hooks/useUpdateValue';
 
-import { NoteLayer } from '@/types/TCanvasState';
+import { NoteLayer, StrokeStyle } from '@/types/TCanvasState';
 
 const font = Kalam({
   subsets: ['latin'],
   weight: ['400'],
 });
 
+const BORDER_STYLES: Record<StrokeStyle, string> = {
+  solid: 'solid',
+  dashed: 'dashed',
+  dotted: 'dotted',
+};
+
 interface NoteProps {
   id: string;
   layer: NoteLayer;
+  isEditing: boolean;
   onPointerDown: (e: React.PointerEvent, id: string) => void;
+  onEdit: (id: string) => void;
+  onStopEditing: () => void;
 }
 
 const Note: React.FC<NoteProps> = ({
   id,
   layer,
+  isEditing,
   onPointerDown,
+  onEdit,
+  onStopEditing,
 }): JSX.Element => {
-  const { x, y, width, height, fill, opacity, value = '' } = layer;
+  const { x, y, width, height, fill, value = '' } = layer;
 
   const { updateValue } = useUpdateValue();
-  const editable = useRef<HTMLElement>(
-    null
-  ) as React.RefObject<HTMLElement>;
+  const style = shapeStyle(layer);
+  const editable = useRef<HTMLElement>(null) as React.RefObject<HTMLElement>;
 
-  /* A fresh note is placed to be written on, so it takes the caret at once. */
   useEffect(() => {
-    if (!editable.current?.textContent) {
+    if (isEditing) {
       editable.current?.focus({ preventScroll: true });
     }
-  }, []);
+  }, [isEditing]);
 
   const handleContentChange = (e: ContentEditableEvent) => {
     updateValue(htmlToPlainText(e.target.value), id);
@@ -63,24 +74,47 @@ const Note: React.FC<NoteProps> = ({
       width={width}
       height={height}
       onPointerDown={(e) => onPointerDown(e, id)}
-      opacity={(opacity ?? 100) / 100}
-      style={{ backgroundColor: colorToCss(fill) }}
-      className='shadow-md drop-shadow-xl'
+      onDoubleClick={() => onEdit(id)}
+      opacity={style.opacity}
     >
-      <ContentEditable
-        innerRef={editable}
-        html={plainTextToHtml(value)}
-        onChange={handleContentChange}
-        onPaste={handlePaste}
-        className={cn(
-          'flex h-full w-full items-center justify-center text-center outline-none',
-          font.className
-        )}
+      {/* The paper carries the outline the panel writes, so a note looks the
+          same committed as it did while it was being dragged out. */}
+      <div
+        className='h-full w-full shadow-md drop-shadow-xl'
         style={{
-          fontSize: calculateFontSize(width, height),
-          color: getContrastingTextColor(fill),
+          backgroundColor: colorToCss(fill),
+          border: `${style.strokeWidth}px ${BORDER_STYLES[layer.strokeStyle ?? 'solid']} ${style.stroke}`,
+          borderRadius: style.radius,
         }}
-      />
+      >
+        {/* Editable only while it is being edited: a permanently editable box
+            would take the caret on a single click, and every keyboard
+            shortcut on the board would go to it instead. */}
+        <ContentEditable
+          innerRef={editable}
+          disabled={!isEditing}
+          html={plainTextToHtml(value)}
+          onChange={handleContentChange}
+          onBlur={onStopEditing}
+          onPaste={handlePaste}
+          onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              editable.current?.blur();
+            }
+          }}
+          className={cn(
+            'flex h-full w-full items-center justify-center text-center outline-none',
+            font.className
+          )}
+          style={{
+            fontSize: calculateFontSize(width, height),
+            color: getContrastingTextColor(fill),
+            cursor: isEditing ? 'text' : 'inherit',
+            userSelect: isEditing ? 'text' : 'none',
+          }}
+        />
+      </div>
     </foreignObject>
   );
 };

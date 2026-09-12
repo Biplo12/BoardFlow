@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { arrowHead } from '@/lib/canvas-geometry';
 import { MAX_CORNER_RADIUS } from '@/lib/canvas-style';
 import { colorToCss, DEFAULT_FILLS } from '@/lib/utils';
 
@@ -43,6 +44,8 @@ const InsertPreview: React.FC<InsertPreviewProps> = ({
         ? colorToCss(style.background)
         : 'none',
     opacity: style.opacity / 100,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
     pointerEvents: 'none' as const,
   };
 
@@ -68,16 +71,51 @@ const InsertPreview: React.FC<InsertPreviewProps> = ({
   }
 
   if (layerType === LayerType.Arrow || layerType === LayerType.Line) {
+    const shaft = {
+      x1: origin.x,
+      y1: origin.y,
+      x2: current.x,
+      y2: current.y,
+    };
+
+    if (layerType === LayerType.Line) {
+      return <line {...shaft} {...common} fill='none' strokeLinecap='round' />;
+    }
+
+    const [left, right] = arrowHead(origin, current, style.strokeWidth);
+    const barb = {
+      stroke: common.stroke,
+      strokeWidth: common.strokeWidth,
+      strokeLinecap: 'round' as const,
+      pointerEvents: 'none' as const,
+    };
+
     return (
-      <line
-        x1={origin.x}
-        y1={origin.y}
-        x2={current.x}
-        y2={current.y}
-        {...common}
-        fill='none'
-        strokeLinecap='round'
-      />
+      <g opacity={common.opacity}>
+        <line
+          {...shaft}
+          stroke={common.stroke}
+          strokeWidth={common.strokeWidth}
+          strokeDasharray={common.strokeDasharray}
+          fill='none'
+          strokeLinecap='round'
+          pointerEvents='none'
+        />
+        <line
+          x1={current.x}
+          y1={current.y}
+          x2={left.x}
+          y2={left.y}
+          {...barb}
+        />
+        <line
+          x1={current.x}
+          y1={current.y}
+          x2={right.x}
+          y2={right.y}
+          {...barb}
+        />
+      </g>
     );
   }
 

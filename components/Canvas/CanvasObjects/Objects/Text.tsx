@@ -21,13 +21,19 @@ const font = Kalam({
 interface TextProps {
   id: string;
   layer: TextLayer;
+  isEditing: boolean;
   onPointerDown: (e: React.PointerEvent, id: string) => void;
+  onEdit: (id: string) => void;
+  onStopEditing: () => void;
 }
 
 const Text: React.FC<TextProps> = ({
   id,
   layer,
+  isEditing,
   onPointerDown,
+  onEdit,
+  onStopEditing,
 }): JSX.Element => {
   const { x, y, width, height, fill, stroke, opacity, value = '' } = layer;
 
@@ -36,13 +42,11 @@ const Text: React.FC<TextProps> = ({
     null
   ) as React.RefObject<HTMLElement>;
 
-  /* A fresh text box is placed to be typed into, so it takes the caret the
-     moment it appears. */
   useEffect(() => {
-    if (!editable.current?.textContent) {
+    if (isEditing) {
       editable.current?.focus({ preventScroll: true });
     }
-  }, []);
+  }, [isEditing]);
 
   const handleContentChange = (e: ContentEditableEvent) => {
     updateValue(htmlToPlainText(e.target.value), id);
@@ -56,6 +60,11 @@ const Text: React.FC<TextProps> = ({
     document.execCommand('insertText', false, text);
   };
 
+  const handleBlur = () => {
+    onStopEditing();
+    discardIfEmpty(id);
+  };
+
   return (
     <foreignObject
       x={x}
@@ -63,14 +72,25 @@ const Text: React.FC<TextProps> = ({
       width={width}
       height={height}
       onPointerDown={(e) => onPointerDown(e, id)}
+      onDoubleClick={() => onEdit(id)}
       opacity={(opacity ?? 100) / 100}
     >
+      {/* Editable only while it is being edited: a permanently editable box
+          would take the caret on a single click, and every keyboard shortcut
+          on the board would go to it instead. */}
       <ContentEditable
         innerRef={editable}
+        disabled={!isEditing}
         html={plainTextToHtml(value)}
         onChange={handleContentChange}
-        onBlur={() => discardIfEmpty(id)}
+        onBlur={handleBlur}
         onPaste={handlePaste}
+        onKeyDown={(e: React.KeyboardEvent) => {
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            editable.current?.blur();
+          }
+        }}
         className={cn(
           'flex h-full w-full items-center justify-center text-center outline-none',
           font.className
@@ -78,6 +98,8 @@ const Text: React.FC<TextProps> = ({
         style={{
           fontSize: calculateFontSize(width, height),
           color: colorToCss(stroke ?? fill),
+          cursor: isEditing ? 'text' : 'inherit',
+          userSelect: isEditing ? 'text' : 'none',
         }}
       />
     </foreignObject>

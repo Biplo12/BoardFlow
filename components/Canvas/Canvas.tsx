@@ -43,7 +43,7 @@ const Canvas: React.FC<CanvasProps> = ({ boardId }): JSX.Element => {
   const { sendToBack, sendBackward, bringForward, bringToFront } =
     useLayerOrder();
   const alignLayers = useAlignLayers();
-  const duplicateLayers = useDuplicateLayers();
+  const { duplicateLayers } = useDuplicateLayers();
   const deleteLayers = useDeleteLayer();
 
   const dispatch = useAppDispatch();
@@ -74,7 +74,7 @@ const Canvas: React.FC<CanvasProps> = ({ boardId }): JSX.Element => {
       <CanvasToolbar
         canvasActions={canvasActions}
         canvasState={canvasState}
-        setCanvasState={setCanvasState}
+        setCanvasState={canvasActions.setCanvasState}
       />
       <CanvasZoom canvasActions={canvasActions} />
       <CanvasStylePanel
@@ -90,6 +90,8 @@ const Canvas: React.FC<CanvasProps> = ({ boardId }): JSX.Element => {
         onDuplicate={duplicateLayers}
         onDelete={deleteLayers}
         onSetImageUrl={isImageSelected ? openImageUrlDialog : undefined}
+        onSlideStart={canvasActions.pauseHistory}
+        onSlideEnd={canvasActions.resumeHistory}
       />
       <CanvasObjects canvasState={canvasState} canvasActions={canvasActions} />
       <CanvasDialogController />

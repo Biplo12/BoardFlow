@@ -33,6 +33,7 @@ const Rectangle: React.FC<RectangleProps> = ({
         stroke={style.stroke}
         strokeWidth={style.strokeWidth}
         strokeDasharray={style.strokeDasharray}
+        strokeLinecap='round'
         strokeLinejoin='round'
       />
       <rect

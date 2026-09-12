@@ -29,7 +29,7 @@ import { CanvasMode, LayerType, TCanvasState } from '@/types/TCanvasState';
 interface ToolbarProps {
   canvasActions: ReturnType<typeof useCanvas>;
   canvasState: TCanvasState;
-  setCanvasState: React.Dispatch<React.SetStateAction<TCanvasState>>;
+  setCanvasState: (next: TCanvasState) => void;
 }
 
 const CanvasToolbar: React.FC<ToolbarProps> = ({

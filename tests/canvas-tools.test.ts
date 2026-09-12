@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { hitsLayer, topmostHit } from '@/lib/canvas-hit';
+import { layerBoxFromDrag, MIN_LAYER_SIZE } from '@/lib/canvas-geometry';
+import { hitsAlongSegment, hitsLayer, topmostHit } from '@/lib/canvas-hit';
 import { OrderMove, orderMoves } from '@/lib/canvas-order';
 import { resizeBox, scaleLayer } from '@/lib/canvas-resize';
 import { shapeStyle } from '@/lib/canvas-style';
+import { penPointsToPathLayer } from '@/lib/utils';
 
 import { Layer, LayerType, Side } from '@/types/TCanvasState';
 
@@ -401,5 +403,166 @@ describe('resolving a shape style', () => {
   it('turns the percentage from the panel into an svg opacity', () => {
     expect(shapeStyle({ ...base, opacity: 40 }).opacity).toBeCloseTo(0.4);
     expect(shapeStyle(base).opacity).toBe(1);
+  });
+});
+
+describe('the eraser sweeps a path, not a point', () => {
+  const layers = new Map<string, Layer>([
+    ['left', shape(LayerType.Rectangle, { x: 0, y: 0, width: 40, height: 40 })],
+    [
+      'middle',
+      shape(LayerType.Rectangle, { x: 200, y: 0, width: 40, height: 40 }),
+    ],
+    [
+      'right',
+      shape(LayerType.Rectangle, { x: 400, y: 0, width: 40, height: 40 }),
+    ],
+    [
+      'away',
+      shape(LayerType.Rectangle, { x: 200, y: 500, width: 40, height: 40 }),
+    ],
+  ]);
+  const ids = ['left', 'middle', 'right', 'away'];
+
+  it('catches everything a fast flick passes over', () => {
+    const hit = hitsAlongSegment(
+      ids,
+      layers,
+      { x: 10, y: 20 },
+      { x: 430, y: 20 }
+    );
+
+    expect(hit.sort()).toEqual(['left', 'middle', 'right']);
+  });
+
+  it('leaves alone what the stroke never touched', () => {
+    const hit = hitsAlongSegment(
+      ids,
+      layers,
+      { x: 10, y: 20 },
+      { x: 430, y: 20 }
+    );
+
+    expect(hit).not.toContain('away');
+  });
+
+  it('works for a stroke that has not moved yet', () => {
+    const hit = hitsAlongSegment(
+      ids,
+      layers,
+      { x: 210, y: 20 },
+      { x: 210, y: 20 }
+    );
+
+    expect(hit).toEqual(['middle']);
+  });
+
+  it('marks a shape only once however slowly it is crossed', () => {
+    const hit = hitsAlongSegment(
+      ids,
+      layers,
+      { x: 200, y: 20 },
+      { x: 240, y: 20 }
+    );
+
+    expect(hit).toEqual(['middle']);
+  });
+
+  it('stays bounded for an absurdly long stroke', () => {
+    const hit = hitsAlongSegment(
+      ids,
+      layers,
+      { x: -100000, y: 20 },
+      { x: 100000, y: 20 }
+    );
+
+    expect(Array.isArray(hit)).toBe(true);
+  });
+
+  it('reaches further with a wider nib', () => {
+    const near = { x: 20, y: 55 };
+
+    expect(hitsAlongSegment(ids, layers, near, near, 4)).toEqual([]);
+    expect(hitsAlongSegment(ids, layers, near, near, 20)).toEqual(['left']);
+  });
+});
+
+describe('a freehand stroke can be picked up again', () => {
+  /* Built with the same helper the pen uses, so the relative-point convention
+     is exercised end to end rather than assumed. */
+  const drawn = penPointsToPathLayer(
+    [
+      [300, 200, 0.5],
+      [340, 260, 0.5],
+      [420, 210, 0.5],
+    ],
+    INK
+  );
+  const stroke = { ...drawn, strokeWidth: 4 } as Layer;
+  const ids = ['stroke'];
+  const layers = new Map<string, Layer>([['stroke', stroke]]);
+
+  it('stores its points relative to its own box', () => {
+    expect(stroke.x).toBe(300);
+    expect(stroke.y).toBe(200);
+    expect((stroke as { points: number[][] }).points[0]).toEqual([0, 0, 0.5]);
+  });
+
+  it('is hit where the ink actually is', () => {
+    expect(hitsLayer(stroke, { x: 300, y: 200 })).toBe(true);
+    expect(hitsLayer(stroke, { x: 340, y: 260 })).toBe(true);
+  });
+
+  it('is not hit across the empty inside of its box', () => {
+    expect(hitsLayer(stroke, { x: 360, y: 205 })).toBe(false);
+  });
+
+  it('is swept up by an eraser stroke crossing it', () => {
+    const hit = hitsAlongSegment(
+      ids,
+      layers,
+      { x: 250, y: 230 },
+      { x: 470, y: 230 }
+    );
+
+    expect(hit).toEqual(['stroke']);
+  });
+
+  it('reaches the edge of a thick nib, not just the centre line', () => {
+    const thick = { ...stroke, strokeWidth: 8 } as Layer;
+    const edge = { x: 300, y: 200 - 14 };
+
+    expect(hitsLayer(thick, edge)).toBe(true);
+    expect(hitsLayer({ ...stroke, strokeWidth: 1 } as Layer, edge)).toBe(false);
+  });
+});
+
+describe('a layer can never collapse to nothing', () => {
+  it('keeps a side on a perfectly horizontal drag', () => {
+    const { box } = layerBoxFromDrag({ x: 0, y: 100 }, { x: 300, y: 100 });
+
+    expect(box.width).toBe(300);
+    expect(box.height).toBeGreaterThanOrEqual(MIN_LAYER_SIZE);
+  });
+
+  it('keeps a side on a perfectly vertical drag', () => {
+    const { box } = layerBoxFromDrag({ x: 100, y: 0 }, { x: 100, y: 300 });
+
+    expect(box.width).toBeGreaterThanOrEqual(MIN_LAYER_SIZE);
+    expect(box.height).toBe(300);
+  });
+
+  it('keeps a side when a handle is dragged onto the opposite edge', () => {
+    const bounds = { x: 100, y: 100, width: 200, height: 100 };
+    const { box } = resizeBox(bounds, Side.Left, { x: 300, y: 0 });
+
+    expect(box.width).toBeGreaterThanOrEqual(MIN_LAYER_SIZE);
+  });
+
+  it('can still be scaled back up afterwards', () => {
+    const flat = { x: 0, y: 0, width: 200, height: MIN_LAYER_SIZE };
+    const grown = scaleLayer(flat, flat, { x: 0, y: 0, width: 200, height: 80 });
+
+    expect(grown.height).toBe(80);
   });
 });

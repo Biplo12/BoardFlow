@@ -72,6 +72,8 @@ interface CanvasStylePanelProps {
   onDuplicate: () => void;
   onDelete: () => void;
   onSetImageUrl?: () => void;
+  onSlideStart: () => void;
+  onSlideEnd: () => void;
 }
 
 const CanvasStylePanel: React.FC<CanvasStylePanelProps> = ({
@@ -87,6 +89,8 @@ const CanvasStylePanel: React.FC<CanvasStylePanelProps> = ({
   onDuplicate,
   onDelete,
   onSetImageUrl,
+  onSlideStart,
+  onSlideEnd,
 }): JSX.Element | null => {
   if (!visible) {
     return null;
@@ -283,6 +287,11 @@ const CanvasStylePanel: React.FC<CanvasStylePanelProps> = ({
           step={10}
           value={style.opacity}
           aria-label='Opacity'
+          onPointerDown={onSlideStart}
+          onPointerUp={onSlideEnd}
+          onKeyDown={onSlideStart}
+          onKeyUp={onSlideEnd}
+          onBlur={onSlideEnd}
           onChange={(event) =>
             onChange({ opacity: Number(event.target.value) })
           }

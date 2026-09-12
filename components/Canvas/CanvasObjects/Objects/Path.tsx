@@ -3,7 +3,7 @@ import React from 'react';
 
 import { getSvgPathFromStroke } from '@/lib/utils';
 
-const NIB_SCALE = 4;
+import { PEN_NIB_SCALE } from '@/constant/canvas';
 
 interface PathProps {
   x: number;
@@ -29,7 +29,7 @@ const Path: React.FC<PathProps> = ({
       onPointerDown={onPointerDown}
       d={getSvgPathFromStroke(
         getStroke(points, {
-          size: strokeWidth * NIB_SCALE,
+          size: strokeWidth * PEN_NIB_SCALE,
           thinning: 0.5,
           smoothing: 0.5,
           streamline: 0.5,

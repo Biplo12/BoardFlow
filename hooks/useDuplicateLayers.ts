@@ -1,17 +1,21 @@
 import { LiveObject } from '@liveblocks/client';
 import { nanoid } from 'nanoid';
+import { useCallback } from 'react';
 
-import { useMutation, useSelf } from '@/liveblocks.config';
+import { useMutation } from '@/liveblocks.config';
 
 import { Layer } from '@/types/TCanvasState';
 
 const OFFSET = 24;
 
 const useDuplicateLayers = () => {
-  const selection = useSelf((me) => me.presence.selection);
+  const duplicate = useMutation(
+    ({ storage, self, setMyPresence }, offset: number) => {
+      /* Read from presence, not from the render that created this callback:
+         alt-drag selects the layer under the pointer and duplicates it in the
+         same tick, and the closure would still hold the previous selection. */
+      const selection = self.presence.selection;
 
-  const duplicateLayers = useMutation(
-    ({ storage, setMyPresence }, offset: number = OFFSET) => {
       if (!selection?.length) return;
 
       const liveLayers = storage.get('layers');
@@ -37,10 +41,16 @@ const useDuplicateLayers = () => {
 
       setMyPresence({ selection: copies }, { addToHistory: true });
     },
-    [selection]
+    []
   );
 
-  return duplicateLayers;
+  /* Both are event handlers, so neither takes an argument: a click event
+     landing in a positional parameter would be written straight into the
+     coordinates of every copy. */
+  const duplicateLayers = useCallback(() => duplicate(OFFSET), [duplicate]);
+  const duplicateInPlace = useCallback(() => duplicate(0), [duplicate]);
+
+  return { duplicateLayers, duplicateInPlace };
 };
 
 export default useDuplicateLayers;

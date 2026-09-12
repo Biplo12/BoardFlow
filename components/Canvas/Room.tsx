@@ -26,6 +26,9 @@ const Room: React.FC<RoomProps> = ({ children, roomId, fallback }) => {
           selection: [],
           pencilDraft: null,
           penColor: null,
+          penWidth: null,
+          penOpacity: null,
+          draft: null,
         }}
         initialStorage={{
           layers: new LiveMap<string, LiveObject<Layer>>(),

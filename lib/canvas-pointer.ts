@@ -12,7 +12,13 @@ export function claimPointer(e: React.PointerEvent, surface: Element | null) {
     e.preventDefault();
   }
 
-  surface?.setPointerCapture?.(e.pointerId);
+  /* A pointer the browser has already forgotten throws here, and losing the
+     capture must never take the rest of the gesture down with it. */
+  try {
+    surface?.setPointerCapture?.(e.pointerId);
+  } catch {
+    /* the gesture still works, it just is not captured */
+  }
 }
 
 export function surfaceOf(element: Element) {

@@ -35,6 +35,7 @@ const Diamond: React.FC<DiamondProps> = ({
         stroke={style.stroke}
         strokeWidth={style.strokeWidth}
         strokeDasharray={style.strokeDasharray}
+        strokeLinecap='round'
         strokeLinejoin={layer.edges === 'round' ? 'round' : 'miter'}
       />
       <polygon

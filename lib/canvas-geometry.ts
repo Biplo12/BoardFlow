@@ -2,6 +2,10 @@ import { DEFAULT_SHAPE_SIZE, MIN_DRAG_TO_SIZE } from '@/constant/canvas';
 
 import { Point, XYWH } from '@/types/TCanvasState';
 
+/* An SVG rect with a zero side paints nothing, and a layer with a zero side
+   can never be scaled back up, so no box is allowed to collapse. */
+export const MIN_LAYER_SIZE = 1;
+
 /* A click and a drag both have to produce a sane box, and a drag in any of the
    four directions has to come out with positive width and height. */
 export function layerBoxFromDrag(
@@ -31,8 +35,8 @@ export function layerBoxFromDrag(
     box: {
       x: Math.min(origin.x, current.x),
       y: Math.min(origin.y, current.y),
-      width: Math.abs(current.x - origin.x),
-      height: Math.abs(current.y - origin.y),
+      width: Math.max(MIN_LAYER_SIZE, Math.abs(current.x - origin.x)),
+      height: Math.max(MIN_LAYER_SIZE, Math.abs(current.y - origin.y)),
     },
   };
 }
@@ -86,4 +90,32 @@ export function snapSegment(
     x: origin.x + Math.cos(angle) * length,
     y: origin.y + Math.sin(angle) * length,
   };
+}
+
+const HEAD_SPREAD = Math.PI / 7;
+const MIN_HEAD = 14;
+
+/* Excalidraw draws the head as two strokes off the tip rather than a filled
+   triangle, and keeps it from outgrowing a short arrow. */
+export function arrowHead(
+  start: Point,
+  end: Point,
+  strokeWidth: number
+): [Point, Point] {
+  const angle = Math.atan2(end.y - start.y, end.x - start.x);
+  const length = Math.min(
+    Math.max(MIN_HEAD, strokeWidth * 4),
+    Math.hypot(end.x - start.x, end.y - start.y) * 0.5 || MIN_HEAD
+  );
+
+  return [
+    {
+      x: end.x - length * Math.cos(angle - HEAD_SPREAD),
+      y: end.y - length * Math.sin(angle - HEAD_SPREAD),
+    },
+    {
+      x: end.x - length * Math.cos(angle + HEAD_SPREAD),
+      y: end.y - length * Math.sin(angle + HEAD_SPREAD),
+    },
+  ];
 }

@@ -57,6 +57,7 @@ interface ShortcutOptions {
   zoomOut: () => void;
   resetZoom: () => void;
   setCanvasState: (newState: TCanvasState) => void;
+  isGesturing: MutableRefObject<boolean>;
   spaceHeld: MutableRefObject<boolean>;
 }
 
@@ -70,6 +71,7 @@ const useShortcuts = ({
   zoomOut,
   resetZoom,
   setCanvasState,
+  isGesturing,
   spaceHeld,
 }: ShortcutOptions) => {
   const history = useHistory();
@@ -88,16 +90,16 @@ const useShortcuts = ({
         return;
       }
 
-      if (modifier && key === 'z') {
+      /* Undoing half way through a drag would pop the unfinished change off
+         the stack and leave the board ahead of its own history. */
+      if (modifier && (key === 'z' || key === 'y')) {
         event.preventDefault();
-        if (event.shiftKey) history.redo();
-        else history.undo();
-        return;
-      }
 
-      if (modifier && key === 'y') {
-        event.preventDefault();
-        history.redo();
+        if (isGesturing.current) return;
+
+        if (key === 'y' || event.shiftKey) history.redo();
+        else history.undo();
+
         return;
       }
 
@@ -163,17 +165,26 @@ const useShortcuts = ({
       }
     }
 
+    /* A key-up that lands in another window never arrives here, which would
+       leave the canvas stuck in pan mode with no way out. */
+    function onBlur() {
+      spaceHeld.current = false;
+    }
+
     document.addEventListener('keydown', onKeyDown);
     document.addEventListener('keyup', onKeyUp);
+    window.addEventListener('blur', onBlur);
 
     return () => {
       document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('blur', onBlur);
     };
   }, [
     deleteLayers,
     duplicateLayers,
     history,
+    isGesturing,
     nudgeLayers,
     resetZoom,
     selectAll,
