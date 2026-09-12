@@ -46,6 +46,7 @@ export const get = query({
       return boards.filter(Boolean).map((board) => ({
         ...board!,
         isFavorite: true,
+        canManage: board!.authorId === userId || membership.role === 'admin',
       }));
     }
 
@@ -79,6 +80,7 @@ export const get = query({
       return {
         ...board,
         isFavorite: !!favorite,
+        canManage: board.authorId === userId || membership.role === 'admin',
       };
     });
 

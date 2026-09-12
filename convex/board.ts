@@ -71,7 +71,19 @@ export const remove = mutation({
       throw new Error('Board not found');
     }
 
-    if (board.authorId !== userId) {
+    /* The person who made it, or anyone administering the organization it
+       lives in, which is what the organization panel offers. */
+    const membership = await ctx.db
+      .query('memberships')
+      .withIndex('by_user_org', (q) =>
+        q.eq('userId', userId).eq('orgId', board.orgId)
+      )
+      .unique();
+
+    const canManage =
+      board.authorId === userId || membership?.role === 'admin';
+
+    if (!canManage) {
       throw new Error('Not authorized');
     }
 
@@ -104,7 +116,14 @@ export const rename = mutation({
       throw new Error('Board not found');
     }
 
-    if (board.authorId !== userId) {
+    const membership = await ctx.db
+      .query('memberships')
+      .withIndex('by_user_org', (q) =>
+        q.eq('userId', userId).eq('orgId', board.orgId)
+      )
+      .unique();
+
+    if (board.authorId !== userId && membership?.role !== 'admin') {
       throw new Error('Not authorized');
     }
 
@@ -118,7 +137,7 @@ export const rename = mutation({
       throw new Error('Title cannot be longer than 60 characters');
     }
 
-    await ctx.db.patch(args.id, { title: args.title });
+    await ctx.db.patch(args.id, { title });
   },
 });
 

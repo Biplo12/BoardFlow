@@ -8,5 +8,6 @@ export default interface Board {
   authorId: Id<'users'>;
   authorName: string;
   imageUrl: string;
+  canManage?: boolean;
   isFavorite: boolean;
 }
