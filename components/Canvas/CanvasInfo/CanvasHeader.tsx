@@ -26,6 +26,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
 }): JSX.Element => {
   const dispatch = useAppDispatch();
   const board = useQuery(api.board.get, { id: boardId as Id<'boards'> });
+  const viewer = useQuery(api.users.viewer);
 
   if (!board) {
     return <CanvasHeaderLoading />;
@@ -57,7 +58,13 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
         </Button>
       </Hint>
       <TabSeparator />
-      <Actions id={board._id} title={board.title} side='bottom' sideOffset={10}>
+      <Actions
+        id={board._id}
+        title={board.title}
+        canManage={board.authorId === viewer?._id}
+        side='bottom'
+        sideOffset={10}
+      >
         <div>
           <Hint label='Main menu' side='bottom' sideOffset={10}>
             <Button size='sm' variant='ghost'>

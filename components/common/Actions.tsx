@@ -25,6 +25,7 @@ interface ActionsProps {
   sideOffset?: DropdownMenuContentProps['sideOffset'];
   id: string;
   title: string;
+  canManage?: boolean;
 }
 
 export const Actions = ({
@@ -33,6 +34,7 @@ export const Actions = ({
   sideOffset,
   id,
   title,
+  canManage = false,
 }: ActionsProps) => {
   const dispatch = useAppDispatch();
   const { mutate, pending } = useApiMutation(api.board.remove);
@@ -59,8 +61,9 @@ export const Actions = ({
       }
       toast.success('Board deleted successfully');
     } catch (error) {
-      toast.error('Failed to delete board');
-      console.error(error);
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to delete board'
+      );
     }
   };
 
@@ -85,14 +88,19 @@ export const Actions = ({
           <Link2 className='h-[18px] w-[18px]' />
           Copy board link
         </DropdownMenuItem>
-        <DropdownMenuItem
-          className='cursor-pointer gap-2.5 rounded-[12px] px-3 py-2.5 text-[15px] font-semibold'
-          style={{ color: 'var(--candy-ink)' }}
-          onClick={handleOpenRenameDialog}
-        >
-          <Pencil className='h-[18px] w-[18px]' />
-          Rename
-        </DropdownMenuItem>
+        {/* Renaming and deleting belong to whoever made the board. Everyone
+            else used to be offered both and got a raw server error. */}
+        {canManage && (
+          <DropdownMenuItem
+            className='cursor-pointer gap-2.5 rounded-[12px] px-3 py-2.5 text-[15px] font-semibold'
+            style={{ color: 'var(--candy-ink)' }}
+            onClick={handleOpenRenameDialog}
+          >
+            <Pencil className='h-[18px] w-[18px]' />
+            Rename
+          </DropdownMenuItem>
+        )}
+        {canManage && (
         <ConfirmDialog
           header='Delete board?'
           description='This will delete the board and all of its contents.'
@@ -107,6 +115,7 @@ export const Actions = ({
             Delete
           </button>
         </ConfirmDialog>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

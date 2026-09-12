@@ -6,11 +6,16 @@ import { Actions } from '@/components/common/Actions';
 interface MoreButtonProps {
   id: string;
   title: string;
+  canManage: boolean;
 }
 
-const MoreButton: React.FC<MoreButtonProps> = ({ id, title }): JSX.Element => {
+const MoreButton: React.FC<MoreButtonProps> = ({
+  id,
+  title,
+  canManage,
+}): JSX.Element => {
   return (
-    <Actions id={id} title={title} side='right'>
+    <Actions id={id} title={title} canManage={canManage} side='right'>
       <button
         className='absolute top-2 right-2 z-20 flex h-8 w-8 items-center justify-center rounded-[10px] border-2 bg-white opacity-100 outline-none transition hover:-translate-y-0.5 data-[state=open]:opacity-100 lg:opacity-0 lg:group-hover:opacity-100'
         style={{ borderColor: 'var(--candy-ink)' }}

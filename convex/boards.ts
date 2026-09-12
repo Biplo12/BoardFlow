@@ -1,6 +1,6 @@
 import { getAuthUserId } from '@convex-dev/auth/server';
 import { v } from 'convex/values';
-import { getAllOrThrow } from 'convex-helpers/server/relationships';
+import { getAll } from 'convex-helpers/server/relationships';
 
 import { query } from '@/convex/_generated/server';
 
@@ -39,10 +39,12 @@ export const get = query({
 
       const ids = favoritedBoards.map((b) => b.boardId);
 
-      const boards = await getAllOrThrow(ctx.db, ids);
+      /* A favorite can outlive the board it points at, and one stale row must
+         not take the whole list down with it. */
+      const boards = await getAll(ctx.db, ids);
 
-      return boards.map((board) => ({
-        ...board,
+      return boards.filter(Boolean).map((board) => ({
+        ...board!,
         isFavorite: true,
       }));
     }

@@ -1,7 +1,8 @@
 import { getAuthUserId } from '@convex-dev/auth/server';
 import { v } from 'convex/values';
 
-import { mutation, query } from './_generated/server';
+import { Id } from './_generated/dataModel';
+import { mutation, MutationCtx, query } from './_generated/server';
 
 const slugify = (name: string, seed: string) => {
   const base = name
@@ -176,6 +177,33 @@ export const invite = mutation({
       throw new Error('Email is required');
     }
 
+    const alreadyInvited = await ctx.db
+      .query('invitations')
+      .withIndex('by_email', (q) => q.eq('email', email))
+      .collect();
+
+    if (alreadyInvited.some((row) => row.orgId === args.orgId)) {
+      throw new Error('That address has already been invited');
+    }
+
+    const invitee = await ctx.db
+      .query('users')
+      .withIndex('email', (q) => q.eq('email', email))
+      .unique();
+
+    if (invitee) {
+      const existing = await ctx.db
+        .query('memberships')
+        .withIndex('by_user_org', (q) =>
+          q.eq('userId', invitee._id).eq('orgId', args.orgId)
+        )
+        .unique();
+
+      if (existing) {
+        throw new Error('That person is already in this organization');
+      }
+    }
+
     const token = randomToken();
 
     await ctx.db.insert('invitations', {
@@ -188,6 +216,220 @@ export const invite = mutation({
     });
 
     return token;
+  },
+});
+
+const liveInvitation = (invitation: { expiresAt?: number }) =>
+  invitation.expiresAt === undefined || invitation.expiresAt > Date.now();
+
+/* Who has been asked to join and has not joined yet. Everyone in the
+   organization can see it, the same as they can see the member list. */
+export const pendingInvitations = query({
+  args: {
+    orgId: v.id('organizations'),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
+
+    const membership = await ctx.db
+      .query('memberships')
+      .withIndex('by_user_org', (q) =>
+        q.eq('userId', userId).eq('orgId', args.orgId)
+      )
+      .unique();
+
+    if (!membership) {
+      throw new Error('Not a member of this organization');
+    }
+
+    const invitations = await ctx.db
+      .query('invitations')
+      .withIndex('by_org', (q) => q.eq('orgId', args.orgId))
+      .collect();
+
+    return await Promise.all(
+      invitations.filter(liveInvitation).map(async (invitation) => {
+        const inviter = await ctx.db.get(invitation.invitedBy);
+
+        return {
+          _id: invitation._id,
+          email: invitation.email,
+          role: invitation.role,
+          invitedAt: invitation._creationTime,
+          expiresAt: invitation.expiresAt,
+          invitedBy: inviter?.name ?? inviter?.email ?? 'Someone',
+          canRevoke: membership.role === 'admin',
+        };
+      })
+    );
+  },
+});
+
+/* Every invitation waiting for the signed in person, whatever organization it
+   came from. Matched on the address it was sent to. */
+export const myInvitations = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return [];
+    }
+
+    const user = await ctx.db.get(userId);
+    const email = user?.email?.trim().toLowerCase();
+
+    if (!email) {
+      return [];
+    }
+
+    const invitations = await ctx.db
+      .query('invitations')
+      .withIndex('by_email', (q) => q.eq('email', email))
+      .collect();
+
+    const live = invitations.filter(liveInvitation);
+
+    const resolved = await Promise.all(
+      live.map(async (invitation) => {
+        const [organization, inviter, existing] = await Promise.all([
+          ctx.db.get(invitation.orgId),
+          ctx.db.get(invitation.invitedBy),
+          ctx.db
+            .query('memberships')
+            .withIndex('by_user_org', (q) =>
+              q.eq('userId', userId).eq('orgId', invitation.orgId)
+            )
+            .unique(),
+        ]);
+
+        if (!organization || existing) {
+          return null;
+        }
+
+        return {
+          _id: invitation._id,
+          orgId: invitation.orgId,
+          organization: organization.name,
+          role: invitation.role,
+          invitedAt: invitation._creationTime,
+          invitedBy: inviter?.name ?? inviter?.email ?? 'Someone',
+          /* An unverified address proves nothing, so the invitation is shown
+             but cannot be taken until the address is confirmed. */
+          canAccept: !!user?.emailVerificationTime,
+        };
+      })
+    );
+
+    return resolved.filter(
+      (row): row is NonNullable<typeof row> => row !== null
+    );
+  },
+});
+
+const claimInvitation = async (
+  ctx: MutationCtx,
+  invitationId: Id<'invitations'>
+) => {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) {
+    throw new Error('Not authenticated');
+  }
+
+  const invitation = await ctx.db.get(invitationId);
+  if (!invitation) {
+    throw new Error('Invitation not found');
+  }
+
+  const user = await ctx.db.get(userId);
+  const email = user?.email?.trim().toLowerCase();
+
+  if (!email || email !== invitation.email) {
+    throw new Error('Invitation was sent to a different email');
+  }
+
+  return { userId, invitation, verified: !!user?.emailVerificationTime };
+};
+
+export const acceptMyInvitation = mutation({
+  args: {
+    invitationId: v.id('invitations'),
+  },
+  handler: async (ctx, args) => {
+    const { userId, invitation, verified } = await claimInvitation(
+      ctx,
+      args.invitationId
+    );
+
+    if (!liveInvitation(invitation)) {
+      throw new Error('Invitation expired');
+    }
+
+    if (!verified) {
+      throw new Error('Confirm your email address before joining');
+    }
+
+    const existing = await ctx.db
+      .query('memberships')
+      .withIndex('by_user_org', (q) =>
+        q.eq('userId', userId).eq('orgId', invitation.orgId)
+      )
+      .unique();
+
+    if (!existing) {
+      await ctx.db.insert('memberships', {
+        orgId: invitation.orgId,
+        userId,
+        role: invitation.role,
+      });
+    }
+
+    await ctx.db.delete(invitation._id);
+
+    return invitation.orgId;
+  },
+});
+
+export const declineMyInvitation = mutation({
+  args: {
+    invitationId: v.id('invitations'),
+  },
+  handler: async (ctx, args) => {
+    const { invitation } = await claimInvitation(ctx, args.invitationId);
+
+    await ctx.db.delete(invitation._id);
+  },
+});
+
+export const revokeInvitation = mutation({
+  args: {
+    invitationId: v.id('invitations'),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
+
+    const invitation = await ctx.db.get(args.invitationId);
+    if (!invitation) {
+      throw new Error('Invitation not found');
+    }
+
+    const membership = await ctx.db
+      .query('memberships')
+      .withIndex('by_user_org', (q) =>
+        q.eq('userId', userId).eq('orgId', invitation.orgId)
+      )
+      .unique();
+
+    if (!membership || membership.role !== 'admin') {
+      throw new Error('Not authorized');
+    }
+
+    await ctx.db.delete(args.invitationId);
   },
 });
 

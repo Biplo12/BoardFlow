@@ -75,6 +75,15 @@ export const remove = mutation({
       throw new Error('Not authorized');
     }
 
+    const favorites = await ctx.db
+      .query('userFavorites')
+      .withIndex('by_board', (q) => q.eq('boardId', args.id))
+      .collect();
+
+    for (const favorite of favorites) {
+      await ctx.db.delete(favorite._id);
+    }
+
     await ctx.db.delete(args.id);
   },
 });
