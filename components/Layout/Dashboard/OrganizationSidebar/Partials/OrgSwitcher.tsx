@@ -1,12 +1,13 @@
 'use client';
 
-import { ChevronsUpDown, Plus } from 'lucide-react';
-import React from 'react';
+import { ChevronsUpDown, Plus, Settings2 } from 'lucide-react';
+import React, { useState } from 'react';
 
 import { orgTint } from '@/lib/utils';
 import { useOrganization } from '@/hooks/useOrganization';
 import { useOrganizationList } from '@/hooks/useOrganizationList';
 
+import AdminDialog from '@/components/Layout/Dashboard/Organizations/AdminDialog/AdminDialog';
 import CreateOrganizationDialog from '@/components/Layout/Dashboard/Organizations/CreateOrganizationDialog';
 import {
   DropdownMenu,
@@ -37,7 +38,10 @@ const OrgSwitcher: React.FC = (): JSX.Element => {
   const { organization } = useOrganization();
   const { organizations, setActive } = useOrganizationList();
 
+  const [showAdmin, setShowAdmin] = useState(false);
+
   return (
+    <>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
@@ -71,7 +75,22 @@ const OrgSwitcher: React.FC = (): JSX.Element => {
           boxShadow: '0 4px 0 0 rgba(0,18,52,0.18)',
         }}
       >
-        <DropdownMenuLabel>Organizations</DropdownMenuLabel>
+        {organization && (
+          <>
+            <DropdownMenuItem
+              onSelect={(event) => {
+                event.preventDefault();
+                setShowAdmin(true);
+              }}
+              className='gap-2.5 rounded-[12px] px-2 py-2 text-[15px] font-semibold'
+            >
+              <Settings2 className='h-4 w-4' />
+              Manage {organization.name}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+        <DropdownMenuLabel>Switch to</DropdownMenuLabel>
         {organizations.map((org) => (
           <DropdownMenuItem
             key={org._id}
@@ -94,6 +113,15 @@ const OrgSwitcher: React.FC = (): JSX.Element => {
         </CreateOrganizationDialog>
       </DropdownMenuContent>
     </DropdownMenu>
+
+    {organization && (
+      <AdminDialog
+        organization={organization}
+        open={showAdmin}
+        onOpenChange={setShowAdmin}
+      />
+    )}
+    </>
   );
 };
 export default OrgSwitcher;

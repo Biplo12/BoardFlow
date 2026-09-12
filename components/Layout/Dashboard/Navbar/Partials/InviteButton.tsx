@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from 'convex/react';
-import { Clock, Plus, X } from 'lucide-react';
+import { Clock, Plus, UserMinus, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -36,6 +36,24 @@ const InviteButton: React.FC = (): JSX.Element => {
   );
 
   const { mutate: revoke } = useApiMutation(api.organizations.revokeInvitation);
+  const { mutate: setRole } = useApiMutation(api.organizations.setMemberRole);
+  const { mutate: removeMember } = useApiMutation(
+    api.organizations.removeMember
+  );
+
+  /* Removing somebody is a click away, so the button asks once first. */
+  const [confirming, setConfirming] = useState<string | null>(null);
+
+  const run = async (work: Promise<unknown>, done: string) => {
+    try {
+      await work;
+      toast.success(done);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'That did not work'
+      );
+    }
+  };
 
   const handleRevoke = async (invitationId: Id<'invitations'>) => {
     try {
@@ -125,19 +143,84 @@ const InviteButton: React.FC = (): JSX.Element => {
                 >
                   {member.name}
                 </span>
-                <span
-                  className='rounded-full px-2.5 py-1 text-[12px] font-bold capitalize'
-                  style={{
-                    backgroundColor:
-                      member.role === 'admin'
-                        ? 'var(--candy-pink)'
-                        : 'var(--candy-surface)',
-                    color:
-                      member.role === 'admin' ? '#fff' : 'var(--candy-ink)',
-                  }}
-                >
-                  {member.role}
-                </span>
+                {member.viewerIsAdmin && !member.isOwner && !member.isSelf ? (
+                  <button
+                    onClick={() =>
+                      void run(
+                        setRole({
+                          orgId: organization!._id,
+                          userId: member.userId,
+                          role: member.role === 'admin' ? 'member' : 'admin',
+                        }),
+                        member.role === 'admin'
+                          ? `${member.name} is now a member`
+                          : `${member.name} is now an admin`
+                      )
+                    }
+                    title='Change role'
+                    className='rounded-full px-2.5 py-1 text-[12px] font-bold capitalize transition-transform hover:-translate-y-0.5'
+                    style={{
+                      backgroundColor:
+                        member.role === 'admin'
+                          ? 'var(--candy-pink)'
+                          : 'var(--candy-surface)',
+                      color:
+                        member.role === 'admin' ? '#fff' : 'var(--candy-ink)',
+                    }}
+                  >
+                    {member.role}
+                  </button>
+                ) : (
+                  <span
+                    className='rounded-full px-2.5 py-1 text-[12px] font-bold capitalize'
+                    style={{
+                      backgroundColor:
+                        member.role === 'admin'
+                          ? 'var(--candy-pink)'
+                          : 'var(--candy-surface)',
+                      color:
+                        member.role === 'admin' ? '#fff' : 'var(--candy-ink)',
+                    }}
+                  >
+                    {member.isOwner ? 'owner' : member.role}
+                  </span>
+                )}
+
+                {member.viewerIsAdmin && !member.isOwner && !member.isSelf && (
+                  <button
+                    onClick={() => {
+                      if (confirming === member.userId) {
+                        setConfirming(null);
+                        void run(
+                          removeMember({
+                            orgId: organization!._id,
+                            userId: member.userId,
+                          }),
+                          `${member.name} was removed`
+                        );
+                        return;
+                      }
+
+                      setConfirming(member.userId);
+                    }}
+                    onBlur={() => setConfirming(null)}
+                    aria-label={`Remove ${member.name}`}
+                    className='flex h-8 shrink-0 items-center gap-1.5 rounded-[10px] border-2 px-2 text-[12px] font-bold'
+                    style={{
+                      borderColor:
+                        confirming === member.userId
+                          ? 'var(--candy-pink)'
+                          : 'var(--candy-ink)',
+                      color:
+                        confirming === member.userId
+                          ? 'var(--candy-pink)'
+                          : 'var(--candy-ink)',
+                    }}
+                  >
+                    <UserMinus className='h-4 w-4' />
+                    {confirming === member.userId && 'Sure?'}
+                  </button>
+                )}
               </li>
             ))}
           </ul>

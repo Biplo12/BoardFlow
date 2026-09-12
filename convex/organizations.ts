@@ -132,6 +132,8 @@ export const members = query({
       .withIndex('by_org', (q) => q.eq('orgId', args.orgId))
       .collect();
 
+    const organization = await ctx.db.get(args.orgId);
+
     return await Promise.all(
       memberships.map(async (member) => {
         const user = await ctx.db.get(member.userId);
@@ -143,9 +145,209 @@ export const members = query({
           name: user?.name ?? user?.email ?? 'Teammate',
           email: user?.email,
           image: user?.image,
+          isOwner: organization?.ownerId === member.userId,
+          isSelf: member.userId === userId,
+          viewerIsAdmin: membership.role === 'admin',
         };
       })
     );
+  },
+});
+
+const adminMembership = async (
+  ctx: MutationCtx,
+  orgId: Id<'organizations'>
+) => {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) {
+    throw new Error('Not authenticated');
+  }
+
+  const membership = await ctx.db
+    .query('memberships')
+    .withIndex('by_user_org', (q) => q.eq('userId', userId).eq('orgId', orgId))
+    .unique();
+
+  if (!membership || membership.role !== 'admin') {
+    throw new Error('Not authorized');
+  }
+
+  return { userId, membership };
+};
+
+const memberOf = async (
+  ctx: MutationCtx,
+  orgId: Id<'organizations'>,
+  userId: Id<'users'>
+) => {
+  const membership = await ctx.db
+    .query('memberships')
+    .withIndex('by_user_org', (q) => q.eq('userId', userId).eq('orgId', orgId))
+    .unique();
+
+  if (!membership) {
+    throw new Error('That person is not in this organization');
+  }
+
+  return membership;
+};
+
+export const setMemberRole = mutation({
+  args: {
+    orgId: v.id('organizations'),
+    userId: v.id('users'),
+    role: v.union(v.literal('admin'), v.literal('member')),
+  },
+  handler: async (ctx, args) => {
+    await adminMembership(ctx, args.orgId);
+
+    const organization = await ctx.db.get(args.orgId);
+
+    if (organization?.ownerId === args.userId) {
+      throw new Error('The owner is always an admin');
+    }
+
+    const target = await memberOf(ctx, args.orgId, args.userId);
+
+    if (target.role === args.role) {
+      return;
+    }
+
+    /* An organization nobody can administer is a dead end. */
+    if (target.role === 'admin') {
+      const admins = await ctx.db
+        .query('memberships')
+        .withIndex('by_org', (q) => q.eq('orgId', args.orgId))
+        .collect();
+
+      if (admins.filter((row) => row.role === 'admin').length <= 1) {
+        throw new Error('Leave at least one admin');
+      }
+    }
+
+    await ctx.db.patch(target._id, { role: args.role });
+  },
+});
+
+export const removeMember = mutation({
+  args: {
+    orgId: v.id('organizations'),
+    userId: v.id('users'),
+  },
+  handler: async (ctx, args) => {
+    const { userId } = await adminMembership(ctx, args.orgId);
+
+    if (args.userId === userId) {
+      throw new Error('You cannot remove yourself');
+    }
+
+    const organization = await ctx.db.get(args.orgId);
+
+    if (organization?.ownerId === args.userId) {
+      throw new Error('The owner cannot be removed');
+    }
+
+    const target = await memberOf(ctx, args.orgId, args.userId);
+
+    /* Their boards stay with the organization; what leaves with them is the
+       membership and the favourites that only make sense inside it. */
+    const favorites = await ctx.db
+      .query('userFavorites')
+      .withIndex('by_user_org', (q) =>
+        q.eq('userId', args.userId).eq('orgId', args.orgId)
+      )
+      .collect();
+
+    for (const favorite of favorites) {
+      await ctx.db.delete(favorite._id);
+    }
+
+    await ctx.db.delete(target._id);
+  },
+});
+
+export const rename = mutation({
+  args: {
+    orgId: v.id('organizations'),
+    name: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await adminMembership(ctx, args.orgId);
+
+    const name = args.name.trim();
+
+    if (!name) {
+      throw new Error('A name is required');
+    }
+
+    if (name.length > 60) {
+      throw new Error('That name is too long');
+    }
+
+    /* The slug is left alone on purpose: it is an identifier that other
+       things may already point at, not a display name. */
+    await ctx.db.patch(args.orgId, { name });
+  },
+});
+
+export const remove = mutation({
+  args: {
+    orgId: v.id('organizations'),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
+
+    const organization = await ctx.db.get(args.orgId);
+    if (!organization) {
+      throw new Error('Organization not found');
+    }
+
+    if (organization.ownerId !== userId) {
+      throw new Error('Only the owner can delete an organization');
+    }
+
+    /* Everything hanging off the organization goes with it, or the tables
+       fill up with rows pointing at something that no longer exists. */
+    const boards = await ctx.db
+      .query('boards')
+      .withIndex('by_org', (q) => q.eq('orgId', args.orgId))
+      .collect();
+
+    for (const board of boards) {
+      const favorites = await ctx.db
+        .query('userFavorites')
+        .withIndex('by_board', (q) => q.eq('boardId', board._id))
+        .collect();
+
+      for (const favorite of favorites) {
+        await ctx.db.delete(favorite._id);
+      }
+
+      await ctx.db.delete(board._id);
+    }
+
+    const memberships = await ctx.db
+      .query('memberships')
+      .withIndex('by_org', (q) => q.eq('orgId', args.orgId))
+      .collect();
+
+    for (const membership of memberships) {
+      await ctx.db.delete(membership._id);
+    }
+
+    const invitations = await ctx.db
+      .query('invitations')
+      .withIndex('by_org', (q) => q.eq('orgId', args.orgId))
+      .collect();
+
+    for (const invitation of invitations) {
+      await ctx.db.delete(invitation._id);
+    }
+
+    await ctx.db.delete(args.orgId);
   },
 });
 
