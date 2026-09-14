@@ -8,7 +8,7 @@ const useIsObjectSelected = (objectSelected: LayerType) => {
   );
   const isObjectSelected = useStorage(
     (root) =>
-      soleLayerId && root.layers.get(soleLayerId)?.type === objectSelected
+      soleLayerId && root.layers[soleLayerId]?.type === objectSelected
   );
 
   const isObjectSelectedBoolean = isObjectSelected ? true : false;

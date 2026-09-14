@@ -1,19 +1,22 @@
-import { useAuth } from '@clerk/nextjs';
+'use client';
+
+import { useConvexAuth } from 'convex/react';
 import Link from 'next/link';
 import React from 'react';
 
-import { Button } from '@/components/ui/button';
-
-const DASHBOARD_URL = '/dashboard';
-
 const AuthButton: React.FC = (): JSX.Element => {
-  const { userId, isLoaded } = useAuth();
+  const { isAuthenticated, isLoading } = useConvexAuth();
 
   return (
-    <Link href={DASHBOARD_URL} className='hidden sm:block'>
-      <Button disabled={!isLoaded}>
-        {userId ? 'Go to Dashboard' : 'Sign in to continue'}
-      </Button>
+    <Link
+      href={isAuthenticated ? '/dashboard' : '/login'}
+      className='candy-button flex h-11 items-center rounded-[18px] px-5 text-[15px] font-semibold text-white'
+      style={{
+        backgroundColor: 'var(--candy-pink)',
+        opacity: isLoading ? 0.6 : 1,
+      }}
+    >
+      {isAuthenticated ? 'Open dashboard' : 'Log in'}
     </Link>
   );
 };

@@ -1,10 +1,12 @@
 'use client';
 import { LiveList, LiveMap, LiveObject } from '@liveblocks/client';
-import { ClientSideSuspense } from '@liveblocks/react';
 import React from 'react';
 
-import { RoomProvider } from '@/liveblocks.config';
-import { ConvexClientProvider } from '@/providers/convex-client-provider';
+import {
+  ClientSideSuspense,
+  LiveblocksProvider,
+  RoomProvider,
+} from '@/liveblocks.config';
 
 import { Layer } from '@/types/TCanvasState';
 
@@ -16,25 +18,28 @@ interface RoomProps {
 
 const Room: React.FC<RoomProps> = ({ children, roomId, fallback }) => {
   return (
-    <RoomProvider
-      id={roomId}
-      initialPresence={{
-        cursor: null,
-        selection: [],
-        pencilDraft: null,
-        penColor: null,
-      }}
-      initialStorage={{
-        layers: new LiveMap<string, LiveObject<Layer>>(),
-        layerIds: new LiveList<string>(),
-      }}
-    >
-      <ConvexClientProvider>
+    <LiveblocksProvider authEndpoint='/api/liveblocks-auth' throttle={16}>
+      <RoomProvider
+        id={roomId}
+        initialPresence={{
+          cursor: null,
+          selection: [],
+          pencilDraft: null,
+          penColor: null,
+          penWidth: null,
+          penOpacity: null,
+          draft: null,
+        }}
+        initialStorage={{
+          layers: new LiveMap<string, LiveObject<Layer>>(),
+          layerIds: new LiveList<string>([]),
+        }}
+      >
         <ClientSideSuspense fallback={fallback}>
-          {() => children}
+          {children}
         </ClientSideSuspense>
-      </ConvexClientProvider>
-    </RoomProvider>
+      </RoomProvider>
+    </LiveblocksProvider>
   );
 };
 export default Room;

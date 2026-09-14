@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 
 import { useApiMutation } from '@/hooks/useApiMutation';
 
-import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -15,7 +14,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 
 import { useAppDispatch, useAppSelector } from '@/store/store-hooks';
 
@@ -58,7 +56,7 @@ const RenameDialog: React.FC = (): JSX.Element => {
         </DialogHeader>
         <DialogDescription>Enter a new title for this board</DialogDescription>
         <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-          <Input
+          <input
             disabled={pending}
             required
             maxLength={60}
@@ -66,15 +64,15 @@ const RenameDialog: React.FC = (): JSX.Element => {
             onChange={(e) => setBoardTitle(e.target.value)}
             placeholder='Board title'
           />
-          <DialogFooter className='flex justify-end gap-2 sm:gap-0'>
+          <DialogFooter className='flex justify-end gap-2.5 sm:gap-2.5'>
             <DialogClose asChild>
-              <Button type='button' variant='outline'>
+              <button type='button' className='dialog-ghost'>
                 Cancel
-              </Button>
+              </button>
             </DialogClose>
-            <Button disabled={pending} type='submit'>
-              Save
-            </Button>
+            <button disabled={pending} type='submit' className='dialog-primary'>
+              {pending ? 'Saving…' : 'Save'}
+            </button>
           </DialogFooter>
         </form>
       </DialogContent>
