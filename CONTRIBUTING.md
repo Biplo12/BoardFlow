@@ -4,7 +4,7 @@ Thanks for taking the time. This is a small project, so the process is short.
 
 ## Running it locally
 
-You need Node 20+, Yarn, a free [Convex](https://convex.dev) project and a free
+You need Node 22 or newer (nanoid refuses to install below it), Yarn, a free [Convex](https://convex.dev) project and a free
 [Liveblocks](https://liveblocks.io) project.
 
 ```bash
@@ -22,11 +22,12 @@ functions on save. Auth providers are set on the deployment rather than in
 
 ```bash
 yarn lint
-npx tsc --noEmit
+yarn typecheck
 yarn test
+yarn build
 ```
 
-All three have to pass. CI runs the same three.
+All four have to pass. CI runs the same four on every push and pull request.
 
 ## House style
 

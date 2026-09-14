@@ -10,17 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      # nanoid 6 refuses to install below Node 22, and the v4 actions are
+      # pinned to a Node the runners have deprecated.
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 24
           cache: yarn
 
       - run: yarn install --frozen-lockfile
 
       - run: yarn lint
 
-      - run: npx tsc --noEmit
+      - run: yarn typecheck
 
       - run: yarn test
+
+      - run: yarn build
+        env:
+          NEXT_PUBLIC_CONVEX_URL: https://example.convex.cloud
+          LIVEBLOCKS_SECRET_KEY: sk_dummy_for_build
