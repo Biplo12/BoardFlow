@@ -125,14 +125,6 @@ const InvitesPanel: React.FC<InvitesPanelProps> = ({
                 >
                   {invitation.invitedBy} invited you as {invitation.role}
                 </p>
-                {!invitation.canAccept && (
-                  <p
-                    className='mt-1 text-[13px] font-semibold'
-                    style={{ color: 'var(--candy-pink)' }}
-                  >
-                    Confirm your email address to join.
-                  </p>
-                )}
               </div>
 
               <div className='flex items-center gap-2'>
@@ -152,7 +144,7 @@ const InvitesPanel: React.FC<InvitesPanelProps> = ({
                   onClick={() =>
                     void handleAccept(invitation._id, invitation.organization)
                   }
-                  disabled={busy || !invitation.canAccept}
+                  disabled={busy}
                   className='candy-button flex h-10 items-center gap-2 rounded-[12px] px-4 text-[15px] font-semibold text-white disabled:opacity-50'
                   style={{ backgroundColor: 'var(--candy-pink)' }}
                 >

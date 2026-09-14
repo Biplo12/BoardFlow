@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import React from 'react';
 
+import { shapeStyle } from '@/lib/canvas-style';
+
 import { ImageLayer } from '@/types/TCanvasState';
 
 const PLACEHOLDER_IMAGE = '/images/board/placeholders/placeholder-image.jpeg';
@@ -17,7 +19,8 @@ const ImageObject: React.FC<ImageObjectProps> = ({
   layer,
   onPointerDown,
 }): JSX.Element => {
-  const { x, y, width, height, opacity, value } = layer;
+  const { x, y, width, height, value } = layer;
+  const style = shapeStyle(layer);
 
   return (
     <foreignObject
@@ -26,12 +29,18 @@ const ImageObject: React.FC<ImageObjectProps> = ({
       width={width}
       height={height}
       onPointerDown={(e) => onPointerDown(e, id)}
-      opacity={(opacity ?? 100) / 100}
+      opacity={style.opacity}
     >
+      {/* An image takes the frame and the corner setting from the panel, so
+          the controls are not dead on it. */}
       <img
         src={value || PLACEHOLDER_IMAGE}
         alt='image'
-        className='h-full w-full'
+        className='h-full w-full object-cover'
+        style={{
+          borderRadius: style.radius,
+          border: `${style.strokeWidth}px solid ${style.stroke}`,
+        }}
         onError={(e) => {
           const img = e.target as HTMLImageElement;
           img.src = IMAGE_NOT_FOUND;

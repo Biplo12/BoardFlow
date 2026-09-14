@@ -1,6 +1,8 @@
 import { getAuthUserId } from '@convex-dev/auth/server';
 import { v } from 'convex/values';
 
+import { internal } from './_generated/api';
+
 import { mutation, query } from './_generated/server';
 
 const MAX_TITLE_LENGTH = 60;
@@ -80,10 +82,14 @@ export const remove = mutation({
       )
       .unique();
 
-    const canManage =
-      board.authorId === userId || membership?.role === 'admin';
+    /* Membership first: removing somebody from the organization has to take
+       their power over the boards they made with it, or they can still
+       destroy a board they can no longer open. */
+    if (!membership) {
+      throw new Error('Not a member of this organization');
+    }
 
-    if (!canManage) {
+    if (board.authorId !== userId && membership.role !== 'admin') {
       throw new Error('Not authorized');
     }
 
@@ -97,6 +103,10 @@ export const remove = mutation({
     }
 
     await ctx.db.delete(args.id);
+
+    await ctx.scheduler.runAfter(0, internal.liveblocks.deleteRooms, {
+      roomIds: [args.id],
+    });
   },
 });
 
@@ -123,7 +133,11 @@ export const rename = mutation({
       )
       .unique();
 
-    if (board.authorId !== userId && membership?.role !== 'admin') {
+    if (!membership) {
+      throw new Error('Not a member of this organization');
+    }
+
+    if (board.authorId !== userId && membership.role !== 'admin') {
       throw new Error('Not authorized');
     }
 

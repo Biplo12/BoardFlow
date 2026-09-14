@@ -12,6 +12,7 @@ import type * as auth from "../auth.js";
 import type * as board from "../board.js";
 import type * as boards from "../boards.js";
 import type * as http from "../http.js";
+import type * as liveblocks from "../liveblocks.js";
 import type * as migrations from "../migrations.js";
 import type * as organizations from "../organizations.js";
 import type * as users from "../users.js";
@@ -27,6 +28,7 @@ declare const fullApi: ApiFromModules<{
   board: typeof board;
   boards: typeof boards;
   http: typeof http;
+  liveblocks: typeof liveblocks;
   migrations: typeof migrations;
   organizations: typeof organizations;
   users: typeof users;

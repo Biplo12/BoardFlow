@@ -1,6 +1,7 @@
 import { getAuthUserId } from '@convex-dev/auth/server';
 import { v } from 'convex/values';
 
+import { internal } from './_generated/api';
 import { Id } from './_generated/dataModel';
 import { mutation, MutationCtx, query } from './_generated/server';
 
@@ -316,6 +317,10 @@ export const remove = mutation({
       .withIndex('by_org', (q) => q.eq('orgId', args.orgId))
       .collect();
 
+    await ctx.scheduler.runAfter(0, internal.liveblocks.deleteRooms, {
+      roomIds: boards.map((board) => board._id),
+    });
+
     for (const board of boards) {
       const favorites = await ctx.db
         .query('userFavorites')
@@ -518,9 +523,6 @@ export const myInvitations = query({
           role: invitation.role,
           invitedAt: invitation._creationTime,
           invitedBy: inviter?.name ?? inviter?.email ?? 'Someone',
-          /* An unverified address proves nothing, so the invitation is shown
-             but cannot be taken until the address is confirmed. */
-          canAccept: !!user?.emailVerificationTime,
         };
       })
     );
@@ -548,11 +550,14 @@ const claimInvitation = async (
   const user = await ctx.db.get(userId);
   const email = user?.email?.trim().toLowerCase();
 
+  /* Matched on the address the invitation was sent to. The app has no email
+     verification step anywhere, so requiring one here only made the feature
+     unreachable for accounts created with a password. */
   if (!email || email !== invitation.email) {
     throw new Error('Invitation was sent to a different email');
   }
 
-  return { userId, invitation, verified: !!user?.emailVerificationTime };
+  return { userId, invitation };
 };
 
 export const acceptMyInvitation = mutation({
@@ -560,17 +565,13 @@ export const acceptMyInvitation = mutation({
     invitationId: v.id('invitations'),
   },
   handler: async (ctx, args) => {
-    const { userId, invitation, verified } = await claimInvitation(
+    const { userId, invitation } = await claimInvitation(
       ctx,
       args.invitationId
     );
 
     if (!liveInvitation(invitation)) {
       throw new Error('Invitation expired');
-    }
-
-    if (!verified) {
-      throw new Error('Confirm your email address before joining');
     }
 
     const existing = await ctx.db

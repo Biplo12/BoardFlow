@@ -9,7 +9,8 @@ import PersonAvatar from '@/components/common/PersonAvatar';
 
 const handwriting = Kalam({ subsets: ['latin'], weight: ['400'] });
 
-const TOOLS = 6;
+/* Matches the real toolbar: twelve tools on one strip at the top. */
+const TOOLS = 12;
 
 const NOTES = [
   {
@@ -82,11 +83,11 @@ const BoardMockup: React.FC = (): JSX.Element => {
           backgroundSize: '24px 24px',
         }}
       >
-        <div className='absolute top-1/2 left-4 flex -translate-y-1/2 flex-col gap-1.5 rounded-[14px] bg-white p-1.5 shadow-sm'>
+        <div className='absolute top-4 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-[14px] border-2 bg-white p-1.5 shadow-sm' style={{ borderColor: 'rgba(0,18,52,0.14)' }}>
           {Array.from({ length: TOOLS }).map((_, index) => (
             <span
               key={index}
-              className='block h-9 w-9 rounded-[10px]'
+              className='block h-8 w-8 rounded-[9px]'
               style={{
                 backgroundColor:
                   index === 0 ? 'rgba(0,18,52,0.10)' : 'rgba(0,18,52,0.05)',

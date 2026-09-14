@@ -16,6 +16,11 @@ const ACCOUNT = [
   { name: 'Sign up', href: '/register' },
 ];
 
+const LEGAL = [
+  { name: 'Privacy', href: '/privacy' },
+  { name: 'Terms', href: '/terms' },
+];
+
 const SWATCHES = ['#ff3d7f', '#9466e8', '#c3e776', '#ffd23f', '#0f8fd6'];
 
 const Footer: React.FC = (): JSX.Element => {
@@ -103,10 +108,33 @@ const Footer: React.FC = (): JSX.Element => {
                   </a>
                 </li>
                 <li>
-                  <span className='text-[17px] font-semibold text-white/40'>
+                  <a
+                    href={`${GITHUB}/blob/main/LICENSE`}
+                    target='_blank'
+                    rel='noreferrer'
+                    className='nav-link text-[17px] font-semibold text-white'
+                  >
                     MIT licence
-                  </span>
+                  </a>
                 </li>
+              </ul>
+            </div>
+
+            <div>
+              <span className='text-[12px] font-black tracking-[0.16em] text-white/35 uppercase'>
+                Legal
+              </span>
+              <ul className='mt-5 flex flex-col items-start gap-3'>
+                {LEGAL.map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      href={link.href}
+                      className='nav-link text-[17px] font-semibold text-white'
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>

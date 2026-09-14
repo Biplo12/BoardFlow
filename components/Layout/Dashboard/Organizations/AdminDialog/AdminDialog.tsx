@@ -40,18 +40,22 @@ const TABS: { id: Tab; label: string; Icon: React.FC<{ className?: string }> }[]
 const getInitials = (name: string) =>
   name.trim().slice(0, 2).toUpperCase() || 'OR';
 
+export type AdminTab = Tab;
+
 interface AdminDialogProps {
   organization: Doc<'organizations'>;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultTab?: Tab;
 }
 
 const AdminDialog: React.FC<AdminDialogProps> = ({
   organization,
   open,
   onOpenChange,
+  defaultTab = 'general',
 }): JSX.Element => {
-  const [tab, setTab] = useState<Tab>('general');
+  const [tab, setTab] = useState<Tab>(defaultTab);
 
   const viewer = useQuery(api.users.viewer);
   const members = useQuery(api.organizations.members, {
