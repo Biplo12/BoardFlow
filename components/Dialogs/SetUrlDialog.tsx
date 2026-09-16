@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import useSelectedLayerInfo from '@/hooks/useSelectedLayerInfo';
 import useUpdateValue from '@/hooks/useUpdateValue';
 
-import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -16,7 +15,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 
 import { useAppDispatch, useAppSelector } from '@/store/store-hooks';
 
@@ -57,20 +55,22 @@ const SetUrlDialog: React.FC = (): JSX.Element => {
           Set the URL for selected Image object.
         </DialogDescription>
         <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-          <Input
+          <input
             required
             maxLength={200}
             name='url'
             value={imageURL}
             onChange={(e) => setImageURL(e.target.value)}
           />
-          <DialogFooter className='flex justify-end gap-2 sm:gap-0'>
+          <DialogFooter className='flex justify-end gap-2.5 sm:gap-2.5'>
             <DialogClose asChild>
-              <Button type='button' variant='outline'>
+              <button type='button' className='dialog-ghost'>
                 Cancel
-              </Button>
+              </button>
             </DialogClose>
-            <Button type='submit'>Save</Button>
+            <button type='submit' className='dialog-primary'>
+              Save
+            </button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@config '../tailwind.config.ts';
 
 html,
 body,
@@ -79,5 +78,863 @@ body,
   }
   body {
     @apply bg-background text-foreground;
+  }
+  /* Tailwind v4 dropped the v3 default of cursor: pointer on buttons, and
+     Radix renders menu entries and switches as divs with a role. */
+  button:not(:disabled),
+  summary,
+  select:not(:disabled),
+  input[type='checkbox']:not(:disabled),
+  input[type='radio']:not(:disabled),
+  [role='button']:not(:disabled),
+  [role='menuitem']:not([aria-disabled='true']),
+  [role='menuitemcheckbox']:not([aria-disabled='true']),
+  [role='menuitemradio']:not([aria-disabled='true']),
+  [role='option']:not([aria-disabled='true']),
+  [role='tab']:not([aria-disabled='true']),
+  [role='switch']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+}
+
+/* Auth surface palette. Scoped here so the dashboard and canvas keep their
+   own tokens until this direction is signed off. */
+:root {
+  --candy-sky: #c9e9ff;
+  --candy-ink: #111111;
+  --candy-pink: #ff3d7f;
+  --candy-violet: #9466e8;
+  --candy-lime: #c3e776;
+  --candy-butter: #edf072;
+  --candy-surface: rgba(0, 18, 52, 0.06);
+  --candy-muted: rgba(0, 0, 0, 0.54);
+}
+
+/* One setting carries the whole personality: heaviest weight, uppercase,
+   negative tracking, and a line box tighter than the type size. */
+.candy-display {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.032em;
+  line-height: 0.86;
+}
+
+.candy-field {
+  background: #fff;
+  border: 0;
+  border-radius: 14px;
+  height: 52px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--candy-ink);
+  box-shadow: none;
+  padding-inline: 18px;
+}
+
+/* .candy-field sets padding-inline outside Tailwind's layers, so a utility
+   like pl-11 loses to it. Fields with a leading icon opt in here instead. */
+.candy-field.has-icon {
+  padding-inline-start: 46px;
+}
+
+.candy-field::placeholder {
+  color: var(--candy-muted);
+  font-weight: 400;
+}
+
+.candy-field:focus-visible {
+  outline: 3px solid var(--candy-ink);
+  outline-offset: 2px;
+}
+
+.candy-field:hover:not(:disabled) {
+  background: rgba(0, 18, 52, 0.1) !important;
+}
+
+/* Controls sit on a solid ledge, rise a little under the pointer and get
+   pushed flat into the page when clicked. */
+.candy-button {
+  --ledge: rgba(0, 18, 52, 0.26);
+  box-shadow: 0 4px 0 0 var(--ledge);
+  transition:
+    translate 150ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 150ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.candy-button:hover:not(:disabled) {
+  translate: 0 -2px;
+  box-shadow: 0 6px 0 0 var(--ledge);
+}
+
+.candy-button:active:not(:disabled) {
+  translate: 0 4px;
+  box-shadow: 0 0 0 0 var(--ledge);
+}
+
+/* A rule wipes in under the label from the left. */
+.nav-link {
+  position: relative;
+  transition: translate 220ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -7px 0;
+  height: 3px;
+  border-radius: 3px;
+  background-color: var(--candy-pink);
+  scale: 0 1;
+  transform-origin: 0 50%;
+  transition: scale 260ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.nav-link:hover {
+  translate: 0 -1px;
+}
+
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  scale: 1 1;
+}
+
+.candy-button:focus-visible {
+  outline: 3px solid var(--candy-ink);
+  outline-offset: 3px;
+}
+
+/* A word sitting on a highlighter block, drawn behind the text. */
+.candy-highlight {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+}
+
+.candy-highlight::before {
+  content: '';
+  position: absolute;
+  inset: 8% -3% 6% -3%;
+  border-radius: 10px;
+  background-color: var(--highlight, var(--candy-lime));
+  transform: rotate(-1.6deg);
+  z-index: -1;
+}
+
+/* A pinned badge: rotated, never square to the grid. */
+.candy-badge {
+  transform: rotate(-7deg);
+}
+
+@keyframes artifact-float {
+  from {
+    transform: translateY(-7px);
+  }
+  to {
+    transform: translateY(7px);
+  }
+}
+
+/* Parallax lives on `translate` and the bob on the child's `transform`, so
+   the two never fight over one property. */
+.artifact-float {
+  translate: calc(var(--px, 0px) * var(--depth, 1))
+    calc(var(--py, 0px) * var(--depth, 1));
+  transition:
+    translate 500ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    scale 250ms ease-out;
+}
+
+.artifact-float > * {
+  animation: artifact-float var(--float-duration, 8s) ease-in-out infinite
+    alternate;
+  animation-delay: var(--float-delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .artifact-float > * {
+    animation: none;
+  }
+
+  .artifact-float {
+    translate: none;
+    transition: none;
+  }
+
+  .candy-button,
+  .nav-link,
+  .nav-link::after {
+    transition: none;
+  }
+
+  .candy-button:hover:not(:disabled),
+  .candy-button:active:not(:disabled) {
+    translate: none;
+  }
+}
+
+/* Illustration cards: the whole card straightens and lifts, the ground grows
+   under the figure, and the figure steps up out of it. */
+.peep-card {
+  border-radius: 28px;
+  overflow: hidden;
+  transition:
+    translate 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    rotate 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 320ms ease;
+}
+
+.peep-card:hover {
+  translate: 0 -10px;
+  rotate: 0deg;
+  box-shadow: 0 26px 46px -22px rgba(0, 18, 52, 0.42);
+}
+
+.peep-floor {
+  transition: height 380ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.peep-card:hover .peep-floor {
+  height: 104px;
+}
+
+.peep-figure {
+  translate: -50% 0;
+  transform-origin: 50% 100%;
+  transition:
+    translate 420ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    rotate 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.peep-card:hover .peep-figure {
+  translate: -50% -18px;
+  rotate: -2.2deg;
+}
+
+/* A figure that is one of several in a row keeps its own horizontal spot. */
+.peep-figure-inline {
+  transform-origin: 50% 100%;
+  transition:
+    translate 420ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    rotate 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.peep-card:hover .peep-figure-inline {
+  translate: 0 -16px;
+}
+
+.peep-card:hover .peep-figure-inline:nth-child(1) {
+  rotate: -2.6deg;
+}
+
+.peep-card:hover .peep-figure-inline:nth-child(2) {
+  translate: 0 -26px;
+}
+
+.peep-card:hover .peep-figure-inline:nth-child(3) {
+  rotate: 2.6deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .peep-card,
+  .peep-floor,
+  .peep-figure,
+  .peep-figure-inline {
+    transition: none;
+  }
+
+  .peep-card:hover .peep-figure,
+  .peep-card:hover .peep-figure-inline {
+    rotate: 0deg;
+  }
+
+  .peep-card:hover .peep-figure {
+    translate: -50% 0;
+  }
+
+  .peep-card:hover .peep-figure-inline,
+  .peep-card:hover .peep-figure-inline:nth-child(2) {
+    translate: 0 0;
+  }
+
+  .peep-card:hover .peep-floor {
+    height: 80px;
+  }
+}
+
+.hover-lift {
+  transition:
+    translate 300ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 300ms ease;
+}
+
+.hover-lift:hover {
+  translate: 0 -10px;
+  box-shadow: 0 26px 46px -22px rgba(0, 18, 52, 0.42);
+}
+
+/* Pointers wander the way they do on a live board, each on its own offset. */
+@keyframes cursor-drift {
+  from {
+    translate: -7px -5px;
+  }
+  to {
+    translate: 9px 7px;
+  }
+}
+
+.cursor-drift {
+  animation: cursor-drift 5.2s ease-in-out infinite alternate;
+}
+
+/* Each word wears the thing it names, and straightens up when you point at
+   the card. */
+.board-word {
+  display: inline-flex;
+  rotate: var(--tilt, 0deg);
+  transition: rotate 380ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.group:hover .board-word {
+  rotate: 0deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hover-lift,
+  .board-word {
+    transition: none;
+  }
+
+  .hover-lift:hover {
+    translate: none;
+  }
+
+  .cursor-drift {
+    animation: none;
+  }
+
+  .group:hover .board-word {
+    rotate: var(--tilt, 0deg);
+  }
+}
+
+/* The face row fans out and each face pops when you point at it. */
+.avatar-chip {
+  transform-origin: 50% 85%;
+  transition:
+    translate 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    rotate 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    scale 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.avatar-row:hover .avatar-chip:nth-child(1) {
+  translate: -15px -5px;
+}
+.avatar-row:hover .avatar-chip:nth-child(2) {
+  translate: -9px -5px;
+}
+.avatar-row:hover .avatar-chip:nth-child(3) {
+  translate: -3px -5px;
+}
+.avatar-row:hover .avatar-chip:nth-child(4) {
+  translate: 3px -5px;
+}
+.avatar-row:hover .avatar-chip:nth-child(5) {
+  translate: 9px -5px;
+}
+.avatar-row:hover .avatar-chip:nth-child(6) {
+  translate: 15px -5px;
+}
+
+.avatar-row .avatar-chip:hover {
+  rotate: -7deg;
+  scale: 1.16;
+  z-index: 10;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-chip {
+    transition: none;
+  }
+
+  .avatar-row:hover .avatar-chip {
+    translate: none;
+  }
+
+  .avatar-row .avatar-chip:hover {
+    rotate: 0deg;
+    scale: 1;
+  }
+}
+
+/* The palette strip springs up one bar at a time. */
+.swatch {
+  transform-origin: 50% 100%;
+  transition:
+    scale 340ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    translate 340ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-radius 340ms ease;
+}
+
+.swatch-row:hover .swatch {
+  border-radius: 6px;
+}
+
+.swatch-row:hover .swatch:nth-child(1) {
+  scale: 1 1.8;
+  transition-delay: 0ms;
+}
+.swatch-row:hover .swatch:nth-child(2) {
+  scale: 1 2.8;
+  transition-delay: 45ms;
+}
+.swatch-row:hover .swatch:nth-child(3) {
+  scale: 1 2.2;
+  transition-delay: 90ms;
+}
+.swatch-row:hover .swatch:nth-child(4) {
+  scale: 1 3;
+  transition-delay: 135ms;
+}
+.swatch-row:hover .swatch:nth-child(5) {
+  scale: 1 1.6;
+  transition-delay: 180ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swatch {
+    transition: none;
+  }
+
+  .swatch-row:hover .swatch {
+    scale: 1;
+    border-radius: 9999px;
+  }
+}
+
+/* Sections fade up the first time they come into view. The hidden state is
+   only applied once the observer is running, so no script means no blank
+   page. */
+.reveal-ready [data-reveal] {
+  opacity: 0;
+  translate: 0 10px;
+}
+
+[data-reveal] {
+  transition:
+    opacity 420ms ease-out,
+    translate 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal-ready [data-reveal].is-revealed {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-ready [data-reveal] {
+    opacity: 1;
+    translate: none;
+  }
+
+  [data-reveal] {
+    transition: none;
+  }
+}
+
+/* Dashboard tiles use the same outlined, pressable language as the buttons. */
+.board-tile {
+  border: 2px solid var(--candy-ink);
+  border-radius: 18px;
+  box-shadow: 0 3px 0 0 rgba(0, 18, 52, 0.16);
+  transition:
+    translate 180ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 180ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* An open card menu counts as hover, so the tile does not drop back down
+   while you are choosing from it. */
+.board-tile:hover,
+.board-tile:has([data-state='open']) {
+  translate: 0 -3px;
+  box-shadow: 0 6px 0 0 rgba(0, 18, 52, 0.16);
+}
+
+.board-overlay {
+  background-color: rgba(255, 61, 127, 0.16);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.board-tile:hover .board-overlay,
+.board-tile:has([data-state='open']) .board-overlay {
+  opacity: 1;
+}
+
+.board-tile:active {
+  translate: 0 2px;
+  box-shadow: 0 0 0 0 rgba(0, 18, 52, 0.16);
+}
+
+/* Sidebar entries: the current one sits on a solid pink chip. */
+.rail-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border-radius: 16px;
+  padding: 11px 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--candy-ink);
+  transition:
+    background-color 160ms ease,
+    translate 160ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.rail-link:hover {
+  background-color: rgba(255, 255, 255, 0.66);
+  translate: 2px 0;
+}
+
+.rail-link[data-active='true'] {
+  background-color: var(--candy-pink);
+  color: #fff;
+  box-shadow: 0 4px 0 0 rgba(0, 18, 52, 0.24);
+}
+
+.rail-link[data-active='true']:hover {
+  background-color: var(--candy-pink);
+  translate: 0 -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board-tile,
+  .board-overlay,
+  .rail-link {
+    transition: none;
+  }
+
+  .board-tile:hover,
+  .board-tile:active,
+  .rail-link:hover,
+  .rail-link[data-active='true']:hover {
+    translate: none;
+  }
+}
+
+/* Toasts wear the same outlined, ledge-backed card as everything else. */
+.candy-toast {
+  background: #fff !important;
+  border: 3px solid var(--candy-ink) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 5px 0 0 rgba(0, 18, 52, 0.22) !important;
+  color: var(--candy-ink) !important;
+  gap: 12px !important;
+  padding: 15px 18px !important;
+}
+
+.candy-toast-title {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
+}
+
+.candy-toast-description {
+  color: var(--candy-muted) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.candy-toast [data-icon] {
+  width: 20px;
+  height: 20px;
+  margin-inline-end: 2px;
+}
+
+.candy-toast[data-type='error'] [data-icon] {
+  color: var(--candy-pink);
+}
+
+.candy-toast[data-type='success'] [data-icon] {
+  color: #3f9c2a;
+}
+
+.candy-toast-action {
+  background: var(--candy-pink) !important;
+  border-radius: 12px !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+
+.candy-toast-cancel {
+  background: var(--candy-surface) !important;
+  border-radius: 12px !important;
+  color: var(--candy-ink) !important;
+  font-weight: 600 !important;
+}
+
+/* A plain ring, the one loading shape nobody has to decode. */
+.loader-ring {
+  display: block;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 4px solid rgba(0, 18, 52, 0.12);
+  border-top-color: var(--candy-pink);
+  animation: loader-spin 0.75s linear infinite;
+}
+
+@keyframes loader-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-ring {
+    animation: none;
+  }
+
+}
+
+/* Dialogs, menus and the org rail share the outlined card language. */
+.candy-dialog {
+  background: #fff;
+  border: 3px solid var(--candy-ink);
+  border-radius: 24px;
+  box-shadow: 0 6px 0 0 rgba(0, 18, 52, 0.2);
+  color: var(--candy-ink);
+}
+
+.candy-dialog h2 {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+}
+
+.candy-dialog input {
+  background: var(--candy-surface);
+  border: 0;
+  border-radius: 14px;
+  height: 50px;
+  padding-inline: 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--candy-ink);
+  width: 100%;
+}
+
+.candy-dialog input::placeholder {
+  color: var(--candy-muted);
+  font-weight: 400;
+}
+
+.candy-dialog input:focus-visible {
+  outline: 3px solid var(--candy-ink);
+  outline-offset: 2px;
+}
+
+/* Organisation chips keep their colour at full strength; the current one
+   gains a ring rather than the others being dimmed into mud. */
+.org-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  transition:
+    scale 180ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 180ms ease;
+}
+
+.org-chip:hover {
+  scale: 1.07;
+}
+
+.org-chip[data-active='true'] {
+  box-shadow:
+    0 0 0 3px var(--candy-ink),
+    0 0 0 6px #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .org-chip {
+    transition: none;
+  }
+
+  .org-chip:hover {
+    scale: 1;
+  }
+}
+
+/* Shared dialog buttons so every confirm and cancel looks the same. */
+.dialog-primary,
+.dialog-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding-inline: 22px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  transition:
+    translate 150ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 150ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    background-color 150ms ease;
+}
+
+.dialog-primary {
+  background: var(--candy-pink);
+  color: #fff;
+  box-shadow: 0 4px 0 0 rgba(0, 18, 52, 0.24);
+}
+
+.dialog-primary:hover:not(:disabled) {
+  translate: 0 -2px;
+  box-shadow: 0 6px 0 0 rgba(0, 18, 52, 0.24);
+}
+
+.dialog-primary:active:not(:disabled) {
+  translate: 0 4px;
+  box-shadow: none;
+}
+
+.dialog-primary:disabled {
+  opacity: 0.5;
+}
+
+.dialog-ghost {
+  background: var(--candy-surface);
+  color: var(--candy-ink);
+}
+
+.dialog-ghost:hover {
+  background: rgba(0, 18, 52, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog-primary,
+  .dialog-ghost {
+    transition: none;
+  }
+
+  .dialog-primary:hover:not(:disabled),
+  .dialog-primary:active:not(:disabled) {
+    translate: none;
+  }
+}
+
+/* Canvas chrome: the same outlined, ledge-backed panels as the rest. */
+.canvas-panel {
+  background: #fff;
+  border: 2px solid var(--candy-ink);
+  border-radius: 20px;
+  box-shadow: 0 3px 0 0 rgba(0, 18, 52, 0.16);
+}
+
+.tool-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: var(--candy-ink);
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    translate 150ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.tool-button:hover:not(:disabled) {
+  background-color: var(--candy-surface);
+  translate: 0 -1px;
+}
+
+.tool-button[data-active='true'] {
+  background-color: var(--candy-pink);
+  color: #fff;
+}
+
+.tool-button:disabled {
+  opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-button {
+    transition: none;
+  }
+
+  .tool-button:hover:not(:disabled) {
+    translate: none;
+  }
+}
+
+/* Tooltips wear the same outlined language as the panels they belong to. The
+   entrance animates `translate` rather than `transform`, which the popper is
+   already using to place the box. */
+.tooltip-candy {
+  z-index: 60;
+  max-width: 260px;
+  padding: 6px 11px;
+  border: 2px solid var(--candy-ink);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 3px 0 0 rgba(0, 18, 52, 0.16);
+  color: var(--candy-ink);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+  animation: tooltip-in 130ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.tooltip-candy[data-state='closed'] {
+  animation: tooltip-out 90ms ease-in both;
+}
+
+.tooltip-candy[data-side='top'] {
+  --tooltip-from: 4px;
+}
+
+.tooltip-candy[data-side='bottom'] {
+  --tooltip-from: -4px;
+}
+
+.tooltip-candy[data-side='left'],
+.tooltip-candy[data-side='right'] {
+  --tooltip-from: 0px;
+}
+
+@keyframes tooltip-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--tooltip-from, -4px);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes tooltip-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tooltip-candy,
+  .tooltip-candy[data-state='closed'] {
+    animation: none;
   }
 }

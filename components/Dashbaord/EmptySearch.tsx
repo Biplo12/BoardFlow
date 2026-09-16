@@ -1,21 +1,23 @@
-import Image from 'next/image';
 import React from 'react';
+
+import Peep from '@/components/common/Peep';
 
 const EmptySearch: React.FC = (): JSX.Element => {
   return (
-    <div className='flex h-full w-full flex-col items-center justify-center gap-6 text-center'>
-      <Image
-        src='/images/board/search-bar.svg'
-        height={225}
-        width={225}
-        alt='Empty'
-      />
-      <div className='flex flex-col gap-2'>
-        <h1 className='text-2xl font-semibold'>No boards found!</h1>
-        <p className='text-muted-foreground text-sm'>
-          Try a different search term.
-        </p>
-      </div>
+    <div className='flex h-full w-full flex-col items-center justify-center gap-4 text-center'>
+      <Peep figure='arms-crossed' className='h-[220px]' />
+      <h1
+        className='candy-display text-[30px]'
+        style={{ color: 'var(--candy-ink)' }}
+      >
+        No boards found
+      </h1>
+      <p
+        className='max-w-[320px] text-[16px] font-medium'
+        style={{ color: 'var(--candy-muted)' }}
+      >
+        Nothing matches that search. Try another word.
+      </p>
     </div>
   );
 };

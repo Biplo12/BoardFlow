@@ -1,45 +1,41 @@
-import { useOrganization, useOrganizationList } from '@clerk/nextjs';
-import Image from 'next/image';
+'use client';
+
 import React from 'react';
 
-import { cn } from '@/lib/utils';
+import { orgTint } from '@/lib/utils';
+import { useOrganization } from '@/hooks/useOrganization';
+import { useOrganizationList } from '@/hooks/useOrganizationList';
 
 import Hint from '@/components/common/Hint';
 
+import { Id } from '@/convex/_generated/dataModel';
+
+const getInitials = (name: string) =>
+  name.trim().slice(0, 2).toUpperCase() || 'OR';
+
 interface OrgItemProps {
-  id: string;
+  id: Id<'organizations'>;
   name: string;
-  imageUrl: string;
 }
 
-const OrgItem: React.FC<OrgItemProps> = ({
-  id,
-  name,
-  imageUrl,
-}): JSX.Element => {
+const OrgItem: React.FC<OrgItemProps> = ({ id, name }): JSX.Element => {
   const { organization } = useOrganization();
   const { setActive } = useOrganizationList();
 
-  const isActive = organization?.id === id;
+  const isActive = organization?._id === id;
+  const tint = orgTint(id);
 
-  const handleClickOrg = () => {
-    if (!setActive) return;
-    setActive({ organization: id });
-  };
   return (
     <div className='relative aspect-square'>
       <Hint label={name} side='right' align='start' sideOffset={18}>
-        <Image
-          src={imageUrl}
-          alt={name}
-          layout='fill'
-          fill
-          className={cn(
-            'cursor-pointer rounded-md opacity-75 transition hover:opacity-100',
-            isActive && 'opacity-100'
-          )}
-          onClick={handleClickOrg}
-        />
+        <button
+          onClick={() => setActive(id)}
+          data-active={isActive}
+          className='org-chip'
+          style={{ backgroundColor: tint.background, color: tint.ink }}
+        >
+          {getInitials(name)}
+        </button>
       </Hint>
     </div>
   );

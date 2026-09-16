@@ -1,4 +1,7 @@
+import { getAuthUserId } from '@convex-dev/auth/server';
 import { v } from 'convex/values';
+
+import { internal } from './_generated/api';
 
 import { mutation, query } from './_generated/server';
 
@@ -19,22 +22,35 @@ const images = [
 
 export const create = mutation({
   args: {
-    orgId: v.string(),
+    orgId: v.id('organizations'),
     title: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
       throw new Error('Not authenticated');
     }
+
+    const membership = await ctx.db
+      .query('memberships')
+      .withIndex('by_user_org', (q) =>
+        q.eq('userId', userId).eq('orgId', args.orgId)
+      )
+      .unique();
+
+    if (!membership) {
+      throw new Error('Not a member of this organization');
+    }
+
+    const user = await ctx.db.get(userId);
 
     const randomImage = images[Math.floor(Math.random() * images.length)];
 
     const board = await ctx.db.insert('boards', {
       title: args.title,
       orgId: args.orgId,
-      authorId: identity.subject,
-      authorName: identity.name!,
+      authorId: userId,
+      authorName: user?.name ?? user?.email ?? 'Anonymous',
       imageUrl: randomImage,
     });
 
@@ -47,8 +63,8 @@ export const remove = mutation({
     id: v.id('boards'),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
       throw new Error('Not authenticated');
     }
 
@@ -57,11 +73,40 @@ export const remove = mutation({
       throw new Error('Board not found');
     }
 
-    if (board.authorId !== identity.subject) {
+    /* The person who made it, or anyone administering the organization it
+       lives in, which is what the organization panel offers. */
+    const membership = await ctx.db
+      .query('memberships')
+      .withIndex('by_user_org', (q) =>
+        q.eq('userId', userId).eq('orgId', board.orgId)
+      )
+      .unique();
+
+    /* Membership first: removing somebody from the organization has to take
+       their power over the boards they made with it, or they can still
+       destroy a board they can no longer open. */
+    if (!membership) {
+      throw new Error('Not a member of this organization');
+    }
+
+    if (board.authorId !== userId && membership.role !== 'admin') {
       throw new Error('Not authorized');
     }
 
+    const favorites = await ctx.db
+      .query('userFavorites')
+      .withIndex('by_board', (q) => q.eq('boardId', args.id))
+      .collect();
+
+    for (const favorite of favorites) {
+      await ctx.db.delete(favorite._id);
+    }
+
     await ctx.db.delete(args.id);
+
+    await ctx.scheduler.runAfter(0, internal.liveblocks.deleteRooms, {
+      roomIds: [args.id],
+    });
   },
 });
 
@@ -71,8 +116,8 @@ export const rename = mutation({
     title: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
       throw new Error('Not authenticated');
     }
 
@@ -81,7 +126,18 @@ export const rename = mutation({
       throw new Error('Board not found');
     }
 
-    if (board.authorId !== identity.subject) {
+    const membership = await ctx.db
+      .query('memberships')
+      .withIndex('by_user_org', (q) =>
+        q.eq('userId', userId).eq('orgId', board.orgId)
+      )
+      .unique();
+
+    if (!membership) {
+      throw new Error('Not a member of this organization');
+    }
+
+    if (board.authorId !== userId && membership.role !== 'admin') {
       throw new Error('Not authorized');
     }
 
@@ -95,18 +151,18 @@ export const rename = mutation({
       throw new Error('Title cannot be longer than 60 characters');
     }
 
-    await ctx.db.patch(args.id, { title: args.title });
+    await ctx.db.patch(args.id, { title });
   },
 });
 
 export const favorite = mutation({
   args: {
     id: v.id('boards'),
-    orgId: v.string(),
+    orgId: v.id('organizations'),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
       throw new Error('Not authenticated');
     }
 
@@ -116,10 +172,25 @@ export const favorite = mutation({
       throw new Error('Board not found');
     }
 
+    if (board.orgId !== args.orgId) {
+      throw new Error('Not authorized');
+    }
+
+    const membership = await ctx.db
+      .query('memberships')
+      .withIndex('by_user_org', (q) =>
+        q.eq('userId', userId).eq('orgId', board.orgId)
+      )
+      .unique();
+
+    if (!membership) {
+      throw new Error('Not a member of this organization');
+    }
+
     const existingFavorite = await ctx.db
       .query('userFavorites')
       .withIndex('by_user_board', (q) =>
-        q.eq('userId', identity.subject).eq('boardId', board._id)
+        q.eq('userId', userId).eq('boardId', board._id)
       )
       .unique();
 
@@ -129,7 +200,7 @@ export const favorite = mutation({
 
     await ctx.db.insert('userFavorites', {
       orgId: args.orgId,
-      userId: identity.subject,
+      userId,
       boardId: board._id,
     });
 
@@ -142,8 +213,8 @@ export const unfavorite = mutation({
     id: v.id('boards'),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
       throw new Error('Not authenticated');
     }
 
@@ -156,7 +227,7 @@ export const unfavorite = mutation({
     const existingFavorite = await ctx.db
       .query('userFavorites')
       .withIndex('by_user_board', (q) =>
-        q.eq('userId', identity.subject).eq('boardId', board._id)
+        q.eq('userId', userId).eq('boardId', board._id)
       )
       .unique();
 
@@ -173,7 +244,27 @@ export const get = query({
     id: v.id('boards'),
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
+
     const board = await ctx.db.get(args.id);
+
+    if (!board) {
+      return null;
+    }
+
+    const membership = await ctx.db
+      .query('memberships')
+      .withIndex('by_user_org', (q) =>
+        q.eq('userId', userId).eq('orgId', board.orgId)
+      )
+      .unique();
+
+    if (!membership) {
+      throw new Error('Not a member of this organization');
+    }
 
     return board;
   },

@@ -11,13 +11,14 @@ import EmptyFavorites from '@/components/Dashbaord/EmptyFavorites';
 import EmptySearch from '@/components/Dashbaord/EmptySearch';
 
 import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 
 interface BoardListProps {
   query: {
     search?: string;
     favorites?: string;
   };
-  orgId: string;
+  orgId: Id<'organizations'>;
 }
 
 const BoardList: React.FC<BoardListProps> = ({ orgId, query }): JSX.Element => {
@@ -44,11 +45,14 @@ const BoardList: React.FC<BoardListProps> = ({ orgId, query }): JSX.Element => {
   }
 
   return (
-    <div className='flex h-full w-full flex-col gap-4 p-4'>
-      <h2 className='text-2xl font-semibold'>
-        {query.favorites ? 'Favorites Boards' : 'Team Boards'}
+    <div className='flex h-full w-full flex-col gap-6 p-4'>
+      <h2
+        className='candy-display text-[32px] sm:text-[40px]'
+        style={{ color: 'var(--candy-ink)' }}
+      >
+        {query.favorites ? 'Favorite boards' : 'Team boards'}
       </h2>
-      <div className='grid grid-cols-1 gap-4 pb-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'>
+      <div className='grid grid-cols-1 gap-5 pb-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'>
         <NewBoardButton orgId={orgId} />
         {boards.map((board) => (
           <BoardCard key={board._id} board={board} />

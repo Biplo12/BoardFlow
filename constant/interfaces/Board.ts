@@ -3,10 +3,11 @@ import { Id } from '@/convex/_generated/dataModel';
 export default interface Board {
   _id: Id<'boards'>;
   _creationTime: number;
-  orgId: string;
+  orgId: Id<'organizations'>;
   title: string;
-  authorId: string;
+  authorId: Id<'users'>;
   authorName: string;
   imageUrl: string;
+  canManage?: boolean;
   isFavorite: boolean;
 }
