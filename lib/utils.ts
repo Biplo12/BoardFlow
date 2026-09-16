@@ -292,17 +292,23 @@ const ENTITIES: Record<string, string> = {
 export function htmlToPlainText(html: string) {
   /* A contenteditable wraps every line after the first in its own block, so
      the opening tag is the line break, not just the closing one. */
-  return html
+  let text = html
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<(div|p|li|h[1-6])(\s[^>]*)?>/gi, '\n')
-    .replace(/<\/(div|p|li|h[1-6])>/gi, '')
-    .replace(/<[^>]*>/g, '')
     .replace(
       /&(amp|lt|gt|quot|#39|nbsp);/gi,
       (match) => ENTITIES[match.toLowerCase()] ?? match
-    )
-    .replace(/\n{3,}/g, '\n\n')
-    .replace(/\n+$/, '');
+    );
+
+  let previous: string;
+  do {
+    previous = text;
+    text = text
+      .replace(/<\/(div|p|li|h[1-6])>/gi, '')
+      .replace(/<[^>]*>/g, '');
+  } while (text !== previous);
+
+  return text.replace(/\n{3,}/g, '\n\n').replace(/\n+$/, '');
 }
 
 export function plainTextToHtml(text: string) {
