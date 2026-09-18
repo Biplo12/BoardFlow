@@ -103,6 +103,18 @@ describe('board text is never markup', () => {
     expect(htmlToPlainText(plainTextToHtml(text))).toBe(text);
   });
 
+  it('keeps angle brackets a person typed as text', () => {
+    /* The browser stores typed brackets as entities. Decoding them before
+       tags are stripped would turn them into tags and delete the text. */
+    const stored = '&lt;b&gt;bold&lt;/b&gt; and &lt;hello&gt;';
+
+    expect(htmlToPlainText(stored)).toBe('<b>bold</b> and <hello>');
+  });
+
+  it('strips a tag that only appears once the outer one is gone', () => {
+    expect(htmlToPlainText('<<div>div>text')).toBe('text');
+  });
+
   it('turns the browser div wrapping into newlines', () => {
     expect(htmlToPlainText('one<div>two</div><div>three</div>')).toBe(
       'one\ntwo\nthree'
