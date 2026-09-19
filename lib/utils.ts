@@ -294,13 +294,12 @@ export function htmlToPlainText(html: string) {
      the opening tag is the line break, not just the closing one. */
   let text = html
     .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<(div|p|li|h[1-6])(\s[^>]*)?>/gi, '\n')
-    .replace(
-      /&(amp|lt|gt|quot|#39|nbsp);/gi,
-      (match) => ENTITIES[match.toLowerCase()] ?? match
-    );
+    .replace(/<(div|p|li|h[1-6])(\s[^>]*)?>/gi, '\n');
 
+  /* One pass is not enough: `<<div>div>` leaves a tag behind. Repeat until a
+     pass changes nothing. */
   let previous: string;
+
   do {
     previous = text;
     text = text
@@ -308,7 +307,19 @@ export function htmlToPlainText(html: string) {
       .replace(/<[^>]*>/g, '');
   } while (text !== previous);
 
-  return text.replace(/\n{3,}/g, '\n\n').replace(/\n+$/, '');
+  /* Entities are decoded last, deliberately. Decoding first turns the
+     `&lt;b&gt;` somebody typed as visible text into a real tag, which the
+     strip above then deletes along with what they wrote. Doing it here is
+     safe because the result is stored as plain text and escaped again by
+     plainTextToHtml on the way back into the DOM. */
+  return text
+    .replace(
+      /&(amp|lt|gt|quot|#39|nbsp);/gi,
+      (match) => ENTITIES[match.toLowerCase()] ?? match
+    )
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/^\n+/, '')
+    .replace(/\n+$/, '');
 }
 
 export function plainTextToHtml(text: string) {
