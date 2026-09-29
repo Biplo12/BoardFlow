@@ -20,6 +20,15 @@ cursor moving next to yours.
 
 <br />
 
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/how-it-works.png" alt="Three steps to a board" /></td>
+    <td width="50%"><img src="docs/screenshots/features.png" alt="Tools, live cursors and boards" /></td>
+  </tr>
+</table>
+
 ## What you get
 
 - **Twelve tools, one key each.** Hand, select, rectangle, diamond, ellipse,
