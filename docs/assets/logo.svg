@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="128" height="128" role="img" aria-label="BoardFlow">
+  <rect x="3" y="4" width="21" height="21" rx="7" transform="rotate(-6 13.5 14.5)" fill="#ff3d7f" stroke="#16283c" stroke-width="2"/>
+  <path d="M14 10 14 25.1 18.2 21.3 20.7 29.3 24.9 27.6 22 20.1 28.7 19.2Z" fill="#fff" stroke="#16283c" stroke-width="2" stroke-linejoin="round"/>
+</svg>
